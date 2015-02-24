@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package pubsub contains a Google Directions API client.
+// Package directions contains a Google Directions API client.
 //
 // More information about Google Directions API is available on
 // https://developers.google.com/maps/documentation/directions/
