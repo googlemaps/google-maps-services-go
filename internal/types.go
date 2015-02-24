@@ -46,9 +46,9 @@ func (dt *DateTime) Time() time.Time {
 	loc, err := dt.Location()
 	t := time.Unix(0, dt.Value*int64(time.Millisecond))
 	if err == nil && loc != nil {
-    t = t.In(loc)
+		t = t.In(loc)
 	}
-  return t
+	return t
 }
 
 // NewDateTime builds a DateTime from the given time.Time. This will be nil
