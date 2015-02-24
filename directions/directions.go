@@ -22,7 +22,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-  "time"
+	"time"
 
 	"google.golang.org/maps/internal"
 

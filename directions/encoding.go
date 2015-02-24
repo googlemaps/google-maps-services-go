@@ -15,7 +15,7 @@
 package directions
 
 import (
-  "encoding/json"
+	"encoding/json"
 	"google.golang.org/maps/internal"
 )
 
