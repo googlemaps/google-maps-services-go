@@ -15,6 +15,7 @@
 package maps
 
 import (
+  "reflect"
 	"testing"
 )
 
@@ -36,8 +37,12 @@ const (
 		"C~w@hnB{e@yF}`D`_Ayx@~vGqn@l}CafC"
 )
 
+var (
+  bytesRoute = []byte(routeSydMel)
+)
+
 func TestPolylineDecode(t *testing.T) {
-  p := Polyline{Points: routeSydMel}
+  p := Polyline{Points: bytesRoute}
   decoded := p.Decode()
   l := len(decoded)
 
@@ -50,11 +55,11 @@ func TestPolylineDecode(t *testing.T) {
 }
 
 func TestPolylineEncode(t *testing.T) {
-  p := Polyline{Points: routeSydMel}
+  p := Polyline{Points: bytesRoute}
   decoded := p.Decode()
 
   encoded := Encode(decoded)
-  if encoded.Points != p.Points {
-    t.Errorf("expected equal encoding")
+  if !reflect.DeepEqual(encoded.Points, p.Points) {
+    t.Errorf("expected equal encoding, was len %v, expected len %v", len(p.Points), len(encoded.Points))
   }
 }
