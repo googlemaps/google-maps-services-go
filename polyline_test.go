@@ -15,7 +15,7 @@
 package maps
 
 import (
-  "reflect"
+	"reflect"
 	"testing"
 )
 
@@ -38,28 +38,28 @@ const (
 )
 
 var (
-  bytesRoute = []byte(routeSydMel)
+	bytesRoute = []byte(routeSydMel)
 )
 
 func TestPolylineDecode(t *testing.T) {
-  p := Polyline{Points: bytesRoute}
-  decoded := p.Decode()
-  l := len(decoded)
+	p := Polyline{Points: bytesRoute}
+	decoded := p.Decode()
+	l := len(decoded)
 
-  if expected, actual := NewLatLng(-33.86746, 151.207090), decoded[0]; !expected.Equal(&actual) {
-    t.Errorf("first point was %v, expected %v", decoded[0], expected)
-  }
-  if expected, actual := NewLatLng(-37.814130, 144.963180), decoded[l-1]; !expected.Equal(&actual) {
-    t.Errorf("last point was %v, expected %v", decoded[l-1], expected)
-  }
+	if expected, actual := NewLatLng(-33.86746, 151.207090), decoded[0]; !expected.Equal(&actual) {
+		t.Errorf("first point was %v, expected %v", decoded[0], expected)
+	}
+	if expected, actual := NewLatLng(-37.814130, 144.963180), decoded[l-1]; !expected.Equal(&actual) {
+		t.Errorf("last point was %v, expected %v", decoded[l-1], expected)
+	}
 }
 
 func TestPolylineEncode(t *testing.T) {
-  p := Polyline{Points: bytesRoute}
-  decoded := p.Decode()
+	p := Polyline{Points: bytesRoute}
+	decoded := p.Decode()
 
-  encoded := Encode(decoded)
-  if !reflect.DeepEqual(encoded.Points, p.Points) {
-    t.Errorf("expected equal encoding, was len %v, expected len %v", len(p.Points), len(encoded.Points))
-  }
+	encoded := Encode(decoded)
+	if !reflect.DeepEqual(encoded.Points, p.Points) {
+		t.Errorf("expected equal encoding, was len %v, expected len %v", len(p.Points), len(encoded.Points))
+	}
 }

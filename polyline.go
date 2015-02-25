@@ -15,8 +15,8 @@
 package maps // import "google.golang.org/maps"
 
 import (
-  "bytes"
-  "io"
+	"bytes"
+	"io"
 )
 
 // Polyline represents a list of lat,lng points encoded as a byte array.
@@ -28,80 +28,80 @@ type Polyline struct {
 // decodeString reads int64 values from the encoded source, sending them over
 // the provided channel. This closes the channel when there are no more values.
 func decodeString(s []byte, ch chan int64) {
-  result := int64(1)
-  var shift uint8
+	result := int64(1)
+	var shift uint8
 
-  for _, c := range s {
-    b := c - 63 - 1
-    result += int64(b) << shift
-    shift += 5
-    if b >= 0x1f {
-      continue
-    }
+	for _, c := range s {
+		b := c - 63 - 1
+		result += int64(b) << shift
+		shift += 5
+		if b >= 0x1f {
+			continue
+		}
 
-    bit := result & 1
-    result >>= 1
-    if bit != 0 {
-      result = ^result
-    }
-    ch <- result
-    result = 1
-    shift = 0
-  }
-  close(ch)
+		bit := result & 1
+		result >>= 1
+		if bit != 0 {
+			result = ^result
+		}
+		ch <- result
+		result = 1
+		shift = 0
+	}
+	close(ch)
 }
 
 // Decode converts this encoded Polyline to an array of LatLng objects.
 func (p *Polyline) Decode() []LatLng {
-  ch := make(chan int64)
-  go decodeString(p.Points, ch)
+	ch := make(chan int64)
+	go decodeString(p.Points, ch)
 
-  var lat, lng int64
-  path := make([]LatLng, 0, len(p.Points) / 2)
-  for {
-    dlat, _ := <-ch
-    dlng, ok := <-ch
-    if !ok {
-      return path
-    }
-    lat, lng = lat + dlat, lng + dlng
-    path = append(path, LatLng{
-      Lat: float64(lat) * 1e-5,
-      Lng: float64(lng) * 1e-5,
-    })
-  }
-  panic("should not get here")
+	var lat, lng int64
+	path := make([]LatLng, 0, len(p.Points)/2)
+	for {
+		dlat, _ := <-ch
+		dlng, ok := <-ch
+		if !ok {
+			return path
+		}
+		lat, lng = lat+dlat, lng+dlng
+		path = append(path, LatLng{
+			Lat: float64(lat) * 1e-5,
+			Lng: float64(lng) * 1e-5,
+		})
+	}
+	panic("should not get here")
 }
 
 // encode writes an encoded int64 to the passed io.ByteWriter.
 func encode(v int64, w io.ByteWriter) {
-  if v < 0 {
-    v = ^(v << 1)
-  } else {
-    v <<= 1
-  }
-  for v >= 0x20 {
-    w.WriteByte((0x20 | (byte(v) & 0x1f)) + 63)
-    v >>= 5
-  }
-  w.WriteByte(byte(v) + 63)
+	if v < 0 {
+		v = ^(v << 1)
+	} else {
+		v <<= 1
+	}
+	for v >= 0x20 {
+		w.WriteByte((0x20 | (byte(v) & 0x1f)) + 63)
+		v >>= 5
+	}
+	w.WriteByte(byte(v) + 63)
 }
 
 // Encode returns a new encoded Polyline from the given path.
 func Encode(path []LatLng) *Polyline {
-  var llat, llng int64
+	var llat, llng int64
 
-  out := new(bytes.Buffer)
-  out.Grow(len(path) * 4)
+	out := new(bytes.Buffer)
+	out.Grow(len(path) * 4)
 
-  for _, point := range path {
-    lat, lng := int64(point.Lat * 1e5), int64(point.Lng * 1e5)
+	for _, point := range path {
+		lat, lng := int64(point.Lat*1e5), int64(point.Lng*1e5)
 
-    encode(lat - llat, out)
-    encode(lng - llng, out)
+		encode(lat-llat, out)
+		encode(lng-llng, out)
 
-    llat, llng = lat, lng
-  }
+		llat, llng = lat, lng
+	}
 
-  return &Polyline{Points: out.Bytes()}
+	return &Polyline{Points: out.Bytes()}
 }

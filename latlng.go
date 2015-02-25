@@ -15,11 +15,11 @@
 package maps // import "google.golang.org/maps"
 
 import (
-  "math"
+	"math"
 )
 
 const (
-  Epsilon = 0.0001
+	Epsilon = 0.0001
 )
 
 // LatLng represents a location on the Earth.
@@ -30,13 +30,13 @@ type LatLng struct {
 
 // NewLatLng builds a LatLng from the passed latitude and longitude values.
 func NewLatLng(lat, lng float64) *LatLng {
-  return &LatLng{lat, lng}
+	return &LatLng{lat, lng}
 }
 
 // AlmostEqual returns whether this LatLng is almost equal (below Epsilon) to
 // the other LatLng.
 func (l *LatLng) AlmostEqual(other *LatLng) bool {
-  return math.Abs(l.Lat - other.Lat) < Epsilon && math.Abs(l.Lng - other.Lng) < Epsilon
+	return math.Abs(l.Lat-other.Lat) < Epsilon && math.Abs(l.Lng-other.Lng) < Epsilon
 }
 
 // Bounds represents a bounded square area on the Earth.
