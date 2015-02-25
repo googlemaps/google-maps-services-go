@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package pubsub contains a Google Directions API client.
+// Package directions contains a Google Directions API client.
 //
 // More information about Google Directions API is available on
 // https://developers.google.com/maps/documentation/directions/
@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"google.golang.org/maps"
 	"google.golang.org/maps/internal"
@@ -79,15 +80,15 @@ type Leg struct {
 	Distance `json:"distance"`
 
 	// Duration indicates total time required for this leg.
-	Duration `json:"duration"`
+	time.Duration `json:"duration"`
 
 	// ArrivalTime contains the estimated time of arrival for this leg. This property is only
 	// returned for transit directions.
-	ArrivalTime *DateTime `json:"arrival_time"`
+	ArrivalTime time.Time `json:"arrival_time"`
 
 	// DepartureTime contains the estimated time of departure for this leg. This property is
 	// only returned for transit directions.
-	DepartureTime *DateTime `json:"departure_time"`
+	DepartureTime time.Time `json:"departure_time"`
 
 	// StartLocation contains the latitude/longitude coordinates of the origin of this leg.
 	StartLocation maps.LatLng `json:"start_location"`
@@ -113,7 +114,7 @@ type Step struct {
 	Distance `json:"distance"`
 
 	// Duration contains the typical time required to perform the step, until the next step.
-	Duration `json:"duration"`
+	time.Duration `json:"duration"`
 
 	// StartLocation contains the location of the starting point of this step, as a single set of lat
 	// and lng fields.
@@ -151,29 +152,6 @@ type Distance struct {
 
 	// Text contains a human-readable representation of the distance.
 	Text string `json:"text"`
-}
-
-// Duration represents a period of time.
-type Duration struct {
-	// Value indicates the duration in seconds
-	Value int64 `json:"value"`
-
-	// Text contains a human-readable representation of the duration.
-	Text string `json:"text"`
-}
-
-// DateTime represents a point in time.
-type DateTime struct {
-	// Text the time specified as a string. The time is displayed in the time zone of the
-	// transit stop.
-	Text string `json:"text"`
-
-	// TimeZone contains the time zone of this station. The value is the name of the time
-	// zone as defined in the IANA Time Zone Database, e.g. "America/New_York".
-	TimeZone string `json:"time_zone"`
-
-	// Value is the number of milliseconds since midnight 01 January, 1970 UTC.
-	Value int64 `json:"value"`
 }
 
 // Get retrieves directions between the specified origin and destination.
