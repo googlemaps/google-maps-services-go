@@ -58,9 +58,9 @@ func main() {
 		log.Fatalf("Could not request directions: %v", err)
 	}
 
-  if len(resp.Routes) == 0 {
-    log.Fatalf("No results")
-  }
+	if len(resp.Routes) == 0 {
+		log.Fatalf("No results")
+	}
 	route := resp.Routes[0]
 
 	fmt.Println("Summary:", route.Summary)
