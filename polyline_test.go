@@ -46,10 +46,10 @@ func TestPolylineDecode(t *testing.T) {
 	decoded := p.Decode()
 	l := len(decoded)
 
-	if expected, actual := NewLatLng(-33.86746, 151.207090), decoded[0]; !expected.Equal(&actual) {
+	if expected, actual := (&LatLng{-33.86746, 151.207090}), decoded[0]; !expected.AlmostEqual(&actual) {
 		t.Errorf("first point was %v, expected %v", decoded[0], expected)
 	}
-	if expected, actual := NewLatLng(-37.814130, 144.963180), decoded[l-1]; !expected.Equal(&actual) {
+	if expected, actual := (&LatLng{-37.814130, 144.963180}), decoded[l-1]; !expected.AlmostEqual(&actual) {
 		t.Errorf("last point was %v, expected %v", decoded[l-1], expected)
 	}
 }

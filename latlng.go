@@ -28,11 +28,6 @@ type LatLng struct {
 	Lng float64 `json:"lng"` // longitude
 }
 
-// NewLatLng builds a LatLng from the passed latitude and longitude values.
-func NewLatLng(lat, lng float64) *LatLng {
-	return &LatLng{lat, lng}
-}
-
 // AlmostEqual returns whether this LatLng is almost equal (below Epsilon) to
 // the other LatLng.
 func (l *LatLng) AlmostEqual(other *LatLng) bool {
