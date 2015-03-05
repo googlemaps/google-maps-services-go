@@ -60,12 +60,12 @@ func main() {
 		directionsOptions = append(directionsOptions, option)
 	}
 	ctx := maps.NewContext(*apiKey, client)
-	opts, err := directions.Get(*origin, *destination, directionsOptions...)
+	req, err := directions.Get(*origin, *destination, directionsOptions...)
 	if err != nil {
 		log.Fatalf("Could not configure Get request: %v", err)
 	}
-	fmt.Printf("directions.Get opts: %v\n", opts)
-	resp, err := opts.Execute(ctx)
+	fmt.Printf("directions.Get req: %v\n", req)
+	resp, err := req.Execute(ctx)
 	if err != nil {
 		log.Fatalf("Could not request directions: %v", err)
 	}
