@@ -187,13 +187,13 @@ type DirectionsRequest struct {
 	origin        string
 	destination   string
 	mode          string
-	departureTime time.Time
-	arrivalTime   time.Time
+	departureTime string
+	arrivalTime   string
 }
 
-func (req *DirectionsRequest) String() string {
-	return fmt.Sprintf("origin: '%s' destination: '%s' mode: '%s' departure_time %v arrival_time %v",
-		req.origin, req.destination, req.mode, req.departureTime, req.arrivalTime)
+func (dirReq *DirectionsRequest) String() string {
+	return fmt.Sprintf("origin: '%s' destination: '%s' mode: '%s' departure_time: '%v' arrival_time: '%v'",
+		dirReq.origin, dirReq.destination, dirReq.mode, dirReq.departureTime, dirReq.arrivalTime)
 }
 
 // Get configures a Directions API request, ready to have Execute() called on it.
@@ -240,6 +240,22 @@ func SetMode(mode string) func(*DirectionsRequest) error {
 	}
 }
 
+// SetDepartureTime sets the departure time for transit mode directions.Get requests
+func SetDepartureTime(departureTime string) func(*DirectionsRequest) error {
+	return func(dirReq *DirectionsRequest) error {
+		dirReq.departureTime = departureTime
+		return nil
+	}
+}
+
+// SetArrivalTime sets the arrival time for transit mode directions.Get requests
+func SetArrivalTime(arrivalTime string) func(*DirectionsRequest) error {
+	return func(dirReq *DirectionsRequest) error {
+		dirReq.arrivalTime = arrivalTime
+		return nil
+	}
+}
+
 // Execute will issue the Directions request and retrieve the Response
 func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) {
 	var response Response
@@ -248,7 +264,11 @@ func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) 
 		return response, errors.New("directions: req must not be nil")
 	}
 
-	if strings.EqualFold("transit", dirReq.mode) && dirReq.departureTime.IsZero() && dirReq.arrivalTime.IsZero() {
+	if dirReq.departureTime != "" && dirReq.arrivalTime != "" {
+		return response, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
+	}
+
+	if strings.EqualFold("transit", dirReq.mode) && dirReq.departureTime == "" && dirReq.arrivalTime == "" {
 		return response, errors.New("directions: must specify DepatureTime or ArrivalTime with mode DirectionsModeTransit")
 	}
 

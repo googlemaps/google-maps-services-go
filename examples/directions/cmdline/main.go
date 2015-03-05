@@ -28,10 +28,12 @@ import (
 )
 
 var (
-	apiKey      = flag.String("key", "", "API Key for using Google Maps API.")
-	origin      = flag.String("origin", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
-	destination = flag.String("destination", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
-	mode        = flag.String("mode", "", "The travel mode for this directions request.")
+	apiKey        = flag.String("key", "", "API Key for using Google Maps API.")
+	origin        = flag.String("origin", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
+	destination   = flag.String("destination", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
+	mode          = flag.String("mode", "", "The travel mode for this directions request.")
+	departureTime = flag.String("departure_time", "", "The depature time for transit mode directions request.")
+	arrivalTime   = flag.String("arrival_time", "", "The arrival time for transit mode directions request.")
 )
 
 func usageAndExit(msg string) {
@@ -59,13 +61,21 @@ func main() {
 		option := directions.SetMode(*mode)
 		directionsOptions = append(directionsOptions, option)
 	}
+	if *departureTime != "" {
+		option := directions.SetDepartureTime(*departureTime)
+		directionsOptions = append(directionsOptions, option)
+	}
+	if *arrivalTime != "" {
+		option := directions.SetArrivalTime(*arrivalTime)
+		directionsOptions = append(directionsOptions, option)
+	}
 	ctx := maps.NewContext(*apiKey, client)
-	opts, err := directions.Get(*origin, *destination, directionsOptions...)
+	req, err := directions.Get(*origin, *destination, directionsOptions...)
 	if err != nil {
 		log.Fatalf("Could not configure Get request: %v", err)
 	}
-	fmt.Printf("directions.Get opts: %v\n", opts)
-	resp, err := opts.Execute(ctx)
+	fmt.Printf("directions.Get req: %v\n", req)
+	resp, err := req.Execute(ctx)
 	if err != nil {
 		log.Fatalf("Could not request directions: %v", err)
 	}
