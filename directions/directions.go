@@ -20,8 +20,11 @@ package directions // import "google.golang.org/maps/directions"
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"google.golang.org/maps/internal"
@@ -165,6 +168,7 @@ type Step struct {
 	TravelMode string `json:"travel_mode"`
 }
 
+// TransitDetails represents the TODO(brettmorgan): fill this in
 type TransitDetails struct {
 	// TODO(brettmorgan): fill this in
 }
@@ -178,17 +182,87 @@ type Distance struct {
 	Text string `json:"text"`
 }
 
-// Get retrieves directions between the specified origin and destination.
-func Get(ctx context.Context, origin, destination string) (Response, error) {
+// DirectionsRequest is the functional options struct for directions.Get
+type DirectionsRequest struct {
+	origin        string
+	destination   string
+	mode          string
+	departureTime time.Time
+	arrivalTime   time.Time
+}
+
+func (req *DirectionsRequest) String() string {
+	return fmt.Sprintf("origin: '%s' destination: '%s' mode: '%s' departure_time %v arrival_time %v",
+		req.origin, req.destination, req.mode, req.departureTime, req.arrivalTime)
+}
+
+// Get configures a Directions API request, ready to have Execute() called on it.
+func Get(origin, destination string, options ...func(*DirectionsRequest) error) (*DirectionsRequest, error) {
+	dirReq := &DirectionsRequest{
+		origin:      origin,
+		destination: destination,
+	}
+
+	for _, opt := range options {
+		err := opt(dirReq)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return dirReq, nil
+}
+
+const (
+	// DirectionsModeDriving is for specifying driving as travel mode
+	DirectionsModeDriving = "driving"
+	// DirectionsModeWalking is for specifying walking as travel mode
+	DirectionsModeWalking = "walking"
+	// DirectionsModeBicycling is for specifying bicycling as travel mode
+	DirectionsModeBicycling = "bicycling"
+	// DirectionsModeTransit is for specifying transit as travel mode
+	DirectionsModeTransit = "transit"
+)
+
+// SetMode sets the travel mode for this directions.Get request
+func SetMode(mode string) func(*DirectionsRequest) error {
+	if strings.EqualFold("driving", mode) ||
+		strings.EqualFold("walking", mode) ||
+		strings.EqualFold("bicycling", mode) ||
+		strings.EqualFold("transit", mode) {
+		return func(dirReq *DirectionsRequest) error {
+			dirReq.mode = mode
+			return nil
+		}
+	}
+	return func(dirReq *DirectionsRequest) error {
+		return fmt.Errorf("directions: Unknown travel mode %s", mode)
+	}
+}
+
+// Execute will issue the Directions request and retrieve the Response
+func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) {
 	var response Response
+
+	if dirReq == nil {
+		return response, errors.New("directions: req must not be nil")
+	}
+
+	if strings.EqualFold("transit", dirReq.mode) && dirReq.departureTime.IsZero() && dirReq.arrivalTime.IsZero() {
+		return response, errors.New("directions: must specify DepatureTime or ArrivalTime with mode DirectionsModeTransit")
+	}
+
 	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/directions/json", nil)
 	if err != nil {
 		return response, err
 	}
 	q := req.URL.Query()
-	q.Set("origin", origin)
-	q.Set("destination", destination)
+	q.Set("origin", dirReq.origin)
+	q.Set("destination", dirReq.destination)
 	q.Set("key", internal.APIKey(ctx))
+	if dirReq.mode != "" {
+		q.Set("mode", dirReq.mode)
+	}
 	req.URL.RawQuery = q.Encode()
 
 	log.Println("Request:", req)
