@@ -37,12 +37,8 @@ const (
 		"C~w@hnB{e@yF}`D`_Ayx@~vGqn@l}CafC"
 )
 
-var (
-	bytesRoute = []byte(routeSydMel)
-)
-
 func TestPolylineDecode(t *testing.T) {
-	p := Polyline{Points: bytesRoute}
+	p := Polyline{Points: routeSydMel}
 	decoded := p.Decode()
 	l := len(decoded)
 
@@ -55,7 +51,7 @@ func TestPolylineDecode(t *testing.T) {
 }
 
 func TestPolylineEncode(t *testing.T) {
-	p := Polyline{Points: bytesRoute}
+	p := Polyline{Points: routeSydMel}
 	decoded := p.Decode()
 
 	encoded := Encode(decoded)

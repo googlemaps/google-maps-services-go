@@ -22,12 +22,12 @@ import (
 // Polyline represents a list of lat,lng points encoded as a byte array.
 // See: https://developers.google.com/maps/documentation/utilities/polylinealgorithm
 type Polyline struct {
-	Points []byte `json:"points"`
+	Points string `json:"points"`
 }
 
 // Decode converts this encoded Polyline to an array of LatLng objects.
 func (p *Polyline) Decode() []LatLng {
-	input := bytes.NewBuffer(p.Points)
+	input := bytes.NewBufferString(p.Points)
 
 	var lat, lng int64
 	path := make([]LatLng, 0, len(p.Points)/2)
@@ -45,7 +45,6 @@ func (p *Polyline) Decode() []LatLng {
 			Lng: float64(lng) * 1e-5,
 		})
 	}
-	panic("should not get here")
 }
 
 // Encode returns a new encoded Polyline from the given path.
@@ -64,7 +63,7 @@ func Encode(path []LatLng) *Polyline {
 		llat, llng = lat, lng
 	}
 
-	return &Polyline{Points: out.Bytes()}
+	return &Polyline{Points: out.String()}
 }
 
 // decodeInt reads an encoded int64 from the passed io.ByteReader.
@@ -91,7 +90,6 @@ func decodeInt(r io.ByteReader) (int64, error) {
 			return result, nil
 		}
 	}
-	panic("should not get here")
 }
 
 // encodeInt writes an encoded int64 to the passed io.ByteWriter.
