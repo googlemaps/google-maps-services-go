@@ -31,6 +31,7 @@ var (
 	apiKey      = flag.String("key", "", "API Key for using Google Maps API.")
 	origin      = flag.String("origin", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
 	destination = flag.String("destination", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
+	mode        = flag.String("mode", "", "The travel mode for this directions request.")
 )
 
 func usageAndExit(msg string) {
@@ -43,6 +44,8 @@ func usageAndExit(msg string) {
 func main() {
 	flag.Parse()
 	client := &http.Client{}
+	var directionsOptions []directions.GetOptions
+
 	if *apiKey == "" {
 		usageAndExit("Please specify an API Key.")
 	}
@@ -52,8 +55,17 @@ func main() {
 	if *destination == "" {
 		usageAndExit("Please specify a destination.")
 	}
+	if *mode != "" {
+		option := directions.SetMode(*mode)
+		directionsOptions = append(directionsOptions, option)
+	}
 	ctx := maps.NewContext(*apiKey, client)
-	resp, err := directions.Get(ctx, *origin, *destination)
+	opts, err := directions.Get(ctx, *origin, *destination, directionsOptions...)
+	if err != nil {
+		log.Fatalf("Could not configure Get request: %v", err)
+	}
+	fmt.Printf("directions.Get opts: %v\n", opts)
+	resp, err := opts.Execute()
 	if err != nil {
 		log.Fatalf("Could not request directions: %v", err)
 	}

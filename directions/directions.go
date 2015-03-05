@@ -20,8 +20,11 @@ package directions // import "google.golang.org/maps/directions"
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"google.golang.org/maps/internal"
@@ -165,6 +168,7 @@ type Step struct {
 	TravelMode string `json:"travel_mode"`
 }
 
+// TransitDetails represents the TODO(brettmorgan): fill this in
 type TransitDetails struct {
 	// TODO(brettmorgan): fill this in
 }
@@ -178,22 +182,85 @@ type Distance struct {
 	Text string `json:"text"`
 }
 
-// Get retrieves directions between the specified origin and destination.
-func Get(ctx context.Context, origin, destination string) (Response, error) {
+// Options is the functional options struct for directions.Get
+type Options struct {
+	ctx           context.Context
+	origin        string
+	destination   string
+	mode          string
+	departureTime time.Time
+	arrivalTime   time.Time
+}
+
+func (opts *Options) String() string {
+	return fmt.Sprintf("origin: '%s' destination: '%s' mode: '%s' departure_time %v arrival_time %v",
+		opts.origin, opts.destination, opts.mode, opts.departureTime, opts.arrivalTime)
+}
+
+// GetOptions is the functional options argument type
+type GetOptions func(*Options) error
+
+// Get configures a Directions API request, ready to have Execute() called on it.
+func Get(ctx context.Context, origin, destination string, options ...GetOptions) (*Options, error) {
+	opts := &Options{}
+	opts.ctx = ctx
+	opts.origin = origin
+	opts.destination = destination
+
+	for _, opt := range options {
+		err := opt(opts)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return opts, nil
+}
+
+// SetMode sets the travel mode for this directions.Get request
+func SetMode(mode string) GetOptions {
+	if strings.EqualFold("driving", mode) ||
+		strings.EqualFold("walking", mode) ||
+		strings.EqualFold("bicycling", mode) ||
+		strings.EqualFold("transit", mode) {
+		return func(opts *Options) error {
+			opts.mode = mode
+			return nil
+		}
+	}
+	return func(opts *Options) error {
+		return fmt.Errorf("directions: Unknown travel mode %s", mode)
+	}
+}
+
+// Execute will issue the Directions request and retrieve the Response
+func (opts *Options) Execute() (Response, error) {
 	var response Response
+
+	if opts == nil {
+		return response, errors.New("directions: the options is nil, you probably missed a previous error")
+	}
+
+	if strings.EqualFold("transit", opts.mode) && opts.departureTime.IsZero() && opts.arrivalTime.IsZero() {
+		return response, errors.New("directions: when mode is transit, we require either a departure_time or an arrival_time")
+	}
+
 	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/directions/json", nil)
 	if err != nil {
 		return response, err
 	}
 	q := req.URL.Query()
-	q.Set("origin", origin)
-	q.Set("destination", destination)
-	q.Set("key", internal.APIKey(ctx))
+	q.Set("origin", opts.origin)
+	q.Set("destination", opts.destination)
+	q.Set("key", internal.APIKey(opts.ctx))
+	if opts.mode != "" {
+		q.Set("mode", opts.mode)
+	}
 	req.URL.RawQuery = q.Encode()
 
 	log.Println("Request:", req)
 
-	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
+	err = httpDo(opts.ctx, req, func(resp *http.Response, err error) error {
 		if err != nil {
 			return err
 		}
