@@ -22,6 +22,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"google.golang.org/maps"
 	"google.golang.org/maps/directions"
@@ -34,6 +35,7 @@ var (
 	mode          = flag.String("mode", "", "The travel mode for this directions request.")
 	departureTime = flag.String("departure_time", "", "The depature time for transit mode directions request.")
 	arrivalTime   = flag.String("arrival_time", "", "The arrival time for transit mode directions request.")
+	waypoints     = flag.String("waypoints", "", "The waypoints for driving directions request, | separated.")
 )
 
 func usageAndExit(msg string) {
@@ -69,6 +71,12 @@ func main() {
 		option := directions.SetArrivalTime(*arrivalTime)
 		directionsOptions = append(directionsOptions, option)
 	}
+	if *waypoints != "" {
+		ws := strings.Split(*waypoints, "|")
+		option := directions.SetWaypoints(ws)
+		directionsOptions = append(directionsOptions, option)
+	}
+
 	ctx := maps.NewContext(*apiKey, client)
 	req, err := directions.Get(*origin, *destination, directionsOptions...)
 	if err != nil {

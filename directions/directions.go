@@ -189,6 +189,7 @@ type DirectionsRequest struct {
 	mode          string
 	departureTime string
 	arrivalTime   string
+	waypoints     []string
 }
 
 func (dirReq *DirectionsRequest) String() string {
@@ -256,6 +257,14 @@ func SetArrivalTime(arrivalTime string) func(*DirectionsRequest) error {
 	}
 }
 
+// SetWaypoints sets the waypoints for driving directions.Get requests
+func SetWaypoints(waypoints []string) func(*DirectionsRequest) error {
+	return func(dirReq *DirectionsRequest) error {
+		dirReq.waypoints = waypoints
+		return nil
+	}
+}
+
 // Execute will issue the Directions request and retrieve the Response
 func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) {
 	var response Response
@@ -282,6 +291,9 @@ func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) 
 	q.Set("key", internal.APIKey(ctx))
 	if dirReq.mode != "" {
 		q.Set("mode", dirReq.mode)
+	}
+	if len(dirReq.waypoints) != 0 {
+		q.Set("waypoints", strings.Join(dirReq.waypoints, "|"))
 	}
 	req.URL.RawQuery = q.Encode()
 
