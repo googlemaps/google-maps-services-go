@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -168,9 +169,72 @@ type Step struct {
 	TravelMode string `json:"travel_mode"`
 }
 
-// TransitDetails represents the TODO(brettmorgan): fill this in
+// TransitDetails contains additional information about the transit stop, transit line and transit agency.
 type TransitDetails struct {
-	// TODO(brettmorgan): fill this in
+	// ArrivalStop contains information about the stop/station for this part of the trip.
+	ArrivalStop TransitStop `json:"arrival_stop"`
+	// DepartureStop contains information about the stop/station for this part of the trip.
+	DepartureStop TransitStop `json:"departure_stop"`
+	// ArrivalTime contains the arrival time for this leg of the journey
+	ArrivalTime time.Time `json:"arrival_time"`
+	// DepartureTime contains the departure time for this leg of the journey
+	DepartureTime time.Time `json:"departure_time"`
+	// Headsign specifies the direction in which to travel on this line, as it is marked on the vehicle or at the departure stop.
+	Headsign string `json:"headsign"`
+	// Headway specifies the expected number of seconds between departures from the same stop at this time
+	Headway time.Duration `json:"headway"`
+	// NumStops contains the number of stops in this step, counting the arrival stop, but not the departure stop
+	NumStops uint `json:"num_stops"`
+	// Line contains information about the transit line used in this step
+	Line TransitLine `json:"line"`
+}
+
+// TransitStop contains information about the stop/station for this part of the trip.
+type TransitStop struct {
+	// Location of the transit station/stop.
+	Location LatLng `json:"location"`
+	// Name of the transit station/stop. eg. "Union Square".
+	Name string `json:"name"`
+}
+
+// TransitLine contains information about the transit line used in this step
+type TransitLine struct {
+	// Name contains the full name of this transit line. eg. "7 Avenue Express".
+	Name string `json:"name"`
+	// ShortName contains the short name of this transit line.
+	ShortName string `json:"short_name"`
+	// color contains the color commonly used in signage for this transit line.
+	Color string `json:"color"`
+	// agencies contains information about the operator of the line
+	Agencies TransitLineAgency `json:"agencies"`
+	// url contains the URL for this transit line as provided by the transit agency
+	URL url.URL `json:"url"`
+	// icon contains the URL for the icon associated with this line
+	Icon url.URL `json:"icon"`
+	// text_color contains the color of text commonly used for signage of this line
+	TextColor string `json:"text_color"`
+	// vehicle contains the type of vehicle used on this line
+	Vehicle TransitLineVehicle `json:"vehicle"`
+}
+
+// TransitLineAgency contains information about the operator of the line
+type TransitLineAgency struct {
+	// Name contains the name of the transit agency
+	Name string `json:"name"`
+	// URL contains the URL for the transit agency
+	URL url.URL `json:"url"`
+	// Phone contains the phone number of the transit agency
+	Phone string `json:"phone"`
+}
+
+// TransitLineVehicle contains the type of vehicle used on this line
+type TransitLineVehicle struct {
+	// Name contains the name of the vehicle on this line
+	Name string `json:"name"`
+	// Type contains the type of vehicle that runs on this line
+	Type string `json:"type"`
+	// Icon contains the URL for an icon associated with this vehicle type
+	Icon url.URL `json:"icon"`
 }
 
 // Distance represents a distance covered in a step or leg.
@@ -400,10 +464,6 @@ func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) 
 
 	if dirReq.departureTime != "" && dirReq.arrivalTime != "" {
 		return response, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
-	}
-
-	if strings.EqualFold("transit", dirReq.mode) && dirReq.departureTime == "" && dirReq.arrivalTime == "" {
-		return response, errors.New("directions: must specify DepatureTime or ArrivalTime with mode DirectionsModeTransit")
 	}
 
 	if len(dirReq.transitMode) != 0 && !strings.EqualFold("transit", dirReq.mode) {

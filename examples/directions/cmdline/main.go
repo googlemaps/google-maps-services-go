@@ -24,6 +24,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/kr/pretty"
 	"google.golang.org/maps"
 	"google.golang.org/maps/directions"
 )
@@ -123,28 +124,6 @@ func main() {
 	if len(resp.Routes) == 0 {
 		log.Fatalf("No results")
 	}
-	route := resp.Routes[0]
 
-	fmt.Println("Summary:", route.Summary)
-	fmt.Printf("Bounds NorthEast lat/lng: %f,%f\n", route.Bounds.NorthEast.Lat, route.Bounds.NorthEast.Lng)
-	fmt.Printf("Bounds SouthWest lat/lng: %f,%f\n", route.Bounds.SouthWest.Lat, route.Bounds.SouthWest.Lng)
-	fmt.Println("Copyrights:", route.Copyrights)
-
-	for idx, leg := range route.Legs {
-		fmt.Println("Leg", idx, "distance:", leg.Distance)
-		fmt.Println("Leg", idx, "duration:", leg.Duration)
-		fmt.Println("Leg", idx, "start address:", leg.StartAddress)
-		fmt.Println("Leg", idx, "start location:", leg.StartLocation)
-		fmt.Println("Leg", idx, "end address:", leg.EndAddress)
-		fmt.Println("Leg", idx, "end location:", leg.EndLocation)
-
-		for idx, step := range leg.Steps {
-			fmt.Println("Step", idx, "distance:", step.Distance)
-			fmt.Println("Step", idx, "duration:", step.Duration)
-			fmt.Println("Step", idx, "start location:", step.StartLocation)
-			fmt.Println("Step", idx, "end location:", step.EndLocation)
-			fmt.Println("Step", idx, "travel mode:", step.TravelMode)
-		}
-	}
-
+	pretty.Println(resp)
 }

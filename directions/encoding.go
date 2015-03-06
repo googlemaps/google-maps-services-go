@@ -16,6 +16,7 @@ package directions
 
 import (
 	"encoding/json"
+
 	"google.golang.org/maps/internal"
 )
 
@@ -93,6 +94,46 @@ func (step *Step) MarshalJSON() ([]byte, error) {
 	x.safeStep = safeStep(*step)
 
 	x.EncDuration = internal.NewDuration(step.Duration)
+
+	return json.Marshal(x)
+}
+
+// safeTransitDetails is a raw version of TransitDetails that does not have
+// custom encoding or decoding methods applied.
+type safeTransitDetails TransitDetails
+
+// encodedTransitDetails is the actual encoded version of TransitDetails as per
+// the Maps APIs
+type encodedTransitDetails struct {
+	safeTransitDetails
+	EncArrivalTime   *internal.DateTime `json:"arrival_time"`
+	EncDepartureTime *internal.DateTime `json:"depareture_time"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler for TransitDetails. This decodes
+// the API representation into types useful for Go developers.
+func (transitDetails *TransitDetails) UnmarshalJSON(data []byte) error {
+	x := encodedTransitDetails{}
+	err := json.Unmarshal(data, &x)
+	if err != nil {
+		return err
+	}
+	*transitDetails = TransitDetails(x.safeTransitDetails)
+
+	transitDetails.ArrivalTime = x.EncArrivalTime.Time()
+	transitDetails.DepartureTime = x.EncDepartureTime.Time()
+
+	return nil
+}
+
+// MarshalJSON implements json.Marshaler for Step. This encodes Go types back to
+// the API representation.
+func (transitDetails *TransitDetails) MarshalJSON() ([]byte, error) {
+	x := encodedTransitDetails{}
+	x.safeTransitDetails = safeTransitDetails(*transitDetails)
+
+	x.EncArrivalTime = internal.NewDateTime(transitDetails.ArrivalTime)
+	x.EncDepartureTime = internal.NewDateTime(transitDetails.DepartureTime)
 
 	return json.Marshal(x)
 }
