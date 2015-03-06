@@ -38,6 +38,10 @@ var (
 	waypoints     = flag.String("waypoints", "", "The waypoints for driving directions request, | separated.")
 	alternatives  = flag.Bool("alternatives", false, "Whether the Directions service may provide more than one route alternative in the response.")
 	avoid         = flag.String("avoid", "", "Indicates that the calculated route(s) should avoid the indicated features, | separated.")
+	language      = flag.String("language", "", "Specifies the language in which to return results.")
+	units         = flag.String("units", "", "Specifies the unit system to use when returning results.")
+	region        = flag.String("region", "", "Specifies the region code, specified as a ccTLD (\"top-level domain\") two-character value.")
+	transitMode   = flag.String("transit_mode", "", "Specifies one or more preferred modes of transit, | separated. This parameter may only be specified for transit directions.")
 )
 
 func usageAndExit(msg string) {
@@ -85,6 +89,23 @@ func main() {
 	if *avoid != "" {
 		rs := strings.Split(*avoid, "|")
 		option := directions.SetAvoid(rs)
+		directionsOptions = append(directionsOptions, option)
+	}
+	if *language != "" {
+		option := directions.SetLanguage(*language)
+		directionsOptions = append(directionsOptions, option)
+	}
+	if *units != "" {
+		option := directions.SetUnits(*units)
+		directionsOptions = append(directionsOptions, option)
+	}
+	if *region != "" {
+		option := directions.SetRegion(*region)
+		directionsOptions = append(directionsOptions, option)
+	}
+	if *transitMode != "" {
+		tms := strings.Split(*transitMode, "|")
+		option := directions.SetTransitMode(tms)
 		directionsOptions = append(directionsOptions, option)
 	}
 

@@ -184,19 +184,25 @@ type Distance struct {
 
 // DirectionsRequest is the functional options struct for directions.Get
 type DirectionsRequest struct {
-	origin        string
-	destination   string
-	mode          string
-	departureTime string
-	arrivalTime   string
-	waypoints     []string
-	alternatives  bool
-	avoid         []string
+	origin                   string
+	destination              string
+	mode                     string
+	departureTime            string
+	arrivalTime              string
+	waypoints                []string
+	alternatives             bool
+	avoid                    []string
+	language                 string
+	units                    string
+	region                   string
+	transitMode              []string
+	transitRoutingPreference string
 }
 
 func (dirReq *DirectionsRequest) String() string {
-	return fmt.Sprintf("origin: '%s' destination: '%s' mode: '%s' departure_time: '%v' arrival_time: '%v' waypoints: '%s' alternatives: %v",
-		dirReq.origin, dirReq.destination, dirReq.mode, dirReq.departureTime, dirReq.arrivalTime, strings.Join(dirReq.waypoints, "|"), dirReq.alternatives)
+	return fmt.Sprintf("origin: '%s' destination: '%s' mode: '%s' departure_time: '%v' arrival_time: '%v' waypoints: '%s' alternatives: %v avoid: '%s' language: '%s' units: '%s' region: '%s' transit_mode: '%s'",
+		dirReq.origin, dirReq.destination, dirReq.mode, dirReq.departureTime, dirReq.arrivalTime, strings.Join(dirReq.waypoints, "|"),
+		dirReq.alternatives, strings.Join(dirReq.avoid, "|"), dirReq.language, dirReq.units, dirReq.region, strings.Join(dirReq.transitMode, "|"))
 }
 
 // Get configures a Directions API request, ready to have Execute() called on it.
@@ -299,6 +305,91 @@ func SetAvoid(restrictions []string) func(*DirectionsRequest) error {
 	}
 }
 
+// SetLanguage specifies the language in which to return results
+func SetLanguage(language string) func(*DirectionsRequest) error {
+	return func(dirReq *DirectionsRequest) error {
+		dirReq.language = language
+		return nil
+	}
+}
+
+const (
+	// DirectionsUnitMetric specifies usage of the metric units system
+	DirectionsUnitMetric = "metric"
+	// DirectionsUnitImperial specifies usage of the Imperial (English) units system
+	DirectionsUnitImperial = "imperial"
+)
+
+// SetUnits sets the units system used for measurements in returned directions
+func SetUnits(units string) func(*DirectionsRequest) error {
+	if units != DirectionsUnitMetric && units != DirectionsUnitImperial {
+		return func(*DirectionsRequest) error {
+			return fmt.Errorf("directions: Unknown units '%s'", units)
+		}
+	}
+	return func(dirReq *DirectionsRequest) error {
+		dirReq.units = units
+		return nil
+	}
+}
+
+// SetRegion specifies the region code, specified as a ccTLD two-character value
+func SetRegion(region string) func(*DirectionsRequest) error {
+	return func(dirReq *DirectionsRequest) error {
+		dirReq.region = region
+		return nil
+	}
+}
+
+const (
+	// DirectionsTransitModeBus is for specifying a transit mode of bus
+	DirectionsTransitModeBus = "bus"
+	// DirectionsTransitModeSubway is for specifying a transit mode of subway
+	DirectionsTransitModeSubway = "subway"
+	// DirectionsTransitModeTrain is for specifying a transit mode of train
+	DirectionsTransitModeTrain = "train"
+	// DirectionsTransitModeTram is for specifying a transit mode of tram
+	DirectionsTransitModeTram = "tram"
+	// DirectionsTransitModeRail is for specifying a transit mode of rail
+	DirectionsTransitModeRail = "rail"
+)
+
+// SetTransitMode specifies one or more preferred modes of transit
+func SetTransitMode(transitMode []string) func(*DirectionsRequest) error {
+	for _, tm := range transitMode {
+		if tm != DirectionsTransitModeBus && tm != DirectionsTransitModeSubway && tm != DirectionsTransitModeTrain &&
+			tm != DirectionsTransitModeTram && tm != DirectionsTransitModeRail {
+			return func(*DirectionsRequest) error {
+				return fmt.Errorf("directions: Unknown TransitMode '%s'", tm)
+			}
+		}
+	}
+	return func(dirReq *DirectionsRequest) error {
+		dirReq.transitMode = transitMode
+		return nil
+	}
+}
+
+const (
+	// DirectionsTransitRoutingPreferenceLessWalking indicates that the calculated route should prefer limited amounts of walking
+	DirectionsTransitRoutingPreferenceLessWalking = "less_walking"
+	// DirectionsTransitRoutingPreferenceFewerTransfers indicates that the calculated route should prefer a limited number of transfers
+	DirectionsTransitRoutingPreferenceFewerTransfers = "fewer_transfers"
+)
+
+// SetDirectionsTransitRoutingPreference specifies preferences for transit routes
+func SetDirectionsTransitRoutingPreference(preference string) func(*DirectionsRequest) error {
+	if preference != DirectionsTransitRoutingPreferenceLessWalking && preference != DirectionsTransitRoutingPreferenceFewerTransfers {
+		return func(*DirectionsRequest) error {
+			return fmt.Errorf("directions: Unknown DirectionsTransitRoutingPreference '%s'", preference)
+		}
+	}
+	return func(dirReq *DirectionsRequest) error {
+		dirReq.transitRoutingPreference = preference
+		return nil
+	}
+}
+
 // Execute will issue the Directions request and retrieve the Response
 func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) {
 	var response Response
@@ -313,6 +404,14 @@ func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) 
 
 	if strings.EqualFold("transit", dirReq.mode) && dirReq.departureTime == "" && dirReq.arrivalTime == "" {
 		return response, errors.New("directions: must specify DepatureTime or ArrivalTime with mode DirectionsModeTransit")
+	}
+
+	if len(dirReq.transitMode) != 0 && !strings.EqualFold("transit", dirReq.mode) {
+		return response, errors.New("directions: must specify mode of transit when specifying transitMode")
+	}
+
+	if dirReq.transitRoutingPreference != "" && !strings.EqualFold("transit", dirReq.mode) {
+		return response, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
 	}
 
 	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/directions/json", nil)
@@ -334,6 +433,18 @@ func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) 
 	}
 	if len(dirReq.avoid) > 0 {
 		q.Set("avoid", strings.Join(dirReq.avoid, "|"))
+	}
+	if dirReq.language != "" {
+		q.Set("language", dirReq.language)
+	}
+	if dirReq.units != "" {
+		q.Set("units", dirReq.units)
+	}
+	if dirReq.region != "" {
+		q.Set("region", dirReq.region)
+	}
+	if len(dirReq.transitMode) != 0 {
+		q.Set("transit_mode", strings.Join(dirReq.transitMode, "|"))
 	}
 	req.URL.RawQuery = q.Encode()
 
