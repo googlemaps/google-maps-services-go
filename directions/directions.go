@@ -195,8 +195,9 @@ type DirectionsRequest struct {
 }
 
 func (dirReq *DirectionsRequest) String() string {
-	return fmt.Sprintf("origin: '%s' destination: '%s' mode: '%s' departure_time: '%v' arrival_time: '%v' waypoints: '%s' alternatives: %v",
-		dirReq.origin, dirReq.destination, dirReq.mode, dirReq.departureTime, dirReq.arrivalTime, strings.Join(dirReq.waypoints, "|"), dirReq.alternatives)
+	return fmt.Sprintf("origin: '%s' destination: '%s' mode: '%s' departure_time: '%v' arrival_time: '%v' waypoints: '%s' alternatives: %v avoid: '%s'",
+		dirReq.origin, dirReq.destination, dirReq.mode, dirReq.departureTime, dirReq.arrivalTime, strings.Join(dirReq.waypoints, "|"),
+		dirReq.alternatives, strings.Join(dirReq.avoid, "|"))
 }
 
 // Get configures a Directions API request, ready to have Execute() called on it.
