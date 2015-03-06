@@ -36,6 +36,8 @@ var (
 	departureTime = flag.String("departure_time", "", "The depature time for transit mode directions request.")
 	arrivalTime   = flag.String("arrival_time", "", "The arrival time for transit mode directions request.")
 	waypoints     = flag.String("waypoints", "", "The waypoints for driving directions request, | separated.")
+	alternatives  = flag.Bool("alternatives", false, "Whether the Directions service may provide more than one route alternative in the response.")
+	avoid         = flag.String("avoid", "", "Indicates that the calculated route(s) should avoid the indicated features, | separated.")
 )
 
 func usageAndExit(msg string) {
@@ -74,6 +76,15 @@ func main() {
 	if *waypoints != "" {
 		ws := strings.Split(*waypoints, "|")
 		option := directions.SetWaypoints(ws)
+		directionsOptions = append(directionsOptions, option)
+	}
+	if *alternatives {
+		option := directions.SetAlternatives(true)
+		directionsOptions = append(directionsOptions, option)
+	}
+	if *avoid != "" {
+		rs := strings.Split(*avoid, "|")
+		option := directions.SetAvoid(rs)
 		directionsOptions = append(directionsOptions, option)
 	}
 

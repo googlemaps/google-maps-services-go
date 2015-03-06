@@ -190,11 +190,13 @@ type DirectionsRequest struct {
 	departureTime string
 	arrivalTime   string
 	waypoints     []string
+	alternatives  bool
+	avoid         []string
 }
 
 func (dirReq *DirectionsRequest) String() string {
-	return fmt.Sprintf("origin: '%s' destination: '%s' mode: '%s' departure_time: '%v' arrival_time: '%v'",
-		dirReq.origin, dirReq.destination, dirReq.mode, dirReq.departureTime, dirReq.arrivalTime)
+	return fmt.Sprintf("origin: '%s' destination: '%s' mode: '%s' departure_time: '%v' arrival_time: '%v' waypoints: '%s' alternatives: %v",
+		dirReq.origin, dirReq.destination, dirReq.mode, dirReq.departureTime, dirReq.arrivalTime, strings.Join(dirReq.waypoints, "|"), dirReq.alternatives)
 }
 
 // Get configures a Directions API request, ready to have Execute() called on it.
@@ -265,6 +267,38 @@ func SetWaypoints(waypoints []string) func(*DirectionsRequest) error {
 	}
 }
 
+// SetAlternatives sets whether the Directions API may return alternate routes
+func SetAlternatives(alternatives bool) func(*DirectionsRequest) error {
+	return func(dirReq *DirectionsRequest) error {
+		dirReq.alternatives = alternatives
+		return nil
+	}
+}
+
+const (
+	// DirectionsAvoidTolls is for specifying routes that avoid tolls
+	DirectionsAvoidTolls = "tolls"
+	// DirectionsAvoidHighways is for specifying routes that avoid highways
+	DirectionsAvoidHighways = "highways"
+	// DirectionsAvoidFerries is for specifying routes that avoid ferries
+	DirectionsAvoidFerries = "ferries"
+)
+
+// SetAvoid sets which restrictions to place on generated directions routes.
+func SetAvoid(restrictions []string) func(*DirectionsRequest) error {
+	for _, r := range restrictions {
+		if r != DirectionsAvoidTolls && r != DirectionsAvoidHighways && r != DirectionsAvoidFerries {
+			return func(*DirectionsRequest) error {
+				return fmt.Errorf("directions: Unknown avoid restriction '%v'", r)
+			}
+		}
+	}
+	return func(dirReq *DirectionsRequest) error {
+		dirReq.avoid = restrictions
+		return nil
+	}
+}
+
 // Execute will issue the Directions request and retrieve the Response
 func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) {
 	var response Response
@@ -294,6 +328,12 @@ func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) 
 	}
 	if len(dirReq.waypoints) != 0 {
 		q.Set("waypoints", strings.Join(dirReq.waypoints, "|"))
+	}
+	if dirReq.alternatives {
+		q.Set("alternatives", "true")
+	}
+	if len(dirReq.avoid) > 0 {
+		q.Set("avoid", strings.Join(dirReq.avoid, "|"))
 	}
 	req.URL.RawQuery = q.Encode()
 
