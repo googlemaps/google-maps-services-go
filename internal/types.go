@@ -77,11 +77,17 @@ type Duration struct {
 
 // Duration returns the time.Duration for this internal Duration.
 func (d *Duration) Duration() time.Duration {
+	if d == nil {
+		return time.Duration(0)
+	}
 	return time.Duration(d.Value) * time.Second
 }
 
 // NewDuration builds an internal Duration from the passed time.Duration.
 func NewDuration(d time.Duration) *Duration {
+	if d == time.Duration(0) {
+		return nil
+	}
 	return &Duration{
 		Value: int64(d / time.Second),
 		Text:  d.String(),
