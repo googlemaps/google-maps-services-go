@@ -34,11 +34,16 @@ func TestDateTime(t *testing.T) {
 	if actual := dt.Time(); !actual.Equal(orig) {
 		t.Errorf("expected known time %v, was %v", orig, actual)
 	}
+
+	var blank *DateTime
+	if expected := (time.Time{}); blank.Time() != expected {
+		t.Errorf("expected nil DateTime to be zero time, was %v", blank.Time())
+	}
 }
 
 func TestDuration(t *testing.T) {
-	if empty := NewDuration(time.Duration(0)); empty == nil {
-		t.Errorf("expected non-nil empty duration, was %v", empty)
+	if empty := NewDuration(time.Duration(0)); empty != nil {
+		t.Errorf("expected nil empty duration, was %v", empty)
 	}
 
 	orig := time.Second * time.Duration(133)
@@ -49,5 +54,10 @@ func TestDuration(t *testing.T) {
 
 	if actual := d.Duration(); actual != orig {
 		t.Errorf("expected known duration %v, was %v", d, actual)
+	}
+
+	var blank *Duration
+	if expected := time.Duration(0); blank.Duration() != expected {
+		t.Errorf("expected nil Duration to be zero duration, was %v", blank.Duration())
 	}
 }
