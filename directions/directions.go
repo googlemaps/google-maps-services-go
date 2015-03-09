@@ -163,7 +163,7 @@ type Step struct {
 
 	// TransitDetails contains transit specific information. This field is only returned with travel
 	// mode is set to "transit".
-	TransitDetails `json:"transit_details"`
+	TransitDetails *TransitDetails `json:"transit_details"`
 
 	// TravelMode indicates the travel mode of this step.
 	TravelMode string `json:"travel_mode"`
@@ -203,26 +203,26 @@ type TransitLine struct {
 	Name string `json:"name"`
 	// ShortName contains the short name of this transit line.
 	ShortName string `json:"short_name"`
-	// color contains the color commonly used in signage for this transit line.
+	// Color contains the color commonly used in signage for this transit line.
 	Color string `json:"color"`
-	// agencies contains information about the operator of the line
-	Agencies TransitLineAgency `json:"agencies"`
-	// url contains the URL for this transit line as provided by the transit agency
-	URL url.URL `json:"url"`
-	// icon contains the URL for the icon associated with this line
-	Icon url.URL `json:"icon"`
-	// text_color contains the color of text commonly used for signage of this line
+	// Agencies contains information about the operator of the line
+	Agencies []*TransitAgency `json:"agencies"`
+	// URL contains the URL for this transit line as provided by the transit agency
+	URL *url.URL `json:"url"`
+	// Icon contains the URL for the icon associated with this line
+	Icon *url.URL `json:"icon"`
+	// TextColor contains the color of text commonly used for signage of this line
 	TextColor string `json:"text_color"`
-	// vehicle contains the type of vehicle used on this line
+	// Vehicle contains the type of vehicle used on this line
 	Vehicle TransitLineVehicle `json:"vehicle"`
 }
 
-// TransitLineAgency contains information about the operator of the line
-type TransitLineAgency struct {
+// TransitAgency contains information about the operator of the line
+type TransitAgency struct {
 	// Name contains the name of the transit agency
 	Name string `json:"name"`
 	// URL contains the URL for the transit agency
-	URL url.URL `json:"url"`
+	URL *url.URL `json:"url"`
 	// Phone contains the phone number of the transit agency
 	Phone string `json:"phone"`
 }
@@ -234,7 +234,7 @@ type TransitLineVehicle struct {
 	// Type contains the type of vehicle that runs on this line
 	Type string `json:"type"`
 	// Icon contains the URL for an icon associated with this vehicle type
-	Icon url.URL `json:"icon"`
+	Icon *url.URL `json:"icon"`
 }
 
 // Distance represents a distance covered in a step or leg.

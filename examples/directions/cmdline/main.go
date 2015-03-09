@@ -125,5 +125,7 @@ func main() {
 		log.Fatalf("No results")
 	}
 
-	pretty.Println(resp)
+	route := resp.Routes[0]
+
+	pretty.Println(route)
 }

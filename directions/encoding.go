@@ -16,6 +16,7 @@ package directions
 
 import (
 	"encoding/json"
+	"net/url"
 
 	"google.golang.org/maps/internal"
 )
@@ -107,7 +108,7 @@ type safeTransitDetails TransitDetails
 type encodedTransitDetails struct {
 	safeTransitDetails
 	EncArrivalTime   *internal.DateTime `json:"arrival_time"`
-	EncDepartureTime *internal.DateTime `json:"depareture_time"`
+	EncDepartureTime *internal.DateTime `json:"departure_time"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler for TransitDetails. This decodes
@@ -126,14 +127,140 @@ func (transitDetails *TransitDetails) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalJSON implements json.Marshaler for Step. This encodes Go types back to
-// the API representation.
+// MarshalJSON implements json.Marshaler for TransitDetails. This encodes Go
+// types back to the API representation.
 func (transitDetails *TransitDetails) MarshalJSON() ([]byte, error) {
 	x := encodedTransitDetails{}
 	x.safeTransitDetails = safeTransitDetails(*transitDetails)
 
 	x.EncArrivalTime = internal.NewDateTime(transitDetails.ArrivalTime)
 	x.EncDepartureTime = internal.NewDateTime(transitDetails.DepartureTime)
+
+	return json.Marshal(x)
+}
+
+// safeTransitLine is the raw version of TransitLine that does not have custom
+// encoding or decoding methods applied.
+type safeTransitLine TransitLine
+
+// encodedTransitLine is the actual encoded version of TransitLine as per the
+// Maps APIs
+type encodedTransitLine struct {
+	safeTransitLine
+	EncURL  string `json:"url"`
+	EncIcon string `json:"icon"`
+}
+
+// UnmarshalJSON imlpements json.Unmarshaler for TransitLine. This decodes the
+// API representation into types useful for Go developers.
+func (transitLine *TransitLine) UnmarshalJSON(data []byte) error {
+	x := encodedTransitLine{}
+	err := json.Unmarshal(data, &x)
+	if err != nil {
+		return err
+	}
+	*transitLine = TransitLine(x.safeTransitLine)
+
+	transitLine.URL, err = url.Parse(x.EncURL)
+	if err != nil {
+		return err
+	}
+	transitLine.Icon, err = url.Parse(x.EncIcon)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshallJSON implements json.Marshaler for TransitLine. This encodes Go
+// types back to the API representation.
+func (transitLine *TransitLine) MarshallJSON() ([]byte, error) {
+	x := encodedTransitLine{}
+	x.safeTransitLine = safeTransitLine(*transitLine)
+
+	x.EncURL = transitLine.URL.String()
+	x.EncIcon = transitLine.Icon.String()
+
+	return json.Marshal(x)
+}
+
+// safeTransitAgency is the raw version of TransitAgency that does not have
+// custom encoding or decoding methods applied.
+type safeTransitAgency TransitAgency
+
+// encodedTransitLine is the actual encoded version of TransitLine as per the
+// Maps APIs
+type encodedTransitAgency struct {
+	safeTransitAgency
+	EncURL string `json:"url"`
+}
+
+// UnmarshalJSON imlpements json.Unmarshaler for TransitAgency. This decodes the
+// API representation into types useful for Go developers.
+func (transitAgency *TransitAgency) UnmarshalJSON(data []byte) error {
+	x := encodedTransitAgency{}
+	err := json.Unmarshal(data, &x)
+	if err != nil {
+		return err
+	}
+	*transitAgency = TransitAgency(x.safeTransitAgency)
+
+	transitAgency.URL, err = url.Parse(x.EncURL)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshallJSON implements json.Marshaler for TransitAgency. This encodes Go
+// types back to the API representation.
+func (transitAgency *TransitAgency) MarshallJSON() ([]byte, error) {
+	x := encodedTransitAgency{}
+	x.safeTransitAgency = safeTransitAgency(*transitAgency)
+
+	x.EncURL = transitAgency.URL.String()
+
+	return json.Marshal(x)
+}
+
+// safeTransitLineVehicle is the raw version of TransitLineVehicle that does not
+// have custom encoding or decoding methods applied.
+type safeTransitLineVehicle TransitLineVehicle
+
+// encodedTransitLineVehicle is the actual encoded version of TransitLineVehicle
+// as per the Maps APIs
+type encodedTransitLineVehicle struct {
+	safeTransitLineVehicle
+	EncIcon string `json:"icon"`
+}
+
+// UnmarshalJSON imlpements json.Unmarshaler for TransitLine. This decodes the
+// API representation into types useful for Go developers.
+func (transitLineVehicle *TransitLineVehicle) UnmarshalJSON(data []byte) error {
+	x := encodedTransitLineVehicle{}
+	err := json.Unmarshal(data, &x)
+	if err != nil {
+		return err
+	}
+	*transitLineVehicle = TransitLineVehicle(x.safeTransitLineVehicle)
+
+	transitLineVehicle.Icon, err = url.Parse(x.EncIcon)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshallJSON implements json.Marshaler for TransitLineVehicle. This encodes
+// Go types back to the API representation.
+func (transitLineVehicle *TransitLineVehicle) MarshallJSON() ([]byte, error) {
+	x := encodedTransitLineVehicle{}
+	x.safeTransitLineVehicle = safeTransitLineVehicle(*transitLineVehicle)
+
+	x.EncIcon = transitLineVehicle.Icon.String()
 
 	return json.Marshal(x)
 }

@@ -14,9 +14,7 @@
 
 package internal
 
-import (
-	"time"
-)
+import "time"
 
 // DateTime is the public API representation of a point in time.
 type DateTime struct {
