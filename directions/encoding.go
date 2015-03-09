@@ -173,9 +173,9 @@ func (transitLine *TransitLine) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshallJSON implements json.Marshaler for TransitLine. This encodes Go
+// MarshalJSON implements json.Marshaler for TransitLine. This encodes Go
 // types back to the API representation.
-func (transitLine *TransitLine) MarshallJSON() ([]byte, error) {
+func (transitLine *TransitLine) MarshalJSON() ([]byte, error) {
 	x := encodedTransitLine{}
 	x.safeTransitLine = safeTransitLine(*transitLine)
 
@@ -189,7 +189,7 @@ func (transitLine *TransitLine) MarshallJSON() ([]byte, error) {
 // custom encoding or decoding methods applied.
 type safeTransitAgency TransitAgency
 
-// encodedTransitLine is the actual encoded version of TransitLine as per the
+// encodedTransitAgency is the actual encoded version of TransitAgency as per the
 // Maps APIs
 type encodedTransitAgency struct {
 	safeTransitAgency
@@ -214,9 +214,9 @@ func (transitAgency *TransitAgency) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshallJSON implements json.Marshaler for TransitAgency. This encodes Go
+// MarshalJSON implements json.Marshaler for TransitAgency. This encodes Go
 // types back to the API representation.
-func (transitAgency *TransitAgency) MarshallJSON() ([]byte, error) {
+func (transitAgency *TransitAgency) MarshalJSON() ([]byte, error) {
 	x := encodedTransitAgency{}
 	x.safeTransitAgency = safeTransitAgency(*transitAgency)
 
@@ -236,8 +236,8 @@ type encodedTransitLineVehicle struct {
 	EncIcon string `json:"icon"`
 }
 
-// UnmarshalJSON imlpements json.Unmarshaler for TransitLine. This decodes the
-// API representation into types useful for Go developers.
+// UnmarshalJSON imlpements json.Unmarshaler for TransitLineVehicle. This
+// decodes the API representation into types useful for Go developers.
 func (transitLineVehicle *TransitLineVehicle) UnmarshalJSON(data []byte) error {
 	x := encodedTransitLineVehicle{}
 	err := json.Unmarshal(data, &x)
@@ -254,9 +254,9 @@ func (transitLineVehicle *TransitLineVehicle) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshallJSON implements json.Marshaler for TransitLineVehicle. This encodes
+// MarshalJSON implements json.Marshaler for TransitLineVehicle. This encodes
 // Go types back to the API representation.
-func (transitLineVehicle *TransitLineVehicle) MarshallJSON() ([]byte, error) {
+func (transitLineVehicle *TransitLineVehicle) MarshalJSON() ([]byte, error) {
 	x := encodedTransitLineVehicle{}
 	x.safeTransitLineVehicle = safeTransitLineVehicle(*transitLineVehicle)
 
