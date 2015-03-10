@@ -248,229 +248,100 @@ type Distance struct {
 
 // DirectionsRequest is the functional options struct for directions.Get
 type DirectionsRequest struct {
-	origin                   string
-	destination              string
-	mode                     string
-	departureTime            string
-	arrivalTime              string
-	waypoints                []string
-	alternatives             bool
-	avoid                    []string
-	language                 string
-	units                    string
-	region                   string
-	transitMode              []string
-	transitRoutingPreference string
-}
-
-func (dirReq *DirectionsRequest) String() string {
-	return fmt.Sprintf("origin: '%s' destination: '%s' mode: '%s' departure_time: '%v' arrival_time: '%v' waypoints: '%s' alternatives: %v avoid: '%s' language: '%s' units: '%s' region: '%s' transit_mode: '%s'",
-		dirReq.origin, dirReq.destination, dirReq.mode, dirReq.departureTime, dirReq.arrivalTime, strings.Join(dirReq.waypoints, "|"),
-		dirReq.alternatives, strings.Join(dirReq.avoid, "|"), dirReq.language, dirReq.units, dirReq.region, strings.Join(dirReq.transitMode, "|"))
-}
-
-// Get configures a Directions API request, ready to have Execute() called on it.
-func Get(origin, destination string, options ...func(*DirectionsRequest) error) (*DirectionsRequest, error) {
-	dirReq := &DirectionsRequest{
-		origin:      origin,
-		destination: destination,
-	}
-
-	for _, opt := range options {
-		err := opt(dirReq)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return dirReq, nil
+	Origin                   string
+	Destination              string
+	Mode                     string
+	DepartureTime            string
+	ArrivalTime              string
+	Waypoints                []string
+	Alternatives             bool
+	Avoid                    []string
+	Language                 string
+	Units                    string
+	Region                   string
+	TransitMode              []string
+	TransitRoutingPreference string
 }
 
 const (
-	// DirectionsModeDriving is for specifying driving as travel mode
-	DirectionsModeDriving = "driving"
-	// DirectionsModeWalking is for specifying walking as travel mode
-	DirectionsModeWalking = "walking"
-	// DirectionsModeBicycling is for specifying bicycling as travel mode
-	DirectionsModeBicycling = "bicycling"
-	// DirectionsModeTransit is for specifying transit as travel mode
-	DirectionsModeTransit = "transit"
+	// ModeDriving is for specifying driving as travel mode
+	ModeDriving = "driving"
+	// ModeWalking is for specifying walking as travel mode
+	ModeWalking = "walking"
+	// ModeBicycling is for specifying bicycling as travel mode
+	ModeBicycling = "bicycling"
+	// ModeTransit is for specifying transit as travel mode
+	ModeTransit = "transit"
+
+	// AvoidTolls is for specifying routes that avoid tolls
+	AvoidTolls = "tolls"
+	// AvoidHighways is for specifying routes that avoid highways
+	AvoidHighways = "highways"
+	// AvoidFerries is for specifying routes that avoid ferries
+	AvoidFerries = "ferries"
+
+	// UnitsMetric specifies usage of the metric units system
+	UnitsMetric = "metric"
+	// UnitsImperial specifies usage of the Imperial (English) units system
+	UnitsImperial = "imperial"
+
+	// TransitModeBus is for specifying a transit mode of bus
+	TransitModeBus = "bus"
+	// TransitModeSubway is for specifying a transit mode of subway
+	TransitModeSubway = "subway"
+	// TransitModeTrain is for specifying a transit mode of train
+	TransitModeTrain = "train"
+	// TransitModeTram is for specifying a transit mode of tram
+	TransitModeTram = "tram"
+	// TransitModeRail is for specifying a transit mode of rail
+	TransitModeRail = "rail"
+
+	// TransitRoutingPreferenceLessWalking indicates that the calculated route should prefer limited amounts of walking
+	TransitRoutingPreferenceLessWalking = "less_walking"
+	// TransitRoutingPreferenceFewerTransfers indicates that the calculated route should prefer a limited number of transfers
+	TransitRoutingPreferenceFewerTransfers = "fewer_transfers"
 )
 
-// SetMode sets the travel mode for this directions.Get request
-func SetMode(mode string) func(*DirectionsRequest) error {
-	if strings.EqualFold("driving", mode) ||
-		strings.EqualFold("walking", mode) ||
-		strings.EqualFold("bicycling", mode) ||
-		strings.EqualFold("transit", mode) {
-		return func(dirReq *DirectionsRequest) error {
-			dirReq.mode = mode
-			return nil
-		}
-	}
-	return func(dirReq *DirectionsRequest) error {
-		return fmt.Errorf("directions: Unknown travel mode %s", mode)
-	}
-}
-
-// SetDepartureTime sets the departure time for transit mode directions.Get requests
-func SetDepartureTime(departureTime string) func(*DirectionsRequest) error {
-	return func(dirReq *DirectionsRequest) error {
-		dirReq.departureTime = departureTime
-		return nil
-	}
-}
-
-// SetArrivalTime sets the arrival time for transit mode directions.Get requests
-func SetArrivalTime(arrivalTime string) func(*DirectionsRequest) error {
-	return func(dirReq *DirectionsRequest) error {
-		dirReq.arrivalTime = arrivalTime
-		return nil
-	}
-}
-
-// SetWaypoints sets the waypoints for driving directions.Get requests
-func SetWaypoints(waypoints []string) func(*DirectionsRequest) error {
-	return func(dirReq *DirectionsRequest) error {
-		dirReq.waypoints = waypoints
-		return nil
-	}
-}
-
-// SetAlternatives sets whether the Directions API may return alternate routes
-func SetAlternatives(alternatives bool) func(*DirectionsRequest) error {
-	return func(dirReq *DirectionsRequest) error {
-		dirReq.alternatives = alternatives
-		return nil
-	}
-}
-
-const (
-	// DirectionsAvoidTolls is for specifying routes that avoid tolls
-	DirectionsAvoidTolls = "tolls"
-	// DirectionsAvoidHighways is for specifying routes that avoid highways
-	DirectionsAvoidHighways = "highways"
-	// DirectionsAvoidFerries is for specifying routes that avoid ferries
-	DirectionsAvoidFerries = "ferries"
-)
-
-// SetAvoid sets which restrictions to place on generated directions routes.
-func SetAvoid(restrictions []string) func(*DirectionsRequest) error {
-	for _, r := range restrictions {
-		if r != DirectionsAvoidTolls && r != DirectionsAvoidHighways && r != DirectionsAvoidFerries {
-			return func(*DirectionsRequest) error {
-				return fmt.Errorf("directions: Unknown avoid restriction '%v'", r)
-			}
-		}
-	}
-	return func(dirReq *DirectionsRequest) error {
-		dirReq.avoid = restrictions
-		return nil
-	}
-}
-
-// SetLanguage specifies the language in which to return results
-func SetLanguage(language string) func(*DirectionsRequest) error {
-	return func(dirReq *DirectionsRequest) error {
-		dirReq.language = language
-		return nil
-	}
-}
-
-const (
-	// DirectionsUnitMetric specifies usage of the metric units system
-	DirectionsUnitMetric = "metric"
-	// DirectionsUnitImperial specifies usage of the Imperial (English) units system
-	DirectionsUnitImperial = "imperial"
-)
-
-// SetUnits sets the units system used for measurements in returned directions
-func SetUnits(units string) func(*DirectionsRequest) error {
-	if units != DirectionsUnitMetric && units != DirectionsUnitImperial {
-		return func(*DirectionsRequest) error {
-			return fmt.Errorf("directions: Unknown units '%s'", units)
-		}
-	}
-	return func(dirReq *DirectionsRequest) error {
-		dirReq.units = units
-		return nil
-	}
-}
-
-// SetRegion specifies the region code, specified as a ccTLD two-character value
-func SetRegion(region string) func(*DirectionsRequest) error {
-	return func(dirReq *DirectionsRequest) error {
-		dirReq.region = region
-		return nil
-	}
-}
-
-const (
-	// DirectionsTransitModeBus is for specifying a transit mode of bus
-	DirectionsTransitModeBus = "bus"
-	// DirectionsTransitModeSubway is for specifying a transit mode of subway
-	DirectionsTransitModeSubway = "subway"
-	// DirectionsTransitModeTrain is for specifying a transit mode of train
-	DirectionsTransitModeTrain = "train"
-	// DirectionsTransitModeTram is for specifying a transit mode of tram
-	DirectionsTransitModeTram = "tram"
-	// DirectionsTransitModeRail is for specifying a transit mode of rail
-	DirectionsTransitModeRail = "rail"
-)
-
-// SetTransitMode specifies one or more preferred modes of transit
-func SetTransitMode(transitMode []string) func(*DirectionsRequest) error {
-	for _, tm := range transitMode {
-		if tm != DirectionsTransitModeBus && tm != DirectionsTransitModeSubway && tm != DirectionsTransitModeTrain &&
-			tm != DirectionsTransitModeTram && tm != DirectionsTransitModeRail {
-			return func(*DirectionsRequest) error {
-				return fmt.Errorf("directions: Unknown TransitMode '%s'", tm)
-			}
-		}
-	}
-	return func(dirReq *DirectionsRequest) error {
-		dirReq.transitMode = transitMode
-		return nil
-	}
-}
-
-const (
-	// DirectionsTransitRoutingPreferenceLessWalking indicates that the calculated route should prefer limited amounts of walking
-	DirectionsTransitRoutingPreferenceLessWalking = "less_walking"
-	// DirectionsTransitRoutingPreferenceFewerTransfers indicates that the calculated route should prefer a limited number of transfers
-	DirectionsTransitRoutingPreferenceFewerTransfers = "fewer_transfers"
-)
-
-// SetDirectionsTransitRoutingPreference specifies preferences for transit routes
-func SetDirectionsTransitRoutingPreference(preference string) func(*DirectionsRequest) error {
-	if preference != DirectionsTransitRoutingPreferenceLessWalking && preference != DirectionsTransitRoutingPreferenceFewerTransfers {
-		return func(*DirectionsRequest) error {
-			return fmt.Errorf("directions: Unknown DirectionsTransitRoutingPreference '%s'", preference)
-		}
-	}
-	return func(dirReq *DirectionsRequest) error {
-		dirReq.transitRoutingPreference = preference
-		return nil
-	}
-}
-
-// Execute will issue the Directions request and retrieve the Response
-func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) {
+// Get issues the Directions request and retrieves the Response
+func (dirReq *DirectionsRequest) Get(ctx context.Context) (Response, error) {
 	var response Response
 
-	if dirReq == nil {
-		return response, errors.New("directions: req must not be nil")
+	if dirReq.Origin == "" {
+		return response, errors.New("directions: Origin required")
 	}
-
-	if dirReq.departureTime != "" && dirReq.arrivalTime != "" {
+	if dirReq.Destination == "" {
+		return response, errors.New("directions: Destination required")
+	}
+	if dirReq.Mode != "" && ModeDriving != dirReq.Mode && ModeWalking != dirReq.Mode && ModeBicycling != dirReq.Mode && ModeTransit != dirReq.Mode {
+		return response, fmt.Errorf("directions: unknown Mode: '%s'", dirReq.Mode)
+	}
+	for _, avoid := range dirReq.Avoid {
+		if avoid != AvoidTolls && avoid != AvoidHighways && avoid != AvoidFerries {
+			return response, fmt.Errorf("directions: Unknown Avoid restriction '%s'", avoid)
+		}
+	}
+	if dirReq.Units != "" && dirReq.Units != UnitsMetric && dirReq.Units != UnitsImperial {
+		return response, fmt.Errorf("directions: Unknown Units '%s'", dirReq.Units)
+	}
+	for _, transitMode := range dirReq.TransitMode {
+		if transitMode != TransitModeBus && transitMode != TransitModeSubway && transitMode != TransitModeTrain && transitMode != TransitModeTram && transitMode != TransitModeRail {
+			return response, fmt.Errorf("directions: Unknown TransitMode '%s'", dirReq.TransitMode)
+		}
+	}
+	if dirReq.TransitRoutingPreference != "" && dirReq.TransitRoutingPreference != TransitRoutingPreferenceLessWalking && dirReq.TransitRoutingPreference != TransitRoutingPreferenceFewerTransfers {
+		return response, fmt.Errorf("directions: Unknown TransitRoutingPreference '%s'", dirReq.TransitRoutingPreference)
+	}
+	if dirReq.DepartureTime != "" && dirReq.ArrivalTime != "" {
 		return response, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
 	}
 
-	if len(dirReq.transitMode) != 0 && !strings.EqualFold("transit", dirReq.mode) {
+	if dirReq.DepartureTime != "" && dirReq.ArrivalTime != "" {
+		return response, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
+	}
+	if len(dirReq.TransitMode) != 0 && dirReq.Mode != ModeTransit {
 		return response, errors.New("directions: must specify mode of transit when specifying transitMode")
 	}
-
-	if dirReq.transitRoutingPreference != "" && !strings.EqualFold("transit", dirReq.mode) {
+	if dirReq.TransitRoutingPreference != "" && dirReq.Mode != ModeTransit {
 		return response, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
 	}
 
@@ -479,32 +350,32 @@ func (dirReq *DirectionsRequest) Execute(ctx context.Context) (Response, error) 
 		return response, err
 	}
 	q := req.URL.Query()
-	q.Set("origin", dirReq.origin)
-	q.Set("destination", dirReq.destination)
+	q.Set("origin", dirReq.Origin)
+	q.Set("destination", dirReq.Destination)
 	q.Set("key", internal.APIKey(ctx))
-	if dirReq.mode != "" {
-		q.Set("mode", dirReq.mode)
+	if dirReq.Mode != "" {
+		q.Set("mode", dirReq.Mode)
 	}
-	if len(dirReq.waypoints) != 0 {
-		q.Set("waypoints", strings.Join(dirReq.waypoints, "|"))
+	if len(dirReq.Waypoints) != 0 {
+		q.Set("waypoints", strings.Join(dirReq.Waypoints, "|"))
 	}
-	if dirReq.alternatives {
+	if dirReq.Alternatives {
 		q.Set("alternatives", "true")
 	}
-	if len(dirReq.avoid) > 0 {
-		q.Set("avoid", strings.Join(dirReq.avoid, "|"))
+	if len(dirReq.Avoid) > 0 {
+		q.Set("avoid", strings.Join(dirReq.Avoid, "|"))
 	}
-	if dirReq.language != "" {
-		q.Set("language", dirReq.language)
+	if dirReq.Language != "" {
+		q.Set("language", dirReq.Language)
 	}
-	if dirReq.units != "" {
-		q.Set("units", dirReq.units)
+	if dirReq.Units != "" {
+		q.Set("units", dirReq.Units)
 	}
-	if dirReq.region != "" {
-		q.Set("region", dirReq.region)
+	if dirReq.Region != "" {
+		q.Set("region", dirReq.Region)
 	}
-	if len(dirReq.transitMode) != 0 {
-		q.Set("transit_mode", strings.Join(dirReq.transitMode, "|"))
+	if len(dirReq.TransitMode) != 0 {
+		q.Set("transit_mode", strings.Join(dirReq.TransitMode, "|"))
 	}
 	req.URL.RawQuery = q.Encode()
 

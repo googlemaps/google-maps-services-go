@@ -30,19 +30,20 @@ import (
 )
 
 var (
-	apiKey        = flag.String("key", "", "API Key for using Google Maps API.")
-	origin        = flag.String("origin", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
-	destination   = flag.String("destination", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
-	mode          = flag.String("mode", "", "The travel mode for this directions request.")
-	departureTime = flag.String("departure_time", "", "The depature time for transit mode directions request.")
-	arrivalTime   = flag.String("arrival_time", "", "The arrival time for transit mode directions request.")
-	waypoints     = flag.String("waypoints", "", "The waypoints for driving directions request, | separated.")
-	alternatives  = flag.Bool("alternatives", false, "Whether the Directions service may provide more than one route alternative in the response.")
-	avoid         = flag.String("avoid", "", "Indicates that the calculated route(s) should avoid the indicated features, | separated.")
-	language      = flag.String("language", "", "Specifies the language in which to return results.")
-	units         = flag.String("units", "", "Specifies the unit system to use when returning results.")
-	region        = flag.String("region", "", "Specifies the region code, specified as a ccTLD (\"top-level domain\") two-character value.")
-	transitMode   = flag.String("transit_mode", "", "Specifies one or more preferred modes of transit, | separated. This parameter may only be specified for transit directions.")
+	apiKey                   = flag.String("key", "", "API Key for using Google Maps API.")
+	origin                   = flag.String("origin", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
+	destination              = flag.String("destination", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
+	mode                     = flag.String("mode", "", "The travel mode for this directions request.")
+	departureTime            = flag.String("departure_time", "", "The depature time for transit mode directions request.")
+	arrivalTime              = flag.String("arrival_time", "", "The arrival time for transit mode directions request.")
+	waypoints                = flag.String("waypoints", "", "The waypoints for driving directions request, | separated.")
+	alternatives             = flag.Bool("alternatives", false, "Whether the Directions service may provide more than one route alternative in the response.")
+	avoid                    = flag.String("avoid", "", "Indicates that the calculated route(s) should avoid the indicated features, | separated.")
+	language                 = flag.String("language", "", "Specifies the language in which to return results.")
+	units                    = flag.String("units", "", "Specifies the unit system to use when returning results.")
+	region                   = flag.String("region", "", "Specifies the region code, specified as a ccTLD (\"top-level domain\") two-character value.")
+	transitMode              = flag.String("transit_mode", "", "Specifies one or more preferred modes of transit, | separated. This parameter may only be specified for transit directions.")
+	transitRoutingPreference = flag.String("transit_routing_preference", "", "Specifies preferences for transit routes.")
 )
 
 func usageAndExit(msg string) {
@@ -55,77 +56,38 @@ func usageAndExit(msg string) {
 func main() {
 	flag.Parse()
 	client := &http.Client{}
-	var directionsOptions []func(*directions.DirectionsRequest) error
 
 	if *apiKey == "" {
 		usageAndExit("Please specify an API Key.")
 	}
-	if *origin == "" {
-		usageAndExit("Please specify an origin.")
-	}
-	if *destination == "" {
-		usageAndExit("Please specify a destination.")
-	}
-	if *mode != "" {
-		option := directions.SetMode(*mode)
-		directionsOptions = append(directionsOptions, option)
-	}
-	if *departureTime != "" {
-		option := directions.SetDepartureTime(*departureTime)
-		directionsOptions = append(directionsOptions, option)
-	}
-	if *arrivalTime != "" {
-		option := directions.SetArrivalTime(*arrivalTime)
-		directionsOptions = append(directionsOptions, option)
+
+	req := &directions.DirectionsRequest{
+		Origin:        *origin,
+		Destination:   *destination,
+		Mode:          *mode,
+		DepartureTime: *departureTime,
+		ArrivalTime:   *arrivalTime,
+		Alternatives:  *alternatives,
+		Language:      *language,
+		Units:         *units,
+		Region:        *region,
+		TransitRoutingPreference: *transitRoutingPreference,
 	}
 	if *waypoints != "" {
-		ws := strings.Split(*waypoints, "|")
-		option := directions.SetWaypoints(ws)
-		directionsOptions = append(directionsOptions, option)
-	}
-	if *alternatives {
-		option := directions.SetAlternatives(true)
-		directionsOptions = append(directionsOptions, option)
+		req.Waypoints = strings.Split(*waypoints, "|")
 	}
 	if *avoid != "" {
-		rs := strings.Split(*avoid, "|")
-		option := directions.SetAvoid(rs)
-		directionsOptions = append(directionsOptions, option)
-	}
-	if *language != "" {
-		option := directions.SetLanguage(*language)
-		directionsOptions = append(directionsOptions, option)
-	}
-	if *units != "" {
-		option := directions.SetUnits(*units)
-		directionsOptions = append(directionsOptions, option)
-	}
-	if *region != "" {
-		option := directions.SetRegion(*region)
-		directionsOptions = append(directionsOptions, option)
+		req.Avoid = strings.Split(*avoid, "|")
 	}
 	if *transitMode != "" {
-		tms := strings.Split(*transitMode, "|")
-		option := directions.SetTransitMode(tms)
-		directionsOptions = append(directionsOptions, option)
+		req.TransitMode = strings.Split(*transitMode, "|")
 	}
 
 	ctx := maps.NewContext(*apiKey, client)
-	req, err := directions.Get(*origin, *destination, directionsOptions...)
+	resp, err := req.Get(ctx)
 	if err != nil {
-		log.Fatalf("Could not configure Get request: %v", err)
-	}
-	fmt.Printf("directions.Get req: %v\n", req)
-	resp, err := req.Execute(ctx)
-	if err != nil {
-		log.Fatalf("Could not request directions: %v", err)
+		log.Fatalf("fatal error %v", err)
 	}
 
-	if len(resp.Routes) == 0 {
-		log.Fatalf("No results")
-	}
-
-	route := resp.Routes[0]
-
-	pretty.Println(route)
+	pretty.Println(resp)
 }
