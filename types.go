@@ -79,7 +79,7 @@ type DistanceMatrixResponse struct {
 	OriginAddresses []string `json:"origin_addresses"`
 	// DestinationAddresses contains an array of addresses as returned by the API from your original request.
 	DestinationAddresses []string `json:"destination_addresses"`
-	//Rows contains an array of elements.
+	// Rows contains an array of elements.
 	Rows []DistanceMatrixElementsRow `json:"rows"`
 
 	// Status contains the status of the request, and may contain
