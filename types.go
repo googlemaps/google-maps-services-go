@@ -60,15 +60,31 @@ const (
 
 // DistanceMatrixRequest is the functional options struct for DistanceMatrixGet
 type DistanceMatrixRequest struct {
-	Origins                  []string
-	Destinations             []string
-	Mode                     string
-	Language                 string
-	Avoid                    string
-	Units                    string
-	DepartureTime            string
-	ArrivalTime              string
-	TransitMode              string
+	// Origins is a list of addresses and/or textual latitude/longitude values from which to calculate distance and time. Required.
+	Origins []string
+	// Destinations is a list of addresses and/or textual latitude/longitude values to which to calculate distance and time. Required.
+	Destinations []string
+	// Mode specifies the mode of transport to use when calculating distance. Valid values are `ModeDriving`, `ModeWalking`, `ModeBicycling`
+	// and `ModeTransit`. Optional.
+	Mode string
+	// Language in which to return results. Optional.
+	Language string
+	// Avoid introduces restrictions to the route. Valid values are `AvoidTolls`, `AvoidHighways` and `AvoidFerries`. Optional.
+	Avoid string
+	// Units Specifies the unit system to use when expressing distance as text. Valid values are `UnitsMetric` and `UnitsImperial`. Optional.
+	Units string
+	// DepartureTime is the desired time of departure. You can specify the time as an integer in seconds since midnight, January 1, 1970 UTC.
+	// Alternatively, you can specify a value of `"now"``. Optional.
+	DepartureTime string
+	// ArrivalTime specifies the desired time of arrival for transit requests, in seconds since midnight, January 1, 1970 UTC. You cannot
+	// specify both `DepartureTime` and `ArrivalTime`. Optional.
+	ArrivalTime string
+	// TransitMode specifies one or more preferred modes of transit. This parameter may only be specified for requests where the mode is
+	// `transit`. Valid values are `TransitModeBus`, `TransitModeSubway`, `TransitModeTrain`, `TransitModeTram`, and `TransitModeRail`.
+	// Optional.
+	TransitMode string
+	// TransitRoutingPreference Specifies preferences for transit requests. Valid values are `TransitRoutingPreferenceLessWalking` and
+	// `TransitRoutingPreferenceFewerTransfers`. Optional.
 	TransitRoutingPreference string
 }
 
@@ -99,9 +115,11 @@ type DistanceMatrixElementsRow struct {
 
 // DistanceMatrixElement is the travel distance and time for a pair of origin and destination.
 type DistanceMatrixElement struct {
-	Status   string        `json:"status"`
+	Status string `json:"status"`
+	// Duration is the length of time it takes to travel this route.
 	Duration time.Duration `json:"duration"`
-	Distance Distance      `json:"distance"`
+	// Distance is the total distance of this route.
+	Distance Distance `json:"distance"`
 }
 
 // Distance is the API representation for a distance between two points.
