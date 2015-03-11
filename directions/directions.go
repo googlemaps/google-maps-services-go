@@ -248,18 +248,31 @@ type Distance struct {
 
 // DirectionsRequest is the functional options struct for directions.Get
 type DirectionsRequest struct {
-	Origin                   string
-	Destination              string
-	Mode                     string
-	DepartureTime            string
-	ArrivalTime              string
-	Waypoints                []string
-	Alternatives             bool
-	Avoid                    []string
-	Language                 string
-	Units                    string
-	Region                   string
-	TransitMode              []string
+	// Origin is the address or textual latitude/longitude value from which you wish to calculate directions. Required.
+	Origin string
+	// Destination is the address or textual latitude/longitude value from which you wish to calculate directions. Required.
+	Destination string
+	// Mode specifies the mode of transport to use when calculating directions. Optional.
+	Mode string
+	// DepartureTime specifies the desired time of departure. You can specify the time as an integer in seconds since midnight, January 1, 1970 UTC. Alternatively, you can specify a value of `"now"`. Optional.
+	DepartureTime string
+	// ArrivalTime specifies the desired time of arrival for transit directions, in seconds since midnight, January 1, 1970 UTC. Optional. You cannot specify both `DepartureTime` and `ArrivalTime`.
+	ArrivalTime string
+	// Waypoints specifies an array of points to add to a route. Optional.
+	Waypoints []string
+	// Alternatives specifies if Directions service may provide more than one route alternative in the response. Optional.
+	Alternatives bool
+	// Avoid indicates that the calculated route(s) should avoid the indicated features. Optional.
+	Avoid []string
+	// Language specifies the language in which to return results. Optional.
+	Language string
+	// Units specifies the unit system to use when displaying results. Optional.
+	Units string
+	// Region specifies the region code, specified as a ccTLD two-character value. Optional.
+	Region string
+	// TransitMode specifies one or more preferred modes of transit. This parameter may only be specified for transit directions. Optional.
+	TransitMode []string
+	// TransitRoutingPreference specifies preferences for transit routes. Optional.
 	TransitRoutingPreference string
 }
 
