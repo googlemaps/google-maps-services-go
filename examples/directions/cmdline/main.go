@@ -82,6 +82,7 @@ func main() {
 			fmt.Println("Step", idx, "start location:", step.StartLocation)
 			fmt.Println("Step", idx, "end location:", step.EndLocation)
 			fmt.Println("Step", idx, "travel mode:", step.TravelMode)
+			fmt.Println("Step", idx, "path:", step.Polyline.Decode())
 		}
 	}
 
