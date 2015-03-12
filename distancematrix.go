@@ -23,36 +23,37 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"golang.org/x/net/context"
 	"google.golang.org/maps/internal"
 )
 
 // Get makes a Distance Matrix API request
-func (dmReq *DistanceMatrixRequest) Get(ctx context.Context) (DistanceMatrixResponse, error) {
+func (r *DistanceMatrixRequest) Get(ctx context.Context) (DistanceMatrixResponse, error) {
 	var response DistanceMatrixResponse
-	if len(dmReq.Origins) == 0 {
+	if len(r.Origins) == 0 {
 		return response, errors.New("distancematrix: Origins must contain at least one start address")
 	}
-	if len(dmReq.Destinations) == 0 {
+	if len(r.Destinations) == 0 {
 		return response, errors.New("distancematrix: Destinations must contain at least one end address")
 	}
-	if dmReq.Mode != "" && ModeDriving != dmReq.Mode && ModeWalking != dmReq.Mode && ModeBicycling != dmReq.Mode && ModeTransit != dmReq.Mode {
-		return response, fmt.Errorf("distancematrix: unknown Mode: '%s'", dmReq.Mode)
+	if r.Mode != "" && ModeDriving != r.Mode && ModeWalking != r.Mode && ModeBicycling != r.Mode && ModeTransit != r.Mode {
+		return response, fmt.Errorf("distancematrix: unknown Mode: '%s'", r.Mode)
 	}
-	if dmReq.Avoid != "" && dmReq.Avoid != AvoidTolls && dmReq.Avoid != AvoidHighways && dmReq.Avoid != AvoidFerries {
-		return response, fmt.Errorf("distancematrix: Unknown Avoid restriction '%s'", dmReq.Avoid)
+	if r.Avoid != "" && r.Avoid != AvoidTolls && r.Avoid != AvoidHighways && r.Avoid != AvoidFerries {
+		return response, fmt.Errorf("distancematrix: Unknown Avoid restriction '%s'", r.Avoid)
 	}
-	if dmReq.Units != "" && dmReq.Units != UnitsMetric && dmReq.Units != UnitsImperial {
-		return response, fmt.Errorf("distancematrix: Unknown Units '%s'", dmReq.Units)
+	if r.Units != "" && r.Units != UnitsMetric && r.Units != UnitsImperial {
+		return response, fmt.Errorf("distancematrix: Unknown Units '%s'", r.Units)
 	}
-	if dmReq.TransitMode != "" && dmReq.TransitMode != TransitModeBus && dmReq.TransitMode != TransitModeSubway && dmReq.TransitMode != TransitModeTrain && dmReq.TransitMode != TransitModeTram && dmReq.TransitMode != TransitModeRail {
-		return response, fmt.Errorf("distancematrix: Unknown TransitMode '%s'", dmReq.TransitMode)
+	if r.TransitMode != "" && r.TransitMode != TransitModeBus && r.TransitMode != TransitModeSubway && r.TransitMode != TransitModeTrain && r.TransitMode != TransitModeTram && r.TransitMode != TransitModeRail {
+		return response, fmt.Errorf("distancematrix: Unknown TransitMode '%s'", r.TransitMode)
 	}
-	if dmReq.TransitRoutingPreference != "" && dmReq.TransitRoutingPreference != TransitRoutingPreferenceLessWalking && dmReq.TransitRoutingPreference != TransitRoutingPreferenceFewerTransfers {
-		return response, fmt.Errorf("distancematrix: Unknown TransitRoutingPreference '%s'", dmReq.TransitRoutingPreference)
+	if r.TransitRoutingPreference != "" && r.TransitRoutingPreference != TransitRoutingPreferenceLessWalking && r.TransitRoutingPreference != TransitRoutingPreferenceFewerTransfers {
+		return response, fmt.Errorf("distancematrix: Unknown TransitRoutingPreference '%s'", r.TransitRoutingPreference)
 	}
-	if dmReq.DepartureTime != "" && dmReq.ArrivalTime != "" {
+	if r.DepartureTime != "" && r.ArrivalTime != "" {
 		return response, errors.New("distancematrix: must not specify both DepartureTime and ArrivalTime")
 	}
 
@@ -61,32 +62,32 @@ func (dmReq *DistanceMatrixRequest) Get(ctx context.Context) (DistanceMatrixResp
 		return response, err
 	}
 	q := req.URL.Query()
-	q.Set("origins", strings.Join(dmReq.Origins, "|"))
-	q.Set("destinations", strings.Join(dmReq.Destinations, "|"))
+	q.Set("origins", strings.Join(r.Origins, "|"))
+	q.Set("destinations", strings.Join(r.Destinations, "|"))
 	q.Set("key", internal.APIKey(ctx))
-	if dmReq.Mode != "" {
-		q.Set("mode", dmReq.Mode)
+	if r.Mode != "" {
+		q.Set("mode", string(r.Mode))
 	}
-	if dmReq.Language != "" {
-		q.Set("language", dmReq.Language)
+	if r.Language != "" {
+		q.Set("language", r.Language)
 	}
-	if dmReq.Avoid != "" {
-		q.Set("avoid", dmReq.Avoid)
+	if r.Avoid != "" {
+		q.Set("avoid", string(r.Avoid))
 	}
-	if dmReq.Units != "" {
-		q.Set("units", dmReq.Units)
+	if r.Units != "" {
+		q.Set("units", string(r.Units))
 	}
-	if dmReq.DepartureTime != "" {
-		q.Set("departure_time", dmReq.DepartureTime)
+	if r.DepartureTime != "" {
+		q.Set("departure_time", r.DepartureTime)
 	}
-	if dmReq.ArrivalTime != "" {
-		q.Set("arrival_time", dmReq.ArrivalTime)
+	if r.ArrivalTime != "" {
+		q.Set("arrival_time", r.ArrivalTime)
 	}
-	if dmReq.TransitMode != "" {
-		q.Set("transit_mode", dmReq.TransitMode)
+	if r.TransitMode != "" {
+		q.Set("transit_mode", string(r.TransitMode))
 	}
-	if dmReq.TransitRoutingPreference != "" {
-		q.Set("transit_routing_preference", dmReq.TransitRoutingPreference)
+	if r.TransitRoutingPreference != "" {
+		q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
 	}
 
 	req.URL.RawQuery = q.Encode()
@@ -107,4 +108,76 @@ func (dmReq *DistanceMatrixRequest) Get(ctx context.Context) (DistanceMatrixResp
 	// httpDo waits for the closure we provided to return, so it's safe to
 	// read response here.
 	return response, err
+}
+
+// DistanceMatrixRequest is the request struct for Distance Matrix APi
+type DistanceMatrixRequest struct {
+	// Origins is a list of addresses and/or textual latitude/longitude values from which to calculate distance and time. Required.
+	Origins []string
+	// Destinations is a list of addresses and/or textual latitude/longitude values to which to calculate distance and time. Required.
+	Destinations []string
+	// Mode specifies the mode of transport to use when calculating distance. Valid values are `ModeDriving`, `ModeWalking`, `ModeBicycling`
+	// and `ModeTransit`. Optional.
+	Mode mode
+	// Language in which to return results. Optional.
+	Language string
+	// Avoid introduces restrictions to the route. Valid values are `AvoidTolls`, `AvoidHighways` and `AvoidFerries`. Optional.
+	Avoid avoid
+	// Units Specifies the unit system to use when expressing distance as text. Valid values are `UnitsMetric` and `UnitsImperial`. Optional.
+	Units units
+	// DepartureTime is the desired time of departure. You can specify the time as an integer in seconds since midnight, January 1, 1970 UTC.
+	// Alternatively, you can specify a value of `"now"``. Optional.
+	DepartureTime string
+	// ArrivalTime specifies the desired time of arrival for transit requests, in seconds since midnight, January 1, 1970 UTC. You cannot
+	// specify both `DepartureTime` and `ArrivalTime`. Optional.
+	ArrivalTime string
+	// TransitMode specifies one or more preferred modes of transit. This parameter may only be specified for requests where the mode is
+	// `transit`. Valid values are `TransitModeBus`, `TransitModeSubway`, `TransitModeTrain`, `TransitModeTram`, and `TransitModeRail`.
+	// Optional.
+	TransitMode transitMode
+	// TransitRoutingPreference Specifies preferences for transit requests. Valid values are `TransitRoutingPreferenceLessWalking` and
+	// `TransitRoutingPreferenceFewerTransfers`. Optional.
+	TransitRoutingPreference transitRoutingPreference
+}
+
+// DistanceMatrixResponse represents a Distance Matrix API response.
+type DistanceMatrixResponse struct {
+
+	// OriginAddresses contains an array of addresses as returned by the API from your original request.
+	OriginAddresses []string `json:"origin_addresses"`
+	// DestinationAddresses contains an array of addresses as returned by the API from your original request.
+	DestinationAddresses []string `json:"destination_addresses"`
+	// Rows contains an array of elements.
+	Rows []DistanceMatrixElementsRow `json:"rows"`
+
+	// Status contains the status of the request, and may contain
+	// debugging information to help you track down why the Directions
+	// service failed.
+	// See https://developers.google.com/maps/documentation/distancematrix/#StatusCodes
+	Status string `json:"status"`
+
+	// ErrorMessage is the explanatory field added when Status is an error.
+	ErrorMessage string `json:"error_message"`
+}
+
+// DistanceMatrixElementsRow is a row of distance elements.
+type DistanceMatrixElementsRow struct {
+	Elements []*DistanceMatrixElement `json:"elements"`
+}
+
+// DistanceMatrixElement is the travel distance and time for a pair of origin and destination.
+type DistanceMatrixElement struct {
+	Status string `json:"status"`
+	// Duration is the length of time it takes to travel this route.
+	Duration time.Duration `json:"duration"`
+	// Distance is the total distance of this route.
+	Distance Distance `json:"distance"`
+}
+
+// Distance is the API representation for a distance between two points.
+type Distance struct {
+	// Text is the distance in a human displayable form. The style of display can be changed by setting `units`.
+	Text string `json:"text"`
+	// Value is the distance in meters.
+	Value int `json:"value"`
 }
