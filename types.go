@@ -56,7 +56,16 @@ const (
 	TransitRoutingPreferenceFewerTransfers = "fewer_transfers"
 )
 
-// DistanceMatrixRequest is the functional options struct for DistanceMatrixGet
+// // LatLng represents a location.
+// type LatLng struct {
+// 	// Lat is the latitude of this location.
+// 	Lat float64 `json:"lat"`
+//
+// 	// Lng is the longitude of this location.
+// 	Lng float64 `json:"lng"`
+// }
+
+// DistanceMatrixRequest is the request structure for Distance Matrix API
 type DistanceMatrixRequest struct {
 	// Origins is a list of addresses and/or textual latitude/longitude values from which to calculate distance and time. Required.
 	Origins []string
@@ -126,4 +135,32 @@ type Distance struct {
 	Text string `json:"text"`
 	// Value is the distance in meters.
 	Value int `json:"value"`
+}
+
+// ElevationRequest is the request structure for Elevation API
+type ElevationRequest struct {
+	// Locations defines the location(s) on the earth from which to return elevation data.
+	Locations []LatLng
+	// Path defines a path on the earth for which to return elevation data.
+	Path []LatLng
+	// Samples specifies the number of sample points along a path for which to return elevation data.
+	Samples int
+}
+
+// ElevationResponse is the response structure for Elevation API
+type ElevationResponse struct {
+	// Status indicating if this request was successful
+	Status string `json:"status"`
+	// Results is the Elevation results array
+	Results []ElevationResult `json:"results"`
+}
+
+// ElevationResult is a single elevation at a specific location
+type ElevationResult struct {
+	// Location is the position for which elevation data is being computed.
+	Location *LatLng `json:"location"`
+	// Elevation indicates the elevation of the location in meters
+	Elevation float64 `json:"elevation"`
+	// Resolution indicates the maximum distance between data points from which the elevation was interpolated, in meters
+	Resolution float64 `json:"resolution"`
 }
