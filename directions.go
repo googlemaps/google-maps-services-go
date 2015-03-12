@@ -348,7 +348,7 @@ type TransitLine struct {
 	Vehicle TransitLineVehicle `json:"vehicle"`
 }
 
-// TransitAgency contains informatistringon about the operator of the line
+// TransitAgency contains information about the operator of the line
 type TransitAgency struct {
 	// Name contains the name of the transit agency
 	Name string `json:"name"`
