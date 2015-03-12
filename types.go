@@ -60,3 +60,11 @@ const (
 	// TransitRoutingPreferenceFewerTransfers indicates that the calculated route should prefer a limited number of transfers
 	TransitRoutingPreferenceFewerTransfers = transitRoutingPreference("fewer_transfers")
 )
+
+// Distance is the API representation for a distance between two points.
+type Distance struct {
+	// Text is the distance in a human displayable form. The style of display can be changed by setting `units`.
+	Text string `json:"text"`
+	// Value is the distance in meters.
+	Value int `json:"value"`
+}

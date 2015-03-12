@@ -26,7 +26,6 @@ import (
 
 	"github.com/kr/pretty"
 	"google.golang.org/maps"
-	"google.golang.org/maps/directions"
 )
 
 var (
@@ -61,33 +60,92 @@ func main() {
 		usageAndExit("Please specify an API Key.")
 	}
 
-	req := &directions.DirectionsRequest{
+	r := &maps.DirectionsRequest{
 		Origin:        *origin,
 		Destination:   *destination,
-		Mode:          *mode,
 		DepartureTime: *departureTime,
 		ArrivalTime:   *arrivalTime,
 		Alternatives:  *alternatives,
 		Language:      *language,
-		Units:         *units,
 		Region:        *region,
-		TransitRoutingPreference: *transitRoutingPreference,
-	}
-	if *waypoints != "" {
-		req.Waypoints = strings.Split(*waypoints, "|")
-	}
-	if *avoid != "" {
-		req.Avoid = strings.Split(*avoid, "|")
-	}
-	if *transitMode != "" {
-		req.TransitMode = strings.Split(*transitMode, "|")
 	}
 
+	lookupMode(*mode, r)
+	lookupUnits(*units, r)
+	lookupTransitRoutingPreference(*transitRoutingPreference, r)
+
+	if *waypoints != "" {
+		r.Waypoints = strings.Split(*waypoints, "|")
+	}
+
+	if *avoid != "" {
+		for _, a := range strings.Split(*avoid, "|") {
+			switch {
+			case a == "tolls":
+				r.Avoid = append(r.Avoid, maps.AvoidTolls)
+			case a == "highways":
+				r.Avoid = append(r.Avoid, maps.AvoidHighways)
+			case a == "ferries":
+				r.Avoid = append(r.Avoid, maps.AvoidFerries)
+			}
+		}
+
+	}
+	if *transitMode != "" {
+		for _, t := range strings.Split(*transitMode, "|") {
+			switch {
+			case t == "bus":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeBus)
+			case t == "subway":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeSubway)
+			case t == "train":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeTrain)
+			case t == "tram":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeTram)
+			case t == "rail":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeRail)
+			}
+		}
+	}
+
+	pretty.Println(r)
+
 	ctx := maps.NewContext(*apiKey, client)
-	resp, err := req.Get(ctx)
+	resp, err := r.Get(ctx)
 	if err != nil {
 		log.Fatalf("fatal error %v", err)
 	}
 
 	pretty.Println(resp)
+}
+
+func lookupMode(mode string, r *maps.DirectionsRequest) {
+	switch {
+	case mode == "driving":
+		r.Mode = maps.ModeDriving
+	case mode == "walking":
+		r.Mode = maps.ModeWalking
+	case mode == "bicycling":
+		r.Mode = maps.ModeBicycling
+	case mode == "transit":
+		r.Mode = maps.ModeTransit
+	}
+}
+
+func lookupUnits(units string, r *maps.DirectionsRequest) {
+	switch {
+	case units == "metric":
+		r.Units = maps.UnitsMetric
+	case units == "imperial":
+		r.Units = maps.UnitsImperial
+	}
+}
+
+func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.DirectionsRequest) {
+	switch {
+	case transitRoutingPreference == "fewer_transfers":
+		r.TransitRoutingPreference = maps.TransitRoutingPreferenceFewerTransfers
+	case transitRoutingPreference == "less_walking":
+		r.TransitRoutingPreference = maps.TransitRoutingPreferenceLessWalking
+	}
 }

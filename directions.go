@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package directions contains a Google Directions API client.
-//
 // More information about Google Directions API is available on
 // https://developers.google.com/maps/documentation/directions/
-package directions // import "google.golang.org/maps/directions"
+package maps // import "google.golang.org/maps"
 
 import (
 	"encoding/json"
@@ -33,8 +31,141 @@ import (
 	"golang.org/x/net/context"
 )
 
-// Response represents a Directions API response.
-type Response struct {
+// Get issues the Directions request and retrieves the Response
+func (r *DirectionsRequest) Get(ctx context.Context) (DirectionsResponse, error) {
+	var response DirectionsResponse
+
+	if r.Origin == "" {
+		return response, errors.New("directions: Origin required")
+	}
+	if r.Destination == "" {
+		return response, errors.New("directions: Destination required")
+	}
+	if r.Mode != "" && ModeDriving != r.Mode && ModeWalking != r.Mode && ModeBicycling != r.Mode && ModeTransit != r.Mode {
+		return response, fmt.Errorf("directions: unknown Mode: '%s'", r.Mode)
+	}
+	for _, avoid := range r.Avoid {
+		if avoid != AvoidTolls && avoid != AvoidHighways && avoid != AvoidFerries {
+			return response, fmt.Errorf("directions: Unknown Avoid restriction '%s'", avoid)
+		}
+	}
+	if r.Units != "" && r.Units != UnitsMetric && r.Units != UnitsImperial {
+		return response, fmt.Errorf("directions: Unknown Units '%s'", r.Units)
+	}
+	for _, transitMode := range r.TransitMode {
+		if transitMode != TransitModeBus && transitMode != TransitModeSubway && transitMode != TransitModeTrain && transitMode != TransitModeTram && transitMode != TransitModeRail {
+			return response, fmt.Errorf("directions: Unknown TransitMode '%s'", r.TransitMode)
+		}
+	}
+	if r.TransitRoutingPreference != "" && r.TransitRoutingPreference != TransitRoutingPreferenceLessWalking && r.TransitRoutingPreference != TransitRoutingPreferenceFewerTransfers {
+		return response, fmt.Errorf("directions: Unknown TransitRoutingPreference '%s'", r.TransitRoutingPreference)
+	}
+	if r.DepartureTime != "" && r.ArrivalTime != "" {
+		return response, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
+	}
+
+	if r.DepartureTime != "" && r.ArrivalTime != "" {
+		return response, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
+	}
+	if len(r.TransitMode) != 0 && r.Mode != ModeTransit {
+		return response, errors.New("directions: must specify mode of transit when specifying transitMode")
+	}
+	if r.TransitRoutingPreference != "" && r.Mode != ModeTransit {
+		return response, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
+	}
+
+	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/directions/json", nil)
+	if err != nil {
+		return response, err
+	}
+	q := req.URL.Query()
+	q.Set("origin", r.Origin)
+	q.Set("destination", r.Destination)
+	q.Set("key", internal.APIKey(ctx))
+	if r.Mode != "" {
+		q.Set("mode", string(r.Mode))
+	}
+	if len(r.Waypoints) != 0 {
+		q.Set("waypoints", strings.Join(r.Waypoints, "|"))
+	}
+	if r.Alternatives {
+		q.Set("alternatives", "true")
+	}
+	if len(r.Avoid) > 0 {
+		var avoid []string
+		for _, a := range r.Avoid {
+			avoid = append(avoid, string(a))
+		}
+		q.Set("avoid", strings.Join(avoid, "|"))
+	}
+	if r.Language != "" {
+		q.Set("language", r.Language)
+	}
+	if r.Units != "" {
+		q.Set("units", string(r.Units))
+	}
+	if r.Region != "" {
+		q.Set("region", r.Region)
+	}
+	if len(r.TransitMode) != 0 {
+		var transitMode []string
+		for _, t := range r.TransitMode {
+			transitMode = append(transitMode, string(t))
+		}
+		q.Set("transit_mode", strings.Join(transitMode, "|"))
+	}
+	req.URL.RawQuery = q.Encode()
+
+	log.Println("Request:", req)
+
+	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+
+		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+			return err
+		}
+		return nil
+	})
+	// httpDo waits for the closure we provided to return, so it's safe to
+	// read response here.
+	return response, err
+}
+
+// DirectionsRequest is the functional options struct for directions.Get
+type DirectionsRequest struct {
+	// Origin is the address or textual latitude/longitude value from which you wish to calculate directions. Required.
+	Origin string
+	// Destination is the address or textual latitude/longitude value from which you wish to calculate directions. Required.
+	Destination string
+	// Mode specifies the mode of transport to use when calculating directions. Optional.
+	Mode mode
+	// DepartureTime specifies the desired time of departure. You can specify the time as an integer in seconds since midnight, January 1, 1970 UTC. Alternatively, you can specify a value of `"now"`. Optional.
+	DepartureTime string
+	// ArrivalTime specifies the desired time of arrival for transit directions, in seconds since midnight, January 1, 1970 UTC. Optional. You cannot specify both `DepartureTime` and `ArrivalTime`.
+	ArrivalTime string
+	// Waypoints specifies an array of points to add to a route. Optional.
+	Waypoints []string
+	// Alternatives specifies if Directions service may provide more than one route alternative in the response. Optional.
+	Alternatives bool
+	// Avoid indicates that the calculated route(s) should avoid the indicated features. Optional.
+	Avoid []avoid
+	// Language specifies the language in which to return results. Optional.
+	Language string
+	// Units specifies the unit system to use when displaying results. Optional.
+	Units units
+	// Region specifies the region code, specified as a ccTLD two-character value. Optional.
+	Region string
+	// TransitMode specifies one or more preferred modes of transit. This parameter may only be specified for transit directions. Optional.
+	TransitMode []transitMode
+	// TransitRoutingPreference specifies preferences for transit routes. Optional.
+	TransitRoutingPreference transitRoutingPreference
+}
+
+// DirectionsResponse represents a Directions API response.
+type DirectionsResponse struct {
 	// Routes lists the found routes between origin and destination.
 	Routes []Route
 
@@ -217,7 +348,7 @@ type TransitLine struct {
 	Vehicle TransitLineVehicle `json:"vehicle"`
 }
 
-// TransitAgency contains information about the operator of the line
+// TransitAgency contains informatistringon about the operator of the line
 type TransitAgency struct {
 	// Name contains the name of the transit agency
 	Name string `json:"name"`
@@ -235,200 +366,4 @@ type TransitLineVehicle struct {
 	Type string `json:"type"`
 	// Icon contains the URL for an icon associated with this vehicle type
 	Icon *url.URL `json:"icon"`
-}
-
-// Distance represents a distance covered in a step or leg.
-type Distance struct {
-	// Value indicates the distance in meters
-	Value int64 `json:"value"`
-
-	// Text contains a human-readable representation of the distance.
-	Text string `json:"text"`
-}
-
-// DirectionsRequest is the functional options struct for directions.Get
-type DirectionsRequest struct {
-	// Origin is the address or textual latitude/longitude value from which you wish to calculate directions. Required.
-	Origin string
-	// Destination is the address or textual latitude/longitude value from which you wish to calculate directions. Required.
-	Destination string
-	// Mode specifies the mode of transport to use when calculating directions. Optional.
-	Mode string
-	// DepartureTime specifies the desired time of departure. You can specify the time as an integer in seconds since midnight, January 1, 1970 UTC. Alternatively, you can specify a value of `"now"`. Optional.
-	DepartureTime string
-	// ArrivalTime specifies the desired time of arrival for transit directions, in seconds since midnight, January 1, 1970 UTC. Optional. You cannot specify both `DepartureTime` and `ArrivalTime`.
-	ArrivalTime string
-	// Waypoints specifies an array of points to add to a route. Optional.
-	Waypoints []string
-	// Alternatives specifies if Directions service may provide more than one route alternative in the response. Optional.
-	Alternatives bool
-	// Avoid indicates that the calculated route(s) should avoid the indicated features. Optional.
-	Avoid []string
-	// Language specifies the language in which to return results. Optional.
-	Language string
-	// Units specifies the unit system to use when displaying results. Optional.
-	Units string
-	// Region specifies the region code, specified as a ccTLD two-character value. Optional.
-	Region string
-	// TransitMode specifies one or more preferred modes of transit. This parameter may only be specified for transit directions. Optional.
-	TransitMode []string
-	// TransitRoutingPreference specifies preferences for transit routes. Optional.
-	TransitRoutingPreference string
-}
-
-const (
-	// ModeDriving is for specifying driving as travel mode
-	ModeDriving = "driving"
-	// ModeWalking is for specifying walking as travel mode
-	ModeWalking = "walking"
-	// ModeBicycling is for specifying bicycling as travel mode
-	ModeBicycling = "bicycling"
-	// ModeTransit is for specifying transit as travel mode
-	ModeTransit = "transit"
-
-	// AvoidTolls is for specifying routes that avoid tolls
-	AvoidTolls = "tolls"
-	// AvoidHighways is for specifying routes that avoid highways
-	AvoidHighways = "highways"
-	// AvoidFerries is for specifying routes that avoid ferries
-	AvoidFerries = "ferries"
-
-	// UnitsMetric specifies usage of the metric units system
-	UnitsMetric = "metric"
-	// UnitsImperial specifies usage of the Imperial (English) units system
-	UnitsImperial = "imperial"
-
-	// TransitModeBus is for specifying a transit mode of bus
-	TransitModeBus = "bus"
-	// TransitModeSubway is for specifying a transit mode of subway
-	TransitModeSubway = "subway"
-	// TransitModeTrain is for specifying a transit mode of train
-	TransitModeTrain = "train"
-	// TransitModeTram is for specifying a transit mode of tram
-	TransitModeTram = "tram"
-	// TransitModeRail is for specifying a transit mode of rail
-	TransitModeRail = "rail"
-
-	// TransitRoutingPreferenceLessWalking indicates that the calculated route should prefer limited amounts of walking
-	TransitRoutingPreferenceLessWalking = "less_walking"
-	// TransitRoutingPreferenceFewerTransfers indicates that the calculated route should prefer a limited number of transfers
-	TransitRoutingPreferenceFewerTransfers = "fewer_transfers"
-)
-
-// Get issues the Directions request and retrieves the Response
-func (dirReq *DirectionsRequest) Get(ctx context.Context) (Response, error) {
-	var response Response
-
-	if dirReq.Origin == "" {
-		return response, errors.New("directions: Origin required")
-	}
-	if dirReq.Destination == "" {
-		return response, errors.New("directions: Destination required")
-	}
-	if dirReq.Mode != "" && ModeDriving != dirReq.Mode && ModeWalking != dirReq.Mode && ModeBicycling != dirReq.Mode && ModeTransit != dirReq.Mode {
-		return response, fmt.Errorf("directions: unknown Mode: '%s'", dirReq.Mode)
-	}
-	for _, avoid := range dirReq.Avoid {
-		if avoid != AvoidTolls && avoid != AvoidHighways && avoid != AvoidFerries {
-			return response, fmt.Errorf("directions: Unknown Avoid restriction '%s'", avoid)
-		}
-	}
-	if dirReq.Units != "" && dirReq.Units != UnitsMetric && dirReq.Units != UnitsImperial {
-		return response, fmt.Errorf("directions: Unknown Units '%s'", dirReq.Units)
-	}
-	for _, transitMode := range dirReq.TransitMode {
-		if transitMode != TransitModeBus && transitMode != TransitModeSubway && transitMode != TransitModeTrain && transitMode != TransitModeTram && transitMode != TransitModeRail {
-			return response, fmt.Errorf("directions: Unknown TransitMode '%s'", dirReq.TransitMode)
-		}
-	}
-	if dirReq.TransitRoutingPreference != "" && dirReq.TransitRoutingPreference != TransitRoutingPreferenceLessWalking && dirReq.TransitRoutingPreference != TransitRoutingPreferenceFewerTransfers {
-		return response, fmt.Errorf("directions: Unknown TransitRoutingPreference '%s'", dirReq.TransitRoutingPreference)
-	}
-	if dirReq.DepartureTime != "" && dirReq.ArrivalTime != "" {
-		return response, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
-	}
-
-	if dirReq.DepartureTime != "" && dirReq.ArrivalTime != "" {
-		return response, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
-	}
-	if len(dirReq.TransitMode) != 0 && dirReq.Mode != ModeTransit {
-		return response, errors.New("directions: must specify mode of transit when specifying transitMode")
-	}
-	if dirReq.TransitRoutingPreference != "" && dirReq.Mode != ModeTransit {
-		return response, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
-	}
-
-	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/directions/json", nil)
-	if err != nil {
-		return response, err
-	}
-	q := req.URL.Query()
-	q.Set("origin", dirReq.Origin)
-	q.Set("destination", dirReq.Destination)
-	q.Set("key", internal.APIKey(ctx))
-	if dirReq.Mode != "" {
-		q.Set("mode", dirReq.Mode)
-	}
-	if len(dirReq.Waypoints) != 0 {
-		q.Set("waypoints", strings.Join(dirReq.Waypoints, "|"))
-	}
-	if dirReq.Alternatives {
-		q.Set("alternatives", "true")
-	}
-	if len(dirReq.Avoid) > 0 {
-		q.Set("avoid", strings.Join(dirReq.Avoid, "|"))
-	}
-	if dirReq.Language != "" {
-		q.Set("language", dirReq.Language)
-	}
-	if dirReq.Units != "" {
-		q.Set("units", dirReq.Units)
-	}
-	if dirReq.Region != "" {
-		q.Set("region", dirReq.Region)
-	}
-	if len(dirReq.TransitMode) != 0 {
-		q.Set("transit_mode", strings.Join(dirReq.TransitMode, "|"))
-	}
-	req.URL.RawQuery = q.Encode()
-
-	log.Println("Request:", req)
-
-	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-
-		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			return err
-		}
-		return nil
-	})
-	// httpDo waits for the closure we provided to return, so it's safe to
-	// read response here.
-	return response, err
-}
-
-func httpDo(ctx context.Context, req *http.Request, f func(*http.Response, error) error) error {
-	// Run the HTTP request in a goroutine and pass the response to f.
-	tr := &http.Transport{}
-	client := &http.Client{Transport: tr}
-	c := make(chan error, 1)
-	go func() { c <- f(client.Do(req)) }()
-	select {
-	case <-ctx.Done():
-		tr.CancelRequest(req)
-		<-c // Wait for f to return.
-		return ctx.Err()
-	case err := <-c:
-		return err
-	}
-}
-
-func rawService(ctx context.Context) *http.Client {
-	return internal.Service(ctx, "directions", func(hc *http.Client) interface{} {
-		// TODO(brettmorgan): Introduce a rate limiting wrapper for hc here.
-		return hc
-	}).(*http.Client)
 }
