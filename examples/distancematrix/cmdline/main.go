@@ -75,7 +75,7 @@ func main() {
 
 	resp, err := r.Get(ctx)
 	if err != nil {
-		log.Fatalf("Could not request distancematrix: %v", err)
+		log.Fatalf("error %v", err)
 	}
 
 	pretty.Println(resp)
