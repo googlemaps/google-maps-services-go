@@ -49,12 +49,12 @@ func (r *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
 		if r.Samples == 0 {
 			return nil, errors.New("elevation: Sampled Path Request requires Samples to be specifed")
 		}
-		q.Set("path", fmt.Sprintf("enc:%s", Encode(r.Path).Points))
+		q.Set("path", fmt.Sprintf("enc:%s", Encode(r.Path)))
 		q.Set("samples", strconv.Itoa(r.Samples))
 	}
 
 	if len(r.Locations) > 0 {
-		q.Set("locations", fmt.Sprintf("enc:%s", Encode(r.Locations).Points))
+		q.Set("locations", fmt.Sprintf("enc:%s", Encode(r.Locations)))
 	}
 
 	req.URL.RawQuery = q.Encode()

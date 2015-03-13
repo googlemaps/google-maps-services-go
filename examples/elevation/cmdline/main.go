@@ -85,11 +85,7 @@ func main() {
 // https://developers.google.com/maps/documentation/elevation/#Locations
 func decodeLocations(location string) ([]maps.LatLng, error) {
 	if strings.HasPrefix(location, "enc:") {
-		// Polyline encoded path
-		p := &maps.Polyline{
-			Points: location[len("enc:"):],
-		}
-		return p.Decode(), nil
+		return maps.DecodePolyline(location[len("enc:"):]), nil
 	}
 	result := []maps.LatLng{}
 	if strings.Contains(location, "|") {
@@ -129,11 +125,7 @@ func decodeLocations(location string) ([]maps.LatLng, error) {
 // https://developers.google.com/maps/documentation/elevation/#Paths
 func decodePath(path string) ([]maps.LatLng, error) {
 	if strings.HasPrefix(path, "enc:") {
-		// Polyline encoded path
-		p := &maps.Polyline{
-			Points: path[len("enc:"):],
-		}
-		return p.Decode(), nil
+		return maps.DecodePolyline(path[len("enc:"):]), nil
 	}
 	result := []maps.LatLng{}
 	if strings.Contains(path, "|") {
