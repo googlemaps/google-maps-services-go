@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"time"
 
+	"google.golang.org/maps"
 	"google.golang.org/maps/internal"
 
 	"golang.org/x/net/context"
@@ -56,10 +57,10 @@ type Route struct {
 	WaypointOrder []int `json:"waypoint_order"`
 
 	// OverviewPolyline contains an approximate (smoothed) path of the resulting directions.
-	OverviewPolyline Polyline `json:"overview_polyline"`
+	OverviewPolyline maps.Polyline `json:"overview_polyline"`
 
 	// Bounds contains the viewport bounding box of the overview polyline.
-	Bounds `json:"bounds"`
+	maps.Bounds `json:"bounds"`
 
 	// Copyrights contains the copyrights text to be displayed for this route. You must handle
 	// and display this information yourself.
@@ -70,31 +71,6 @@ type Route struct {
 	Warnings []string `json:"warnings"`
 }
 
-// Bounds represents a bounded area on a map.
-type Bounds struct {
-	// The north east corner of the bounded area.
-	NorthEast LatLng `json:"northeast"`
-
-	// The south west corner of the bounded area.
-	SouthWest LatLng `json:"southwest"`
-}
-
-// LatLng represents a location.
-type LatLng struct {
-	// Lat is the latitude of this location.
-	Lat float64 `json:"lat"`
-
-	// Lng is the longitude of this location.
-	Lng float64 `json:"lng"`
-}
-
-// Polyline represents a list of lat,lng points, encoded as a string.
-// See: https://developers.google.com/maps/documentation/utilities/polylinealgorithm
-type Polyline struct {
-	Points string `json:"points"`
-}
-
-// Leg represents a single leg of a route.
 type Leg struct {
 	// Steps contains an array of steps denoting information about each separate step of the
 	// leg of the journey.
@@ -115,10 +91,10 @@ type Leg struct {
 	DepartureTime time.Time `json:"departure_time"`
 
 	// StartLocation contains the latitude/longitude coordinates of the origin of this leg.
-	StartLocation LatLng `json:"start_location"`
+	StartLocation maps.LatLng `json:"start_location"`
 
 	// EndLocation contains the latitude/longitude coordinates of the destination of this leg.
-	EndLocation LatLng `json:"end_location"`
+	EndLocation maps.LatLng `json:"end_location"`
 
 	// StartAddress contains the human-readable address (typically a street address)
 	// reflecting the start location of this leg.
@@ -142,15 +118,15 @@ type Step struct {
 
 	// StartLocation contains the location of the starting point of this step, as a single set of lat
 	// and lng fields.
-	StartLocation LatLng `json:"start_location"`
+	StartLocation maps.LatLng `json:"start_location"`
 
 	// end_location contains the location of the last point of this step, as a single set of lat and
 	// lng fields.
-	EndLocation LatLng `json:"end_location"`
+	EndLocation maps.LatLng `json:"end_location"`
 
 	// polyline contains a single points object that holds an encoded polyline representation of the
 	// step. This polyline is an approximate (smoothed) path of the step.
-	Polyline `json:"polyline"`
+	maps.Polyline `json:"polyline"`
 
 	// Steps contains detailed directions for walking or driving steps in transit directions. Substeps
 	// are only available when travel_mode is set to "transit". The inner steps array is of the same
