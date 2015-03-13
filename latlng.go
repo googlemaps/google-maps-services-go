@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	Epsilon = 0.0001
+	epsilon = 0.0001
 )
 
 // LatLng represents a location on the Earth.
@@ -28,10 +28,10 @@ type LatLng struct {
 	Lng float64 `json:"lng"` // longitude
 }
 
-// AlmostEqual returns whether this LatLng is almost equal (below Epsilon) to
+// AlmostEqual returns whether this LatLng is almost equal (below epsilon) to
 // the other LatLng.
 func (l *LatLng) AlmostEqual(other *LatLng) bool {
-	return math.Abs(l.Lat-other.Lat) < Epsilon && math.Abs(l.Lng-other.Lng) < Epsilon
+	return math.Abs(l.Lat-other.Lat) < epsilon && math.Abs(l.Lng-other.Lng) < epsilon
 }
 
 // Bounds represents a bounded square area on the Earth.
