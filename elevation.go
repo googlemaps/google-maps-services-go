@@ -41,6 +41,10 @@ func (eReq *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error
 	q := req.URL.Query()
 	q.Set("key", internal.APIKey(ctx))
 
+	if len(eReq.Path) == 0 && len(eReq.Locations) == 0 {
+		return nil, errors.New("elevation: Provide either Path or Locations")
+	}
+
 	if len(eReq.Path) > 0 {
 		// Sampled path request
 		if eReq.Samples == 0 {
