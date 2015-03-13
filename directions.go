@@ -14,6 +14,7 @@
 
 // More information about Google Directions API is available on
 // https://developers.google.com/maps/documentation/directions/
+
 package maps // import "google.golang.org/maps"
 
 import (
@@ -41,7 +42,7 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 	if r.Destination == "" {
 		return nil, errors.New("directions: Destination required")
 	}
-	if r.Mode != "" && ModeDriving != r.Mode && ModeWalking != r.Mode && ModeBicycling != r.Mode && ModeTransit != r.Mode {
+	if r.Mode != "" && TravelModeDriving != r.Mode && TravelModeWalking != r.Mode && TravelModeBicycling != r.Mode && TravelModeTransit != r.Mode {
 		return nil, fmt.Errorf("directions: unknown Mode: '%s'", r.Mode)
 	}
 	for _, avoid := range r.Avoid {
@@ -67,10 +68,10 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 	if r.DepartureTime != "" && r.ArrivalTime != "" {
 		return nil, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
 	}
-	if len(r.TransitMode) != 0 && r.Mode != ModeTransit {
+	if len(r.TransitMode) != 0 && r.Mode != TravelModeTransit {
 		return nil, errors.New("directions: must specify mode of transit when specifying transitMode")
 	}
-	if r.TransitRoutingPreference != "" && r.Mode != ModeTransit {
+	if r.TransitRoutingPreference != "" && r.Mode != TravelModeTransit {
 		return nil, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
 	}
 
