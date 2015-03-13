@@ -83,6 +83,6 @@ func parseLocation(location string, r *maps.TimezoneRequest) {
 			Lng: lng,
 		}
 	} else {
-		usageAndExit("latlng is required")
+		usageAndExit("location is required")
 	}
 }
