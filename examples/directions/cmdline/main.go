@@ -122,13 +122,13 @@ func main() {
 func lookupMode(mode string, r *maps.DirectionsRequest) {
 	switch {
 	case mode == "driving":
-		r.Mode = maps.ModeDriving
+		r.Mode = maps.TravelModeDriving
 	case mode == "walking":
-		r.Mode = maps.ModeWalking
+		r.Mode = maps.TravelModeWalking
 	case mode == "bicycling":
-		r.Mode = maps.ModeBicycling
+		r.Mode = maps.TravelModeBicycling
 	case mode == "transit":
-		r.Mode = maps.ModeTransit
+		r.Mode = maps.TravelModeTransit
 	}
 }
 
