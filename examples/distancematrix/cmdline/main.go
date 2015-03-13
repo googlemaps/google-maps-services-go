@@ -58,11 +58,16 @@ func main() {
 	ctx := maps.NewContext(*apiKey, client)
 
 	r := &maps.DistanceMatrixRequest{
-		Origins:       strings.Split(*origins, "|"),
-		Destinations:  strings.Split(*destinations, "|"),
 		Language:      *language,
 		DepartureTime: *departureTime,
 		ArrivalTime:   *arrivalTime,
+	}
+
+	if len(*origins) != 0 {
+		r.Origins = strings.Split(*origins, "|")
+	}
+	if len(*destinations) != 0 {
+		r.Destinations = strings.Split(*destinations, "|")
 	}
 
 	lookupMode(*mode, r)
@@ -84,13 +89,13 @@ func main() {
 func lookupMode(mode string, r *maps.DistanceMatrixRequest) {
 	switch {
 	case mode == "driving":
-		r.Mode = maps.ModeDriving
+		r.Mode = maps.TravelModeDriving
 	case mode == "walking":
-		r.Mode = maps.ModeWalking
+		r.Mode = maps.TravelModeWalking
 	case mode == "bicycling":
-		r.Mode = maps.ModeBicycling
+		r.Mode = maps.TravelModeBicycling
 	case mode == "transit":
-		r.Mode = maps.ModeTransit
+		r.Mode = maps.TravelModeTransit
 	}
 }
 
