@@ -57,23 +57,83 @@ func main() {
 	}
 	ctx := maps.NewContext(*apiKey, client)
 
-	dmReq := &maps.DistanceMatrixRequest{
-		Origins:                  strings.Split(*origins, "|"),
-		Destinations:             strings.Split(*destinations, "|"),
-		Mode:                     *mode,
-		Language:                 *language,
-		Avoid:                    *avoid,
-		Units:                    *units,
-		DepartureTime:            *departureTime,
-		ArrivalTime:              *arrivalTime,
-		TransitMode:              *transitMode,
-		TransitRoutingPreference: *transitRoutingPreference,
+	r := &maps.DistanceMatrixRequest{
+		Origins:       strings.Split(*origins, "|"),
+		Destinations:  strings.Split(*destinations, "|"),
+		Language:      *language,
+		DepartureTime: *departureTime,
+		ArrivalTime:   *arrivalTime,
 	}
 
-	resp, err := dmReq.Get(ctx)
+	lookupMode(*mode, r)
+	lookupAvoid(*avoid, r)
+	lookupUnits(*units, r)
+	lookupTransitMode(*transitMode, r)
+	lookupTransitRoutingPreference(*transitRoutingPreference, r)
+
+	pretty.Println(r)
+
+	resp, err := r.Get(ctx)
 	if err != nil {
-		log.Fatalf("Could not request distancematrix: %v", err)
+		log.Fatalf("error %v", err)
 	}
 
 	pretty.Println(resp)
+}
+
+func lookupMode(mode string, r *maps.DistanceMatrixRequest) {
+	switch {
+	case mode == "driving":
+		r.Mode = maps.ModeDriving
+	case mode == "walking":
+		r.Mode = maps.ModeWalking
+	case mode == "bicycling":
+		r.Mode = maps.ModeBicycling
+	case mode == "transit":
+		r.Mode = maps.ModeTransit
+	}
+}
+
+func lookupAvoid(avoid string, r *maps.DistanceMatrixRequest) {
+	switch {
+	case avoid == "tolls":
+		r.Avoid = maps.AvoidTolls
+	case avoid == "highways":
+		r.Avoid = maps.AvoidHighways
+	case avoid == "ferries":
+		r.Avoid = maps.AvoidFerries
+	}
+}
+
+func lookupUnits(units string, r *maps.DistanceMatrixRequest) {
+	switch {
+	case units == "metric":
+		r.Units = maps.UnitsMetric
+	case units == "imperial":
+		r.Units = maps.UnitsImperial
+	}
+}
+
+func lookupTransitMode(transitMode string, r *maps.DistanceMatrixRequest) {
+	switch {
+	case transitMode == "bus":
+		r.TransitMode = maps.TransitModeBus
+	case transitMode == "subway":
+		r.TransitMode = maps.TransitModeSubway
+	case transitMode == "train":
+		r.TransitMode = maps.TransitModeTrain
+	case transitMode == "tram":
+		r.TransitMode = maps.TransitModeTram
+	case transitMode == "rail":
+		r.TransitMode = maps.TransitModeRail
+	}
+}
+
+func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.DistanceMatrixRequest) {
+	switch {
+	case transitRoutingPreference == "fewer_transfers":
+		r.TransitRoutingPreference = maps.TransitRoutingPreferenceFewerTransfers
+	case transitRoutingPreference == "less_walking":
+		r.TransitRoutingPreference = maps.TransitRoutingPreferenceLessWalking
+	}
 }

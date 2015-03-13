@@ -14,6 +14,7 @@
 
 // More information about Google Distance Matrix API is available on
 // https://developers.google.com/maps/documentation/distancematrix/
+
 package maps // import "google.golang.org/maps"
 
 import (
@@ -79,4 +80,32 @@ func (eReq *ElevationRequest) Get(ctx context.Context) (ElevationResponse, error
 	// httpDo waits for the closure we provided to return, so it's safe to
 	// read response here.
 	return response, err
+}
+
+// ElevationRequest is the request structure for Elevation API
+type ElevationRequest struct {
+	// Locations defines the location(s) on the earth from which to return elevation data.
+	Locations []LatLng
+	// Path defines a path on the earth for which to return elevation data.
+	Path []LatLng
+	// Samples specifies the number of sample points along a path for which to return elevation data.
+	Samples int
+}
+
+// ElevationResponse is the response structure for Elevation API
+type ElevationResponse struct {
+	// Status indicating if this request was successful
+	Status string `json:"status"`
+	// Results is the Elevation results array
+	Results []ElevationResult `json:"results"`
+}
+
+// ElevationResult is a single elevation at a specific location
+type ElevationResult struct {
+	// Location is the position for which elevation data is being computed.
+	Location *LatLng `json:"location"`
+	// Elevation indicates the elevation of the location in meters
+	Elevation float64 `json:"elevation"`
+	// Resolution indicates the maximum distance between data points from which the elevation was interpolated, in meters
+	Resolution float64 `json:"resolution"`
 }
