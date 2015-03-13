@@ -22,15 +22,27 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
+	"github.com/kr/pretty"
 	"google.golang.org/maps"
-	"google.golang.org/maps/directions"
 )
 
 var (
-	apiKey      = flag.String("key", "", "API Key for using Google Maps API.")
-	origin      = flag.String("origin", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
-	destination = flag.String("destination", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
+	apiKey                   = flag.String("key", "", "API Key for using Google Maps API.")
+	origin                   = flag.String("origin", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
+	destination              = flag.String("destination", "", "The address or textual latitude/longitude value from which you wish to calculate directions.")
+	mode                     = flag.String("mode", "", "The travel mode for this directions request.")
+	departureTime            = flag.String("departure_time", "", "The depature time for transit mode directions request.")
+	arrivalTime              = flag.String("arrival_time", "", "The arrival time for transit mode directions request.")
+	waypoints                = flag.String("waypoints", "", "The waypoints for driving directions request, | separated.")
+	alternatives             = flag.Bool("alternatives", false, "Whether the Directions service may provide more than one route alternative in the response.")
+	avoid                    = flag.String("avoid", "", "Indicates that the calculated route(s) should avoid the indicated features, | separated.")
+	language                 = flag.String("language", "", "Specifies the language in which to return results.")
+	units                    = flag.String("units", "", "Specifies the unit system to use when returning results.")
+	region                   = flag.String("region", "", "Specifies the region code, specified as a ccTLD (\"top-level domain\") two-character value.")
+	transitMode              = flag.String("transit_mode", "", "Specifies one or more preferred modes of transit, | separated. This parameter may only be specified for transit directions.")
+	transitRoutingPreference = flag.String("transit_routing_preference", "", "Specifies preferences for transit routes.")
 )
 
 func usageAndExit(msg string) {
@@ -43,47 +55,97 @@ func usageAndExit(msg string) {
 func main() {
 	flag.Parse()
 	client := &http.Client{}
+
 	if *apiKey == "" {
 		usageAndExit("Please specify an API Key.")
 	}
-	if *origin == "" {
-		usageAndExit("Please specify an origin.")
-	}
-	if *destination == "" {
-		usageAndExit("Please specify a destination.")
-	}
-	ctx := maps.NewContext(*apiKey, client)
-	resp, err := directions.Get(ctx, *origin, *destination)
-	if err != nil {
-		log.Fatalf("Could not request directions: %v", err)
+
+	r := &maps.DirectionsRequest{
+		Origin:        *origin,
+		Destination:   *destination,
+		DepartureTime: *departureTime,
+		ArrivalTime:   *arrivalTime,
+		Alternatives:  *alternatives,
+		Language:      *language,
+		Region:        *region,
 	}
 
-	if len(resp.Routes) == 0 {
-		log.Fatalf("No results")
+	lookupMode(*mode, r)
+	lookupUnits(*units, r)
+	lookupTransitRoutingPreference(*transitRoutingPreference, r)
+
+	if *waypoints != "" {
+		r.Waypoints = strings.Split(*waypoints, "|")
 	}
-	route := resp.Routes[0]
 
-	fmt.Println("Summary:", route.Summary)
-	fmt.Printf("Bounds NorthEast lat/lng: %f,%f\n", route.Bounds.NorthEast.Lat, route.Bounds.NorthEast.Lng)
-	fmt.Printf("Bounds SouthWest lat/lng: %f,%f\n", route.Bounds.SouthWest.Lat, route.Bounds.SouthWest.Lng)
-	fmt.Println("Copyrights:", route.Copyrights)
+	if *avoid != "" {
+		for _, a := range strings.Split(*avoid, "|") {
+			switch {
+			case a == "tolls":
+				r.Avoid = append(r.Avoid, maps.AvoidTolls)
+			case a == "highways":
+				r.Avoid = append(r.Avoid, maps.AvoidHighways)
+			case a == "ferries":
+				r.Avoid = append(r.Avoid, maps.AvoidFerries)
+			}
+		}
 
-	for idx, leg := range route.Legs {
-		fmt.Println("Leg", idx, "distance:", leg.Distance)
-		fmt.Println("Leg", idx, "duration:", leg.Duration)
-		fmt.Println("Leg", idx, "start address:", leg.StartAddress)
-		fmt.Println("Leg", idx, "start location:", leg.StartLocation)
-		fmt.Println("Leg", idx, "end address:", leg.EndAddress)
-		fmt.Println("Leg", idx, "end location:", leg.EndLocation)
-
-		for idx, step := range leg.Steps {
-			fmt.Println("Step", idx, "distance:", step.Distance)
-			fmt.Println("Step", idx, "duration:", step.Duration)
-			fmt.Println("Step", idx, "start location:", step.StartLocation)
-			fmt.Println("Step", idx, "end location:", step.EndLocation)
-			fmt.Println("Step", idx, "travel mode:", step.TravelMode)
-			fmt.Println("Step", idx, "path:", step.Polyline.Decode())
+	}
+	if *transitMode != "" {
+		for _, t := range strings.Split(*transitMode, "|") {
+			switch {
+			case t == "bus":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeBus)
+			case t == "subway":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeSubway)
+			case t == "train":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeTrain)
+			case t == "tram":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeTram)
+			case t == "rail":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeRail)
+			}
 		}
 	}
 
+	pretty.Println(r)
+
+	ctx := maps.NewContext(*apiKey, client)
+	resp, err := r.Get(ctx)
+	if err != nil {
+		log.Fatalf("fatal error %v", err)
+	}
+
+	pretty.Println(resp)
+}
+
+func lookupMode(mode string, r *maps.DirectionsRequest) {
+	switch {
+	case mode == "driving":
+		r.Mode = maps.ModeDriving
+	case mode == "walking":
+		r.Mode = maps.ModeWalking
+	case mode == "bicycling":
+		r.Mode = maps.ModeBicycling
+	case mode == "transit":
+		r.Mode = maps.ModeTransit
+	}
+}
+
+func lookupUnits(units string, r *maps.DirectionsRequest) {
+	switch {
+	case units == "metric":
+		r.Units = maps.UnitsMetric
+	case units == "imperial":
+		r.Units = maps.UnitsImperial
+	}
+}
+
+func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.DirectionsRequest) {
+	switch {
+	case transitRoutingPreference == "fewer_transfers":
+		r.TransitRoutingPreference = maps.TransitRoutingPreferenceFewerTransfers
+	case transitRoutingPreference == "less_walking":
+		r.TransitRoutingPreference = maps.TransitRoutingPreferenceLessWalking
+	}
 }
