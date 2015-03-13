@@ -25,6 +25,14 @@ type Polyline struct {
 	Points string `json:"points"`
 }
 
+// DecodePolyline converts a polyline encoded string to an array of LatLng objects.
+func DecodePolyline(poly string) []LatLng {
+	p := &Polyline{
+		Points: poly,
+	}
+	return p.Decode()
+}
+
 // Decode converts this encoded Polyline to an array of LatLng objects.
 func (p *Polyline) Decode() []LatLng {
 	input := bytes.NewBufferString(p.Points)
@@ -48,7 +56,7 @@ func (p *Polyline) Decode() []LatLng {
 }
 
 // Encode returns a new encoded Polyline from the given path.
-func Encode(path []LatLng) *Polyline {
+func Encode(path []LatLng) string {
 	var llat, llng int64
 
 	out := new(bytes.Buffer)
@@ -63,7 +71,7 @@ func Encode(path []LatLng) *Polyline {
 		llat, llng = lat, lng
 	}
 
-	return &Polyline{Points: out.String()}
+	return out.String()
 }
 
 // decodeInt reads an encoded int64 from the passed io.ByteReader.
