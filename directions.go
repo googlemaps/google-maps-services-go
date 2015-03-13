@@ -32,51 +32,51 @@ import (
 )
 
 // Get issues the Directions request and retrieves the Response
-func (r *DirectionsRequest) Get(ctx context.Context) (DirectionsResponse, error) {
+func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 	var response DirectionsResponse
 
 	if r.Origin == "" {
-		return response, errors.New("directions: Origin required")
+		return nil, errors.New("directions: Origin required")
 	}
 	if r.Destination == "" {
-		return response, errors.New("directions: Destination required")
+		return nil, errors.New("directions: Destination required")
 	}
 	if r.Mode != "" && ModeDriving != r.Mode && ModeWalking != r.Mode && ModeBicycling != r.Mode && ModeTransit != r.Mode {
-		return response, fmt.Errorf("directions: unknown Mode: '%s'", r.Mode)
+		return nil, fmt.Errorf("directions: unknown Mode: '%s'", r.Mode)
 	}
 	for _, avoid := range r.Avoid {
 		if avoid != AvoidTolls && avoid != AvoidHighways && avoid != AvoidFerries {
-			return response, fmt.Errorf("directions: Unknown Avoid restriction '%s'", avoid)
+			return nil, fmt.Errorf("directions: Unknown Avoid restriction '%s'", avoid)
 		}
 	}
 	if r.Units != "" && r.Units != UnitsMetric && r.Units != UnitsImperial {
-		return response, fmt.Errorf("directions: Unknown Units '%s'", r.Units)
+		return nil, fmt.Errorf("directions: Unknown Units '%s'", r.Units)
 	}
 	for _, transitMode := range r.TransitMode {
 		if transitMode != TransitModeBus && transitMode != TransitModeSubway && transitMode != TransitModeTrain && transitMode != TransitModeTram && transitMode != TransitModeRail {
-			return response, fmt.Errorf("directions: Unknown TransitMode '%s'", r.TransitMode)
+			return nil, fmt.Errorf("directions: Unknown TransitMode '%s'", r.TransitMode)
 		}
 	}
 	if r.TransitRoutingPreference != "" && r.TransitRoutingPreference != TransitRoutingPreferenceLessWalking && r.TransitRoutingPreference != TransitRoutingPreferenceFewerTransfers {
-		return response, fmt.Errorf("directions: Unknown TransitRoutingPreference '%s'", r.TransitRoutingPreference)
+		return nil, fmt.Errorf("directions: Unknown TransitRoutingPreference '%s'", r.TransitRoutingPreference)
 	}
 	if r.DepartureTime != "" && r.ArrivalTime != "" {
-		return response, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
+		return nil, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
 	}
 
 	if r.DepartureTime != "" && r.ArrivalTime != "" {
-		return response, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
+		return nil, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
 	}
 	if len(r.TransitMode) != 0 && r.Mode != ModeTransit {
-		return response, errors.New("directions: must specify mode of transit when specifying transitMode")
+		return nil, errors.New("directions: must specify mode of transit when specifying transitMode")
 	}
 	if r.TransitRoutingPreference != "" && r.Mode != ModeTransit {
-		return response, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
+		return nil, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
 	}
 
 	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/directions/json", nil)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
 	q := req.URL.Query()
 	q.Set("origin", r.Origin)
@@ -129,9 +129,14 @@ func (r *DirectionsRequest) Get(ctx context.Context) (DirectionsResponse, error)
 		}
 		return nil
 	})
-	// httpDo waits for the closure we provided to return, so it's safe to
-	// read response here.
-	return response, err
+	if err != nil {
+		return nil, err
+	}
+	if response.Status != "OK" {
+		return nil, fmt.Errorf("directions: %s - %s", response.Status, response.ErrorMessage)
+	}
+
+	return response.Routes, nil
 }
 
 // DirectionsRequest is the functional options struct for directions.Get
@@ -167,13 +172,16 @@ type DirectionsRequest struct {
 // DirectionsResponse represents a Directions API response.
 type DirectionsResponse struct {
 	// Routes lists the found routes between origin and destination.
-	Routes []Route
+	Routes []Route `json:"routes"`
 
 	// Status contains the status of the request, and may contain
 	// debugging information to help you track down why the Directions
 	// service failed.
 	// See https://developers.google.com/maps/documentation/directions/#StatusCodes
-	Status string
+	Status string `json:"status"`
+
+	// ErrorMessage is the explanatory field added when Status is an error.
+	ErrorMessage string `json:"error_message"`
 }
 
 // Route represents a single route between an origin and a destination.
