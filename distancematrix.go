@@ -41,7 +41,7 @@ func (r *DistanceMatrixRequest) Get(ctx context.Context) (DistanceMatrixResponse
 	if len(r.Destinations) == 0 {
 		return response, errors.New("distancematrix: Destinations must contain at least one end address")
 	}
-	if r.Mode != "" && ModeDriving != r.Mode && ModeWalking != r.Mode && ModeBicycling != r.Mode && ModeTransit != r.Mode {
+	if r.Mode != "" && TravelModeDriving != r.Mode && TravelModeWalking != r.Mode && TravelModeBicycling != r.Mode && TravelModeTransit != r.Mode {
 		return response, fmt.Errorf("distancematrix: unknown Mode: '%s'", r.Mode)
 	}
 	if r.Avoid != "" && r.Avoid != AvoidTolls && r.Avoid != AvoidHighways && r.Avoid != AvoidFerries {
