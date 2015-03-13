@@ -24,14 +24,13 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"golang.org/x/net/context"
 	"google.golang.org/maps/internal"
 )
 
 // Get makes an Elevation API request
-func (eReq *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
+func (r *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
 	var response elevationResponse
 
 	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/elevation/json", nil)
@@ -41,29 +40,21 @@ func (eReq *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error
 	q := req.URL.Query()
 	q.Set("key", internal.APIKey(ctx))
 
-	if len(eReq.Path) == 0 && len(eReq.Locations) == 0 {
+	if len(r.Path) == 0 && len(r.Locations) == 0 {
 		return nil, errors.New("elevation: Provide either Path or Locations")
 	}
 
-	if len(eReq.Path) > 0 {
+	if len(r.Path) > 0 {
 		// Sampled path request
-		if eReq.Samples == 0 {
+		if r.Samples == 0 {
 			return nil, errors.New("elevation: Sampled Path Request requires Samples to be specifed")
 		}
-		var l []string
-		for _, ll := range eReq.Path {
-			l = append(l, fmt.Sprintf("%g,%g", ll.Lat, ll.Lng))
-		}
-		q.Set("path", strings.Join(l, "|"))
-		q.Set("samples", strconv.Itoa(eReq.Samples))
+		q.Set("path", fmt.Sprintf("enc:%s", Encode(r.Path).Points))
+		q.Set("samples", strconv.Itoa(r.Samples))
 	}
 
-	if len(eReq.Locations) > 0 {
-		var l []string
-		for _, ll := range eReq.Locations {
-			l = append(l, fmt.Sprintf("%g,%g", ll.Lat, ll.Lng))
-		}
-		q.Set("locations", strings.Join(l, "|"))
+	if len(r.Locations) > 0 {
+		q.Set("locations", fmt.Sprintf("enc:%s", Encode(r.Locations).Points))
 	}
 
 	req.URL.RawQuery = q.Encode()
