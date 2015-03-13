@@ -19,9 +19,11 @@ package maps // import "google.golang.org/maps"
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"golang.org/x/net/context"
 	"google.golang.org/maps/internal"
@@ -38,10 +40,42 @@ func (r *GeocodingRequest) Get(ctx context.Context) ([]GeocodingResult, error) {
 	q := req.URL.Query()
 	q.Set("key", internal.APIKey(ctx))
 
+	if r.Address == "" && len(r.components) == 0 && r.LatLng == nil {
+		return nil, errors.New("geocoding: You must specify at least one of Address or Components for a geocoding request, or LatLng for a reverse geocoding request")
+	}
+
 	if r.Address != "" {
 		q.Set("address", r.Address)
 	}
-	// TODO: fill in the rest of the params
+	var cf []string
+	for c, f := range r.components {
+		cf = append(cf, fmt.Sprintf("%s:%s", c, f))
+	}
+	if len(cf) > 0 {
+		q.Set("components", strings.Join(cf, "|"))
+	}
+	if r.Bounds != nil {
+		q.Set("bounds", r.Bounds.String())
+	}
+	if r.Region != "" {
+		q.Set("region", r.Region)
+	}
+	if r.LatLng != nil {
+		q.Set("latlng", r.LatLng.String())
+	}
+	if len(r.ResultType) > 0 {
+		q.Set("result_type", strings.Join(r.ResultType, "|"))
+	}
+	if len(r.LocationType) > 0 {
+		var lt []string
+		for _, l := range r.LocationType {
+			lt = append(lt, string(l))
+		}
+		q.Set("location_type", strings.Join(lt, "|"))
+	}
+	if r.Language != "" {
+		q.Set("language", r.Language)
+	}
 
 	req.URL.RawQuery = q.Encode()
 
@@ -66,7 +100,6 @@ func (r *GeocodingRequest) Get(ctx context.Context) ([]GeocodingResult, error) {
 	}
 
 	return response.Results, nil
-
 }
 
 type componentFilter string
@@ -84,18 +117,51 @@ const (
 	ComponentCounty = componentFilter("country")
 )
 
+type locationType string
+
+const (
+	// LocationTypeRooftop restricts the results to addresses for which we have location information accurate down to street address precision
+	LocationTypeRooftop = locationType("ROOFTOP")
+	// LocationTypeRangeInterpolated restricts the results to those that reflect an approximation interpolated between two precise points.
+	LocationTypeRangeInterpolated = locationType("RANGE_INTERPOLATED")
+	// LocationTypeGeometricCenter restricts the results to geometric centers of a location such as a polyline or polygon.
+	LocationTypeGeometricCenter = locationType("GEOMETRIC_CENTER")
+	// LocationTypeApproximate restricts the results to those that are characterized as approximate.
+	LocationTypeApproximate = locationType("APPROXIMATE")
+)
+
 // GeocodingRequest is the request structure for Geocoding API
 type GeocodingRequest struct {
+	// Geocoding fields
+
 	// Address is the street address that you want to geocode, in the format used by the national postal service of the country concerned.
 	Address string
 	// Components is a component filter for which you wish to obtain a geocode. Either Address or Components is required in a geocoding request.
-	Components map[componentFilter]string
+	components map[string]string
 	// Bounds is the bounding box of the viewport within which to bias geocode results more prominently. Optional.
-	Bounds Bounds
-	// Language is the language in which to return results. Optional.
-	Language string
+	Bounds *Bounds
 	// Region is the region code, specified as a ccTLD two-character value. Optional.
 	Region string
+
+	// Reverse geocoding fields
+
+	// LatLng is the textual latitude/longitude value for which you wish to obtain the closest, human-readable address. Required for reverse geocoding.
+	LatLng *LatLng
+	// ResultType is an array of one or more address types. Optional.
+	ResultType []string
+	// LocationType is an array of One or more location types. Optional.
+	LocationType []locationType
+
+	// Language is the language in which to return results. Optional.
+	Language string
+}
+
+// AddComponentFilter adds component filters to a request
+func (r *GeocodingRequest) AddComponentFilter(componentFilter componentFilter, value string) {
+	if r.components == nil {
+		r.components = make(map[string]string)
+	}
+	r.components[string(componentFilter)] = value
 }
 
 type geocodingResponse struct {
