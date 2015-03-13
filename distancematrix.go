@@ -31,7 +31,9 @@ import (
 
 // Get makes a Distance Matrix API request
 func (r *DistanceMatrixRequest) Get(ctx context.Context) (DistanceMatrixResponse, error) {
+	var raw rawDistanceMatrixResponse
 	var response DistanceMatrixResponse
+
 	if len(r.Origins) == 0 {
 		return response, errors.New("distancematrix: Origins must contain at least one start address")
 	}
@@ -100,14 +102,22 @@ func (r *DistanceMatrixRequest) Get(ctx context.Context) (DistanceMatrixResponse
 		}
 		defer resp.Body.Close()
 
-		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
 			return err
 		}
 		return nil
 	})
-	// httpDo waits for the closure we provided to return, so it's safe to
-	// read response here.
-	return response, err
+	if err != nil {
+		return response, err
+	}
+	if raw.Status != "OK" {
+		return response, fmt.Errorf("distancematrix: %s - %s", raw.Status, raw.ErrorMessage)
+	}
+
+	response.DestinationAddresses = raw.DestinationAddresses
+	response.OriginAddresses = raw.OriginAddresses
+	response.Rows = raw.Rows
+	return response, nil
 }
 
 // DistanceMatrixRequest is the request struct for Distance Matrix APi
@@ -140,9 +150,7 @@ type DistanceMatrixRequest struct {
 	TransitRoutingPreference transitRoutingPreference
 }
 
-// DistanceMatrixResponse represents a Distance Matrix API response.
-type DistanceMatrixResponse struct {
-
+type rawDistanceMatrixResponse struct {
 	// OriginAddresses contains an array of addresses as returned by the API from your original request.
 	OriginAddresses []string `json:"origin_addresses"`
 	// DestinationAddresses contains an array of addresses as returned by the API from your original request.
@@ -158,6 +166,17 @@ type DistanceMatrixResponse struct {
 
 	// ErrorMessage is the explanatory field added when Status is an error.
 	ErrorMessage string `json:"error_message"`
+}
+
+// DistanceMatrixResponse represents a Distance Matrix API response.
+type DistanceMatrixResponse struct {
+
+	// OriginAddresses contains an array of addresses as returned by the API from your original request.
+	OriginAddresses []string
+	// DestinationAddresses contains an array of addresses as returned by the API from your original request.
+	DestinationAddresses []string
+	// Rows contains an array of elements.
+	Rows []DistanceMatrixElementsRow
 }
 
 // DistanceMatrixElementsRow is a row of distance elements.
