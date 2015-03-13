@@ -31,12 +31,12 @@ import (
 )
 
 // Get makes an Elevation API request
-func (eReq *ElevationRequest) Get(ctx context.Context) (ElevationResponse, error) {
-	var response ElevationResponse
+func (eReq *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
+	var response elevationResponse
 
 	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/elevation/json", nil)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
 	q := req.URL.Query()
 	q.Set("key", internal.APIKey(ctx))
@@ -44,7 +44,7 @@ func (eReq *ElevationRequest) Get(ctx context.Context) (ElevationResponse, error
 	if len(eReq.Path) > 0 {
 		// Sampled path request
 		if eReq.Samples == 0 {
-			return response, errors.New("elevation: Sampled Path Request requires Samples to be specifed")
+			return nil, errors.New("elevation: Sampled Path Request requires Samples to be specifed")
 		}
 		var l []string
 		for _, ll := range eReq.Path {
@@ -77,9 +77,14 @@ func (eReq *ElevationRequest) Get(ctx context.Context) (ElevationResponse, error
 		}
 		return nil
 	})
-	// httpDo waits for the closure we provided to return, so it's safe to
-	// read response here.
-	return response, err
+	if err != nil {
+		return nil, err
+	}
+	if response.Status != "OK" {
+		return nil, fmt.Errorf("distancematrix: %s - %s", response.Status, response.ErrorMessage)
+	}
+
+	return response.Results, nil
 }
 
 // ElevationRequest is the request structure for Elevation API
@@ -92,12 +97,14 @@ type ElevationRequest struct {
 	Samples int
 }
 
-// ElevationResponse is the response structure for Elevation API
-type ElevationResponse struct {
-	// Status indicating if this request was successful
-	Status string `json:"status"`
+type elevationResponse struct {
 	// Results is the Elevation results array
 	Results []ElevationResult `json:"results"`
+
+	// Status indicating if this request was successful
+	Status string `json:"status"`
+	// ErrorMessage is the explanatory field added when Status is an error.
+	ErrorMessage string `json:"error_message"`
 }
 
 // ElevationResult is a single elevation at a specific location
