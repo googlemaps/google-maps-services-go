@@ -23,14 +23,14 @@ type transitMode string
 type transitRoutingPreference string
 
 const (
-	// ModeDriving is for specifying driving as travel mode
-	ModeDriving = mode("driving")
-	// ModeWalking is for specifying walking as travel mode
-	ModeWalking = mode("walking")
-	// ModeBicycling is for specifying bicycling as travel mode
-	ModeBicycling = mode("bicycling")
-	// ModeTransit is for specifying transit as travel mode
-	ModeTransit = mode("transit")
+	// TravelModeDriving is for specifying driving as travel mode
+	TravelModeDriving = mode("driving")
+	// TravelModeWalking is for specifying walking as travel mode
+	TravelModeWalking = mode("walking")
+	// TravelModeBicycling is for specifying bicycling as travel mode
+	TravelModeBicycling = mode("bicycling")
+	// TravelModeTransit is for specifying transit as travel mode
+	TravelModeTransit = mode("transit")
 
 	// AvoidTolls is for specifying routes that avoid tolls
 	AvoidTolls = avoid("tolls")
