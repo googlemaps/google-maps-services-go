@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package main contains a simple command line tool for DistanceMatrix
+// Package main contains a simple command line tool for Elevation API
 // Directions docs: https://developers.google.com/maps/documentation/distancematrix/
 package main
 
