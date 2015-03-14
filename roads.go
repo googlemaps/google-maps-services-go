@@ -100,7 +100,7 @@ type SnappedPoint struct {
 	// Location of the snapped point.
 	Location Location `json:"location"`
 	// OriginalIndex is an integer that indicates the corresponding value in the original request. Not present on interpolated points.
-	OriginalIndex int `json:"originalIndex"`
+	OriginalIndex *int `json:"originalIndex"`
 	// PlaceID is a unique identifier for a place.
 	PlaceID string `json:"placeId"`
 }
