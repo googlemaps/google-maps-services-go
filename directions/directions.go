@@ -59,8 +59,8 @@ type Route struct {
 	// OverviewPolyline contains an approximate (smoothed) path of the resulting directions.
 	OverviewPolyline maps.Polyline `json:"overview_polyline"`
 
-	// Bounds contains the viewport bounding box of the overview polyline.
-	maps.Bounds `json:"bounds"`
+	// LatLngBounds contains the viewport bounding box of the overview polyline.
+	maps.LatLngBounds `json:"bounds"`
 
 	// Copyrights contains the copyrights text to be displayed for this route. You must handle
 	// and display this information yourself.
@@ -107,7 +107,7 @@ type Leg struct {
 
 // Step represents a single step of a leg.
 type Step struct {
-	// html_instructions contains formatted instructions for this step, presented as an HTML text string.
+	// HTMLInstructions contains formatted instructions for this step, presented as an HTML text string.
 	HTMLInstructions string `json:"html_instructions"`
 
 	// Distance contains the distance covered by this step until the next step.
@@ -120,11 +120,11 @@ type Step struct {
 	// and lng fields.
 	StartLocation maps.LatLng `json:"start_location"`
 
-	// end_location contains the location of the last point of this step, as a single set of lat and
+	// EndLocation contains the location of the last point of this step, as a single set of lat and
 	// lng fields.
 	EndLocation maps.LatLng `json:"end_location"`
 
-	// polyline contains a single points object that holds an encoded polyline representation of the
+	// Polyline contains a single points object that holds an encoded polyline representation of the
 	// step. This polyline is an approximate (smoothed) path of the step.
 	maps.Polyline `json:"polyline"`
 
