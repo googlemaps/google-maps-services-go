@@ -139,7 +139,7 @@ type GeocodingRequest struct {
 	// Components is a component filter for which you wish to obtain a geocode. Either Address or Components is required in a geocoding request.
 	components map[string]string
 	// Bounds is the bounding box of the viewport within which to bias geocode results more prominently. Optional.
-	Bounds *Bounds
+	Bounds *LatLngBounds
 	// Region is the region code, specified as a ccTLD two-character value. Optional.
 	Region string
 
@@ -189,8 +189,8 @@ type AddressComponent struct {
 
 // AddressGeometry is the location of a an address
 type AddressGeometry struct {
-	Location     LatLng   `json:"location"`
-	LocationType string   `json:"location_type"`
-	Viewport     Bounds   `json:"viewport"`
-	Types        []string `json:"types"`
+	Location     LatLng       `json:"location"`
+	LocationType string       `json:"location_type"`
+	Viewport     LatLngBounds `json:"viewport"`
+	Types        []string     `json:"types"`
 }

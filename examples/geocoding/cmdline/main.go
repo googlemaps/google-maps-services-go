@@ -121,7 +121,7 @@ func parseBounds(bounds string, r *maps.GeocodingRequest) {
 			log.Fatalf("Couldn't parse bounds: %#v", err)
 		}
 
-		r.Bounds = &maps.Bounds{
+		r.Bounds = &maps.LatLngBounds{
 			NorthEast: maps.LatLng{Lat: neLat, Lng: neLng},
 			SouthWest: maps.LatLng{Lat: swLat, Lng: swLng},
 		}

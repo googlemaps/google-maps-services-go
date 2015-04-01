@@ -41,6 +41,6 @@ type LatLngBounds struct {
 	SouthWest LatLng `json:"southwest"` // sw corner
 }
 
-func (b *Bounds) String() string {
+func (b *LatLngBounds) String() string {
 	return fmt.Sprintf("%s|%s", b.SouthWest.String(), b.NorthEast.String())
 }
