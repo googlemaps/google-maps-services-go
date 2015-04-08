@@ -203,7 +203,7 @@ type Route struct {
 	OverviewPolyline Polyline `json:"overview_polyline"`
 
 	// Bounds contains the viewport bounding box of the overview polyline.
-	Bounds `json:"bounds"`
+	Bounds LatLngBounds `json:"bounds"`
 
 	// Copyrights contains the copyrights text to be displayed for this route. You must handle
 	// and display this information yourself.
@@ -212,30 +212,6 @@ type Route struct {
 	// Warnings contains an array of warnings to be displayed when showing these directions.
 	// You must handle and display these warnings yourself.
 	Warnings []string `json:"warnings"`
-}
-
-// Bounds represents a bounded area on a map.
-type Bounds struct {
-	// The north east corner of the bounded area.
-	NorthEast LatLng `json:"northeast"`
-
-	// The south west corner of the bounded area.
-	SouthWest LatLng `json:"southwest"`
-}
-
-// LatLng represents a location.
-type LatLng struct {
-	// Lat is the latitude of this location.
-	Lat float64 `json:"lat"`
-
-	// Lng is the longitude of this location.
-	Lng float64 `json:"lng"`
-}
-
-// Polyline represents a list of lat,lng points, encoded as a string.
-// See: https://developers.google.com/maps/documentation/utilities/polylinealgorithm
-type Polyline struct {
-	Points string `json:"points"`
 }
 
 // Leg represents a single leg of a route.
