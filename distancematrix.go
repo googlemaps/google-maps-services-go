@@ -193,11 +193,3 @@ type DistanceMatrixElement struct {
 	// Distance is the total distance of this route.
 	Distance Distance `json:"distance"`
 }
-
-// Distance is the API representation for a distance between two points.
-type Distance struct {
-	// Text is the distance in a human displayable form. The style of display can be changed by setting `units`.
-	Text string `json:"text"`
-	// Value is the distance in meters.
-	Value int `json:"value"`
-}
