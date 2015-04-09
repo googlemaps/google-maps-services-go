@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -134,8 +133,6 @@ func (r *SpeedLimitsRequest) Get(ctx context.Context) (SpeedLimitsResponse, erro
 	}
 
 	req.URL.RawQuery = q.Encode()
-
-	log.Printf("SpeedLimitsRequest: %v", req)
 
 	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
 		if err != nil {
