@@ -63,10 +63,10 @@ func main() {
 		ArrivalTime:   *arrivalTime,
 	}
 
-	if len(*origins) != 0 {
+	if *origins != "" {
 		r.Origins = strings.Split(*origins, "|")
 	}
-	if len(*destinations) != 0 {
+	if *destinations != "" {
 		r.Destinations = strings.Split(*destinations, "|")
 	}
 

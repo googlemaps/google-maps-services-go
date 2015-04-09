@@ -16,6 +16,7 @@ package maps // import "google.golang.org/maps"
 
 import (
 	"bytes"
+	"log"
 	"io"
 )
 
@@ -43,7 +44,9 @@ func (p *Polyline) Decode() []LatLng {
 		dlat, _ := decodeInt(input)
 		dlng, err := decodeInt(input)
 		if err != nil {
-			// err should only be io.EOF here.
+      if err != io.EOF {
+        log.Fatal("unexpected err decoding polyline", err)
+      }
 			return path
 		}
 
@@ -57,18 +60,19 @@ func (p *Polyline) Decode() []LatLng {
 
 // Encode returns a new encoded Polyline from the given path.
 func Encode(path []LatLng) string {
-	var llat, llng int64
+	var prevLat, prevLng int64
 
 	out := new(bytes.Buffer)
 	out.Grow(len(path) * 4)
 
 	for _, point := range path {
-		lat, lng := int64(point.Lat*1e5), int64(point.Lng*1e5)
+		lat := int64(point.Lat*1e5)
+    lng := int64(point.Lng*1e5)
 
-		encodeInt(lat-llat, out)
-		encodeInt(lng-llng, out)
+		encodeInt(lat-prevLat, out)
+		encodeInt(lng-prevLng, out)
 
-		llat, llng = lat, lng
+		prevLat, prevLng = lat, lng
 	}
 
 	return out.String()

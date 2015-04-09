@@ -203,7 +203,7 @@ type Route struct {
 	OverviewPolyline Polyline `json:"overview_polyline"`
 
 	// Bounds contains the viewport bounding box of the overview polyline.
-	Bounds `json:"bounds"`
+	Bounds LatLngBounds `json:"bounds"`
 
 	// Copyrights contains the copyrights text to be displayed for this route. You must handle
 	// and display this information yourself.

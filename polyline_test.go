@@ -20,6 +20,7 @@ import (
 )
 
 const (
+  epsilon = 0.0001
 	routeSydMel = "rvumEis{y[`NsfA~tAbF`bEj^h{@{KlfA~eA~`AbmEghAt~D|e@jlRpO~yH_\\v}LjbBh~FdvCxu@`nCplDbcBf_B|w" +
 		"BhIfhCnqEb~D~jCn_EngApdEtoBbfClf@t_CzcCpoEr_Gz_DxmAphDjjBxqCviEf}B|pEvsEzbE~qGfpExjBlqCx}" +
 		"BvmLb`FbrQdpEvkAbjDllD|uDldDj`Ef|AzcEx_Gtm@vuI~xArwD`dArlFnhEzmHjtC~eDluAfkC|eAdhGpJh}N_m" +
@@ -41,10 +42,10 @@ func TestPolylineDecode(t *testing.T) {
 	decoded := DecodePolyline(routeSydMel)
 	l := len(decoded)
 
-	if expected, actual := (&LatLng{-33.86746, 151.207090}), decoded[0]; !expected.AlmostEqual(&actual) {
+	if expected, actual := (&LatLng{-33.86746, 151.207090}), decoded[0]; !expected.AlmostEqual(&actual, epsilon) {
 		t.Errorf("first point was %v, expected %v", decoded[0], expected)
 	}
-	if expected, actual := (&LatLng{-37.814130, 144.963180}), decoded[l-1]; !expected.AlmostEqual(&actual) {
+	if expected, actual := (&LatLng{-37.814130, 144.963180}), decoded[l-1]; !expected.AlmostEqual(&actual, epsilon) {
 		t.Errorf("last point was %v, expected %v", decoded[l-1], expected)
 	}
 }
