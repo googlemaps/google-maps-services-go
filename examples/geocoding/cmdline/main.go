@@ -61,6 +61,10 @@ func main() {
 		Region:   *region,
 	}
 
+	if *components == "" && *address == "" {
+		usageAndExit("Please specify an Address or Components")
+	}
+
 	parseComponents(*components, r)
 	parseBounds(*bounds, r)
 	parseLatLng(*latlng, r)

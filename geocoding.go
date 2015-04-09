@@ -134,7 +134,8 @@ type GeocodingRequest struct {
 	// Address is the street address that you want to geocode, in the format used by the national postal service of the country concerned.
 	Address string
 	// Components is a component filter for which you wish to obtain a geocode. Either Address or Components is required in a geocoding request.
-	components map[string]string
+	// For more detail on Component Filtering please see https://developers.google.com/maps/documentation/geocoding/#ComponentFiltering
+	components map[componentFilter]string
 	// Bounds is the bounding box of the viewport within which to bias geocode results more prominently. Optional.
 	Bounds *LatLngBounds
 	// Region is the region code, specified as a ccTLD two-character value. Optional.
@@ -154,11 +155,12 @@ type GeocodingRequest struct {
 }
 
 // AddComponentFilter adds component filters to a request
-func (r *GeocodingRequest) AddComponentFilter(componentFilter componentFilter, value string) {
+// For more detail on Component Filtering, please see https://developers.google.com/maps/documentation/geocoding/#ComponentFiltering
+func (r *GeocodingRequest) AddComponentFilter(filter componentFilter, value string) {
 	if r.components == nil {
-		r.components = make(map[string]string)
+		r.components = make(map[componentFilter]string)
 	}
-	r.components[string(componentFilter)] = value
+	r.components[filter] = value
 }
 
 type geocodingResponse struct {
