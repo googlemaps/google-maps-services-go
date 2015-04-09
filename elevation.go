@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -58,8 +57,6 @@ func (r *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
 	}
 
 	req.URL.RawQuery = q.Encode()
-
-	log.Println("Request:", req)
 
 	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
 		if err != nil {

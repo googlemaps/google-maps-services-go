@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -116,8 +115,6 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 		q.Set("transit_mode", strings.Join(transitMode, "|"))
 	}
 	req.URL.RawQuery = q.Encode()
-
-	log.Println("Request:", req)
 
 	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
 		if err != nil {

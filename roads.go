@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -55,8 +54,6 @@ func (r *SnapToRoadRequest) Get(ctx context.Context) (SnapToRoadResponse, error)
 	}
 
 	req.URL.RawQuery = q.Encode()
-
-	log.Println("Request:", req)
 
 	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
 		if err != nil {
@@ -136,8 +133,6 @@ func (r *SpeedLimitsRequest) Get(ctx context.Context) (SpeedLimitsResponse, erro
 	}
 
 	req.URL.RawQuery = q.Encode()
-
-	log.Println("Request:", req)
 
 	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
 		if err != nil {

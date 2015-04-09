@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -78,8 +77,6 @@ func (r *GeocodingRequest) Get(ctx context.Context) ([]GeocodingResult, error) {
 	}
 
 	req.URL.RawQuery = q.Encode()
-
-	log.Println("Request:", req)
 
 	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
 		if err != nil {
