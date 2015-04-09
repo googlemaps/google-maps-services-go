@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -77,7 +78,7 @@ type SnapToRoadRequest struct {
 	Interpolate bool
 }
 
-// Location is a point on Earth
+// Location is a point on Earth. Please note this is different to the LatLng struct.
 type Location struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
@@ -95,7 +96,7 @@ type SnapToRoadResponse struct {
 // SnappedPoint is the original path point snapped to a road.
 type SnappedPoint struct {
 	// Location of the snapped point.
-	Location Location `json:"location"`
+	Location `json:"location"`
 	// OriginalIndex is an integer that indicates the corresponding value in the original request. Not present on interpolated points.
 	OriginalIndex *int `json:"originalIndex"`
 	// PlaceID is a unique identifier for a place.
@@ -113,7 +114,7 @@ func (r *SpeedLimitsRequest) Get(ctx context.Context) (SpeedLimitsResponse, erro
 	q := req.URL.Query()
 	q.Set("key", internal.APIKey(ctx))
 
-	if len(r.Path) == 0 || len(r.PlaceID) == 0 {
+	if len(r.Path) == 0 && len(r.PlaceID) == 0 {
 		return response, errors.New("speedLimits: You must specify a Path or PlaceID")
 	}
 
@@ -126,13 +127,15 @@ func (r *SpeedLimitsRequest) Get(ctx context.Context) (SpeedLimitsResponse, erro
 		q.Set("path", strings.Join(p, "|"))
 	}
 	for _, id := range r.PlaceID {
-		q.Add("placeid", id)
+		q.Add("placeId", id)
 	}
 	if r.Units != "" {
 		q.Set("units", string(r.Units))
 	}
 
 	req.URL.RawQuery = q.Encode()
+
+	log.Printf("SpeedLimitsRequest: %v", req)
 
 	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
 		if err != nil {
@@ -160,10 +163,10 @@ const (
 // SpeedLimitsRequest is the request structure for the Roads Speed Limits API.
 type SpeedLimitsRequest struct {
 	// Path is the path to be snapped and speed limits requested.
-	Path []LatLng
+	Path []Location
 	// PlaceID is the PlaceIDs to request speed limits for.
 	PlaceID []string
-	// Units is whether to return speed limits in `SpeedLimitKPH` or `SpeedLimitMPH`.
+	// Units is whether to return speed limits in `SpeedLimitKPH` or `SpeedLimitMPH`. Optional, default behavior is to return results in KPH.
 	Units speedLimitUnit
 }
 
@@ -178,7 +181,7 @@ type SpeedLimit struct {
 	// PlaceID is a unique identifier for a place.
 	PlaceID string `json:"placeId"`
 	// SpeedLimit is the speed limit for that road segment.
-	SpeedLimit int `json:"speedLimit"`
+	SpeedLimit float64 `json:"speedLimit"`
 	// Units is either KPH or MPH.
-	Units string `json:"units"`
+	Units speedLimitUnit `json:"units"`
 }

@@ -30,9 +30,10 @@ import (
 )
 
 var (
-	apiKey      = flag.String("key", "", "API Key for using Google Maps API.")
-	path        = flag.String("path", "", "The path to be snapped. The path parameter accepts a list of latitude/longitude pairs. Latitude and longitude values should be separated by commas. Coordinates should be separated by the pipe character.")
-	interpolate = flag.Bool("interpolate", false, "Whether to interpolate a path to include all points forming the full road-geometry.")
+	apiKey   = flag.String("key", "", "API Key for using Google Maps API.")
+	path     = flag.String("path", "", "The path to be snapped. The path parameter accepts a list of latitude/longitude pairs. Latitude and longitude values should be separated by commas. Coordinates should be separated by the pipe character.")
+	placeIds = flag.String("placeIds", "", "The place ID of the road segment. Place IDs are returned by the snapToRoads method. You can pass up to 100 placeIds with each request. PlaceIds should be separated by a comma.")
+	units    = flag.String("units", "", "Whether to return speed limits in kilometers or miles per hour. This can be set to either KPH or MPH. Defaults to KPH.")
 )
 
 func usageAndExit(msg string) {
@@ -49,11 +50,20 @@ func main() {
 		usageAndExit("Please specify an API Key.")
 	}
 	ctx := maps.NewContext(*apiKey, client)
-	r := &maps.SnapToRoadRequest{
-		Interpolate: *interpolate,
+	r := &maps.SpeedLimitsRequest{}
+
+	if *units == "KPH" {
+		r.Units = maps.SpeedLimitKPH
+	}
+	if *units == "MPH" {
+		r.Units = maps.SpeedLimitMPH
 	}
 
+	if *path == "" && *placeIds == "" {
+		usageAndExit("Please specify either a path to be snapped, or a list of placeIds.")
+	}
 	parsePath(*path, r)
+	parsePlaceIds(*placeIds, r)
 
 	pretty.Println(r)
 
@@ -66,7 +76,7 @@ func main() {
 }
 
 // parsePath takes a location argument string and decodes it.
-func parsePath(path string, r *maps.SnapToRoadRequest) {
+func parsePath(path string, r *maps.SpeedLimitsRequest) {
 	if path != "" {
 		ls := strings.Split(path, "|")
 		for _, l := range ls {
@@ -81,7 +91,15 @@ func parsePath(path string, r *maps.SnapToRoadRequest) {
 			}
 			r.Path = append(r.Path, maps.Location{Latitude: lat, Longitude: lng})
 		}
-	} else {
-		usageAndExit("Path required")
+	}
+}
+
+// parsePlacesIds takes a placesIds argument string and decodes it.
+func parsePlaceIds(placeIds string, r *maps.SpeedLimitsRequest) {
+	if placeIds != "" {
+		ids := strings.Split(placeIds, ",")
+		for _, id := range ids {
+			r.PlaceID = append(r.PlaceID, id)
+		}
 	}
 }
