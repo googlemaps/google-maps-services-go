@@ -14,13 +14,13 @@
 
 // More information about Google Distance Matrix API is available on
 // https://developers.google.com/maps/documentation/distancematrix/
+
 package maps // import "google.golang.org/maps"
 
 import (
 	"net/http"
 
 	"golang.org/x/net/context"
-	"google.golang.org/maps/internal"
 )
 
 func httpDo(ctx context.Context, req *http.Request, f func(*http.Response, error) error) error {
@@ -37,11 +37,4 @@ func httpDo(ctx context.Context, req *http.Request, f func(*http.Response, error
 	case err := <-c:
 		return err
 	}
-}
-
-func rawService(ctx context.Context) *http.Client {
-	return internal.Service(ctx, "directions", func(hc *http.Client) interface{} {
-		// TODO(brettmorgan): Introduce a rate limiting wrapper for hc here.
-		return hc
-	}).(*http.Client)
 }
