@@ -14,6 +14,7 @@
 
 // More information about Google Distance Matrix API is available on
 // https://developers.google.com/maps/documentation/distancematrix/
+
 package maps // import "google.golang.org/maps"
 
 import (

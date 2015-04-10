@@ -15,6 +15,7 @@
 package maps // import "google.golang.org/maps"
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -22,6 +23,10 @@ import (
 type LatLng struct {
 	Lat float64 `json:"lat"` // latitude
 	Lng float64 `json:"lng"` // longitude
+}
+
+func (l *LatLng) String() string {
+	return fmt.Sprintf("%g,%g", l.Lat, l.Lng)
 }
 
 // AlmostEqual returns whether this LatLng is almost equal (below epsilon) to
@@ -34,4 +39,8 @@ func (l *LatLng) AlmostEqual(other *LatLng, epsilon float64) bool {
 type LatLngBounds struct {
 	NorthEast LatLng `json:"northeast"` // ne corner
 	SouthWest LatLng `json:"southwest"` // sw corner
+}
+
+func (b *LatLngBounds) String() string {
+	return fmt.Sprintf("%s|%s", b.SouthWest.String(), b.NorthEast.String())
 }
