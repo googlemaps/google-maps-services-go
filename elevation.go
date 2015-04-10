@@ -79,13 +79,13 @@ func (r *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
 	return response.Results, nil
 }
 
-// ElevationRequest is the request structure for Elevation API
+// ElevationRequest is the request structure for Elevation API. Either Locations or Path must be set.
 type ElevationRequest struct {
 	// Locations defines the location(s) on the earth from which to return elevation data.
 	Locations []LatLng
 	// Path defines a path on the earth for which to return elevation data.
 	Path []LatLng
-	// Samples specifies the number of sample points along a path for which to return elevation data.
+	// Samples specifies the number of sample points along a path for which to return elevation data. Required if Path is supplied.
 	Samples int
 }
 

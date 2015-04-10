@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"golang.org/x/net/context"
 	"google.golang.org/maps/internal"
@@ -38,12 +39,12 @@ func (r *TimezoneRequest) Get(ctx context.Context) (TimezoneResult, error) {
 	q := req.URL.Query()
 	q.Set("key", internal.APIKey(ctx))
 
-	if r.Location == nil || r.Timestamp == "" {
+	if r.Location == nil || r.Timestamp == nil {
 		return TimezoneResult{}, errors.New("timezone: You must specify Location and Timestamp")
 	}
 
 	q.Set("location", r.Location.String())
-	q.Set("timestamp", r.Timestamp)
+	q.Set("timestamp", strconv.Itoa(*r.Timestamp))
 	if r.Language != "" {
 		q.Set("language", r.Language)
 	}
@@ -78,9 +79,12 @@ func (r *TimezoneRequest) Get(ctx context.Context) (TimezoneResult, error) {
 
 // TimezoneRequest is the request structure for Timezone API.
 type TimezoneRequest struct {
-	Location  *LatLng
-	Timestamp string
-	Language  string
+	// Location represents the location to look up.
+	Location *LatLng
+	// Timestamp specifies the desired time as seconds since midnight, January 1, 1970 UTC. Time Zone API uses the timestamp to determine whether or not Daylight Savings should be applied.
+	Timestamp *int
+	// Language in which to return results.
+	Language string
 }
 
 type timezoneResponse struct {

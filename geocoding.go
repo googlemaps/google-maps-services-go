@@ -117,7 +117,7 @@ const (
 type locationType string
 
 const (
-	// LocationTypeRooftop restricts the results to addresses for which we have location information accurate down to street address precision
+	// LocationTypeRooftop restricts the results to addresses for which Google has location information accurate down to street address precision
 	LocationTypeRooftop = locationType("ROOFTOP")
 	// LocationTypeRangeInterpolated restricts the results to those that reflect an approximation interpolated between two precise points.
 	LocationTypeRangeInterpolated = locationType("RANGE_INTERPOLATED")

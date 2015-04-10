@@ -50,9 +50,14 @@ func main() {
 		usageAndExit("Please specify an API Key.")
 	}
 	ctx := maps.NewContext(*apiKey, client)
+	t, err := strconv.Atoi(*timestamp)
+	if err != nil {
+		usageAndExit(fmt.Sprintf("Could not convert timestamp to int: %v", err))
+	}
+
 	r := &maps.TimezoneRequest{
-		Timestamp: *timestamp,
 		Language:  *language,
+		Timestamp: &t,
 	}
 
 	parseLocation(*location, r)

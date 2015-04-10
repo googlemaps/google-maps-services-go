@@ -199,8 +199,8 @@ type Route struct {
 	// OverviewPolyline contains an approximate (smoothed) path of the resulting directions.
 	OverviewPolyline Polyline `json:"overview_polyline"`
 
-	// LatLngBounds contains the viewport bounding box of the overview polyline.
-	LatLngBounds `json:"bounds"`
+	// Bounds contains the viewport bounding box of the overview polyline.
+	Bounds LatLngBounds `json:"bounds"`
 
 	// Copyrights contains the copyrights text to be displayed for this route. You must handle
 	// and display this information yourself.
