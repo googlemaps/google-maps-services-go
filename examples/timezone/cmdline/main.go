@@ -24,6 +24,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/kr/pretty"
 	"google.golang.org/maps"
@@ -57,7 +58,7 @@ func main() {
 
 	r := &maps.TimezoneRequest{
 		Language:  *language,
-		Timestamp: &t,
+		Timestamp: time.Unix(int64(t), 0),
 	}
 
 	parseLocation(*location, r)
