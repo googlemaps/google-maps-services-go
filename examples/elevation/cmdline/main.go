@@ -88,6 +88,8 @@ func decodeLocations(location string) ([]maps.LatLng, error) {
 		return maps.DecodePolyline(location[len("enc:"):]), nil
 	}
 	result := []maps.LatLng{}
+
+	// TODO: break this out into a helper function
 	if strings.Contains(location, "|") {
 		// | delimited list of locations
 		ls := strings.Split(location, "|")

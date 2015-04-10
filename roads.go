@@ -78,6 +78,7 @@ type SnapToRoadRequest struct {
 }
 
 // Location is a point on Earth. Please note this is different to the LatLng struct.
+// TODO: Investigate the inconsistency between this API and the other Geo WS APIs.
 type Location struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
