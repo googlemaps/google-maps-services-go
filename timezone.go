@@ -82,7 +82,7 @@ func (r *TimezoneRequest) Get(ctx context.Context) (TimezoneResult, error) {
 type TimezoneRequest struct {
 	// Location represents the location to look up.
 	Location *LatLng
-	// Timestamp specifies the desired time as seconds since midnight, January 1, 1970 UTC. Time Zone API uses the timestamp to determine whether or not Daylight Savings should be applied.
+	// Timestamp specifies the desired time. Time Zone API uses the timestamp to determine whether or not Daylight Savings should be applied.
 	Timestamp time.Time
 	// Language in which to return results.
 	Language string
