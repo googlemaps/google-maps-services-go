@@ -304,3 +304,42 @@ func (dme *DistanceMatrixElement) MarshalJSON() ([]byte, error) {
 
 	return json.Marshal(x)
 }
+
+// safeSnappedPoint is a raw version of SnappedPoint that does not have custom
+// encoding or decoding methods applied.
+type safeSnappedPoint SnappedPoint
+
+// encodedSnappedPoint is the actual encoded version of SnappedPoint as per the
+// Roads API.
+type encodedSnappedPoint struct {
+	safeSnappedPoint
+	EncLocation internal.Location `json:"location"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler for SnappedPoint. This decode the
+// API representation into types useful for Go developers.
+func (sp *SnappedPoint) UnmarshalJSON(data []byte) error {
+	x := encodedSnappedPoint{}
+	err := json.Unmarshal(data, &x)
+	if err != nil {
+		return err
+	}
+	*sp = SnappedPoint(x.safeSnappedPoint)
+
+	sp.Location.Lat = x.EncLocation.Latitude
+	sp.Location.Lng = x.EncLocation.Longitude
+
+	return nil
+}
+
+// MarshalJSON implements json.Marshaler for SnappedPoint. This encodes Go
+// types back to the API representation.
+func (sp *SnappedPoint) MarshalJSON() ([]byte, error) {
+	x := encodedSnappedPoint{}
+	x.safeSnappedPoint = safeSnappedPoint(*sp)
+
+	x.EncLocation.Latitude = sp.Location.Lat
+	x.EncLocation.Longitude = sp.Location.Lng
+
+	return json.Marshal(x)
+}

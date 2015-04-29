@@ -20,7 +20,6 @@ package maps // import "google.golang.org/maps"
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -71,21 +70,11 @@ func (r *SnapToRoadRequest) Get(ctx context.Context) (SnapToRoadResponse, error)
 
 // SnapToRoadRequest is the request structure for the Roads Snap to Road API.
 type SnapToRoadRequest struct {
-	// Path is the path to be snapped
-	Path []Location
-	// Interpolate is whether to interpolate a path to include all points forming the full road-geometry
+	// Path is the path to be snapped.
+	Path []LatLng
+
+	// Interpolate is whether to interpolate a path to include all points forming the full road-geometry.
 	Interpolate bool
-}
-
-// Location is a point on Earth. Please note this is different to the LatLng struct.
-// TODO: Investigate the inconsistency between this API and the other Geo WS APIs.
-type Location struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-}
-
-func (l *Location) String() string {
-	return fmt.Sprintf("%g,%g", l.Latitude, l.Longitude)
 }
 
 // SnapToRoadResponse is an array of snapped points.
@@ -96,9 +85,11 @@ type SnapToRoadResponse struct {
 // SnappedPoint is the original path point snapped to a road.
 type SnappedPoint struct {
 	// Location of the snapped point.
-	Location `json:"location"`
+	Location LatLng `json:"location"`
+
 	// OriginalIndex is an integer that indicates the corresponding value in the original request. Not present on interpolated points.
 	OriginalIndex *int `json:"originalIndex"`
+
 	// PlaceID is a unique identifier for a place.
 	PlaceID string `json:"placeId"`
 }
@@ -161,9 +152,11 @@ const (
 // SpeedLimitsRequest is the request structure for the Roads Speed Limits API.
 type SpeedLimitsRequest struct {
 	// Path is the path to be snapped and speed limits requested.
-	Path []Location
+	Path []LatLng
+
 	// PlaceID is the PlaceIDs to request speed limits for.
 	PlaceID []string
+
 	// Units is whether to return speed limits in `SpeedLimitKPH` or `SpeedLimitMPH`. Optional, default behavior is to return results in KPH.
 	Units speedLimitUnit
 }
