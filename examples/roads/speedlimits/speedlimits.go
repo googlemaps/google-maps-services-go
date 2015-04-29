@@ -89,7 +89,7 @@ func parsePath(path string, r *maps.SpeedLimitsRequest) {
 			if err != nil {
 				usageAndExit(fmt.Sprintf("Could not parse path: %v", err))
 			}
-			r.Path = append(r.Path, maps.Location{Latitude: lat, Longitude: lng})
+			r.Path = append(r.Path, maps.LatLng{Lat: lat, Lng: lng})
 		}
 	}
 }

@@ -91,3 +91,11 @@ func NewDuration(d time.Duration) *Duration {
 		Text:  d.String(),
 	}
 }
+
+// Location is the Roads API+ representation of a location on the Earth. It
+// differs only in the encoded names, which are the longer forms of 'latitude'
+// and 'longitude'.
+type Location struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+}
