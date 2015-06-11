@@ -120,44 +120,44 @@ func main() {
 }
 
 func lookupMode(mode string, r *maps.DirectionsRequest) {
-	if mode != "" {
-		switch {
-		case mode == "driving":
-			r.Mode = maps.TravelModeDriving
-		case mode == "walking":
-			r.Mode = maps.TravelModeWalking
-		case mode == "bicycling":
-			r.Mode = maps.TravelModeBicycling
-		case mode == "transit":
-			r.Mode = maps.TravelModeTransit
-		default:
-			log.Fatalf("Unknown mode '%s'", mode)
-		}
+	switch {
+	case mode == "driving":
+		r.Mode = maps.TravelModeDriving
+	case mode == "walking":
+		r.Mode = maps.TravelModeWalking
+	case mode == "bicycling":
+		r.Mode = maps.TravelModeBicycling
+	case mode == "transit":
+		r.Mode = maps.TravelModeTransit
+	case mode == "":
+		// ignore
+	default:
+		log.Fatalf("Unknown mode '%s'", mode)
 	}
 }
 
 func lookupUnits(units string, r *maps.DirectionsRequest) {
-	if units != "" {
-		switch {
-		case units == "metric":
-			r.Units = maps.UnitsMetric
-		case units == "imperial":
-			r.Units = maps.UnitsImperial
-		default:
-			log.Fatalf("Unknown units '%s'", units)
-		}
+	switch {
+	case units == "metric":
+		r.Units = maps.UnitsMetric
+	case units == "imperial":
+		r.Units = maps.UnitsImperial
+	case units == "":
+		// ignore
+	default:
+		log.Fatalf("Unknown units '%s'", units)
 	}
 }
 
 func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.DirectionsRequest) {
-	if transitRoutingPreference != "" {
-		switch {
-		case transitRoutingPreference == "fewer_transfers":
-			r.TransitRoutingPreference = maps.TransitRoutingPreferenceFewerTransfers
-		case transitRoutingPreference == "less_walking":
-			r.TransitRoutingPreference = maps.TransitRoutingPreferenceLessWalking
-		default:
-			log.Fatalf("Unknown transit_routing_preference '%s'", transitRoutingPreference)
-		}
+	switch {
+	case transitRoutingPreference == "fewer_transfers":
+		r.TransitRoutingPreference = maps.TransitRoutingPreferenceFewerTransfers
+	case transitRoutingPreference == "less_walking":
+		r.TransitRoutingPreference = maps.TransitRoutingPreferenceLessWalking
+	case transitRoutingPreference == "":
+		// ignore
+	default:
+		log.Fatalf("Unknown transit_routing_preference '%s'", transitRoutingPreference)
 	}
 }
