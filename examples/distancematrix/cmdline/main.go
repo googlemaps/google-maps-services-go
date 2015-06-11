@@ -87,58 +87,78 @@ func main() {
 }
 
 func lookupMode(mode string, r *maps.DistanceMatrixRequest) {
-	switch {
-	case mode == "driving":
-		r.Mode = maps.TravelModeDriving
-	case mode == "walking":
-		r.Mode = maps.TravelModeWalking
-	case mode == "bicycling":
-		r.Mode = maps.TravelModeBicycling
-	case mode == "transit":
-		r.Mode = maps.TravelModeTransit
+	if mode != "" {
+		switch {
+		case mode == "driving":
+			r.Mode = maps.TravelModeDriving
+		case mode == "walking":
+			r.Mode = maps.TravelModeWalking
+		case mode == "bicycling":
+			r.Mode = maps.TravelModeBicycling
+		case mode == "transit":
+			r.Mode = maps.TravelModeTransit
+		default:
+			log.Fatalf("Unknown mode %s", mode)
+		}
 	}
 }
 
 func lookupAvoid(avoid string, r *maps.DistanceMatrixRequest) {
-	switch {
-	case avoid == "tolls":
-		r.Avoid = maps.AvoidTolls
-	case avoid == "highways":
-		r.Avoid = maps.AvoidHighways
-	case avoid == "ferries":
-		r.Avoid = maps.AvoidFerries
+	if avoid != "" {
+		switch {
+		case avoid == "tolls":
+			r.Avoid = maps.AvoidTolls
+		case avoid == "highways":
+			r.Avoid = maps.AvoidHighways
+		case avoid == "ferries":
+			r.Avoid = maps.AvoidFerries
+		default:
+			log.Fatalf("Unknown avoid restriction %s", avoid)
+		}
 	}
 }
 
 func lookupUnits(units string, r *maps.DistanceMatrixRequest) {
-	switch {
-	case units == "metric":
-		r.Units = maps.UnitsMetric
-	case units == "imperial":
-		r.Units = maps.UnitsImperial
+	if units != "" {
+		switch {
+		case units == "metric":
+			r.Units = maps.UnitsMetric
+		case units == "imperial":
+			r.Units = maps.UnitsImperial
+		default:
+			log.Fatalf("Unknown units %s", units)
+		}
 	}
 }
 
 func lookupTransitMode(transitMode string, r *maps.DistanceMatrixRequest) {
-	switch {
-	case transitMode == "bus":
-		r.TransitMode = maps.TransitModeBus
-	case transitMode == "subway":
-		r.TransitMode = maps.TransitModeSubway
-	case transitMode == "train":
-		r.TransitMode = maps.TransitModeTrain
-	case transitMode == "tram":
-		r.TransitMode = maps.TransitModeTram
-	case transitMode == "rail":
-		r.TransitMode = maps.TransitModeRail
+	if transitMode != "" {
+		switch {
+		case transitMode == "bus":
+			r.TransitMode = maps.TransitModeBus
+		case transitMode == "subway":
+			r.TransitMode = maps.TransitModeSubway
+		case transitMode == "train":
+			r.TransitMode = maps.TransitModeTrain
+		case transitMode == "tram":
+			r.TransitMode = maps.TransitModeTram
+		case transitMode == "rail":
+			r.TransitMode = maps.TransitModeRail
+		default:
+			log.Fatalf("Unknown transit_mode %s", transitMode)
+		}
 	}
 }
 
 func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.DistanceMatrixRequest) {
-	switch {
-	case transitRoutingPreference == "fewer_transfers":
-		r.TransitRoutingPreference = maps.TransitRoutingPreferenceFewerTransfers
-	case transitRoutingPreference == "less_walking":
-		r.TransitRoutingPreference = maps.TransitRoutingPreferenceLessWalking
+	if transitRoutingPreference != "" {
+		switch {
+		case transitRoutingPreference == "fewer_transfers":
+			r.TransitRoutingPreference = maps.TransitRoutingPreferenceFewerTransfers
+		case transitRoutingPreference == "less_walking":
+			r.TransitRoutingPreference = maps.TransitRoutingPreferenceLessWalking
+		default:
+			log.Fatalf("Unknown transit_routing_preference %s", transitRoutingPreference)
+		}
 	}
 }

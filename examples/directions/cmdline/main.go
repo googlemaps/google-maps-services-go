@@ -113,39 +113,51 @@ func main() {
 	ctx := maps.NewContext(*apiKey, client)
 	resp, err := r.Get(ctx)
 	if err != nil {
-		log.Fatalf("fatal error %v", err)
+		log.Fatalf("fatal error '%s'", err)
 	}
 
 	pretty.Println(resp)
 }
 
 func lookupMode(mode string, r *maps.DirectionsRequest) {
-	switch {
-	case mode == "driving":
-		r.Mode = maps.TravelModeDriving
-	case mode == "walking":
-		r.Mode = maps.TravelModeWalking
-	case mode == "bicycling":
-		r.Mode = maps.TravelModeBicycling
-	case mode == "transit":
-		r.Mode = maps.TravelModeTransit
+	if mode != "" {
+		switch {
+		case mode == "driving":
+			r.Mode = maps.TravelModeDriving
+		case mode == "walking":
+			r.Mode = maps.TravelModeWalking
+		case mode == "bicycling":
+			r.Mode = maps.TravelModeBicycling
+		case mode == "transit":
+			r.Mode = maps.TravelModeTransit
+		default:
+			log.Fatalf("Unknown mode '%s'", mode)
+		}
 	}
 }
 
 func lookupUnits(units string, r *maps.DirectionsRequest) {
-	switch {
-	case units == "metric":
-		r.Units = maps.UnitsMetric
-	case units == "imperial":
-		r.Units = maps.UnitsImperial
+	if units != "" {
+		switch {
+		case units == "metric":
+			r.Units = maps.UnitsMetric
+		case units == "imperial":
+			r.Units = maps.UnitsImperial
+		default:
+			log.Fatalf("Unknown units '%s'", units)
+		}
 	}
 }
 
 func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.DirectionsRequest) {
-	switch {
-	case transitRoutingPreference == "fewer_transfers":
-		r.TransitRoutingPreference = maps.TransitRoutingPreferenceFewerTransfers
-	case transitRoutingPreference == "less_walking":
-		r.TransitRoutingPreference = maps.TransitRoutingPreferenceLessWalking
+	if transitRoutingPreference != "" {
+		switch {
+		case transitRoutingPreference == "fewer_transfers":
+			r.TransitRoutingPreference = maps.TransitRoutingPreferenceFewerTransfers
+		case transitRoutingPreference == "less_walking":
+			r.TransitRoutingPreference = maps.TransitRoutingPreferenceLessWalking
+		default:
+			log.Fatalf("Unknown transit_routing_preference '%s'", transitRoutingPreference)
+		}
 	}
 }
