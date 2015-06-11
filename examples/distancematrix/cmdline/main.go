@@ -80,7 +80,7 @@ func main() {
 
 	resp, err := r.Get(ctx)
 	if err != nil {
-		log.Fatalf("error %v", err)
+		log.Fatalf("Fatal error: %s", err)
 	}
 
 	pretty.Println(resp)

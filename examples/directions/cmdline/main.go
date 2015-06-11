@@ -113,7 +113,7 @@ func main() {
 	ctx := maps.NewContext(*apiKey, client)
 	resp, err := r.Get(ctx)
 	if err != nil {
-		log.Fatalf("fatal error '%s'", err)
+		log.Fatalf("fatal error: %s", err)
 	}
 
 	pretty.Println(resp)
