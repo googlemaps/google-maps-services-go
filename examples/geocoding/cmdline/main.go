@@ -86,16 +86,16 @@ func parseComponents(components string, r *maps.GeocodingRequest) {
 		c := strings.Split(components, "|")
 		for _, cf := range c {
 			i := strings.Split(cf, ":")
-			switch {
-			case i[0] == "route":
+			switch i[0] {
+			case "route":
 				r.AddComponentFilter(maps.ComponentRoute, i[1])
-			case i[0] == "locality":
+			case "locality":
 				r.AddComponentFilter(maps.ComponentLocality, i[1])
-			case i[0] == "administrative_area":
+			case "administrative_area":
 				r.AddComponentFilter(maps.ComponentAdministrativeArea, i[1])
-			case i[0] == "postal_code":
+			case "postal_code":
 				r.AddComponentFilter(maps.ComponentPostalCode, i[1])
-			case i[0] == "country":
+			case "country":
 				r.AddComponentFilter(maps.ComponentCounty, i[1])
 			}
 		}
@@ -159,14 +159,14 @@ func parseResultType(resultType string, r *maps.GeocodingRequest) {
 func parseLocationType(locationType string, r *maps.GeocodingRequest) {
 	if locationType != "" {
 		for _, l := range strings.Split(locationType, "|") {
-			switch {
-			case l == "ROOFTOP":
+			switch l {
+			case "ROOFTOP":
 				r.LocationType = append(r.LocationType, maps.LocationTypeRooftop)
-			case l == "RANGE_INTERPOLATED":
+			case "RANGE_INTERPOLATED":
 				r.LocationType = append(r.LocationType, maps.LocationTypeRangeInterpolated)
-			case l == "GEOMETRIC_CENTER":
+			case "GEOMETRIC_CENTER":
 				r.LocationType = append(r.LocationType, maps.LocationTypeGeometricCenter)
-			case l == "APPROXIMATE":
+			case "APPROXIMATE":
 				r.LocationType = append(r.LocationType, maps.LocationTypeApproximate)
 			}
 		}

@@ -80,12 +80,12 @@ func main() {
 
 	if *avoid != "" {
 		for _, a := range strings.Split(*avoid, "|") {
-			switch {
-			case a == "tolls":
+			switch a {
+			case "tolls":
 				r.Avoid = append(r.Avoid, maps.AvoidTolls)
-			case a == "highways":
+			case "highways":
 				r.Avoid = append(r.Avoid, maps.AvoidHighways)
-			case a == "ferries":
+			case "ferries":
 				r.Avoid = append(r.Avoid, maps.AvoidFerries)
 			}
 		}
@@ -93,16 +93,16 @@ func main() {
 	}
 	if *transitMode != "" {
 		for _, t := range strings.Split(*transitMode, "|") {
-			switch {
-			case t == "bus":
+			switch t {
+			case "bus":
 				r.TransitMode = append(r.TransitMode, maps.TransitModeBus)
-			case t == "subway":
+			case "subway":
 				r.TransitMode = append(r.TransitMode, maps.TransitModeSubway)
-			case t == "train":
+			case "train":
 				r.TransitMode = append(r.TransitMode, maps.TransitModeTrain)
-			case t == "tram":
+			case "tram":
 				r.TransitMode = append(r.TransitMode, maps.TransitModeTram)
-			case t == "rail":
+			case "rail":
 				r.TransitMode = append(r.TransitMode, maps.TransitModeRail)
 			}
 		}
@@ -113,39 +113,51 @@ func main() {
 	ctx := maps.NewContext(*apiKey, client)
 	resp, err := r.Get(ctx)
 	if err != nil {
-		log.Fatalf("fatal error %v", err)
+		log.Fatalf("fatal error: %s", err)
 	}
 
 	pretty.Println(resp)
 }
 
 func lookupMode(mode string, r *maps.DirectionsRequest) {
-	switch {
-	case mode == "driving":
+	switch mode {
+	case "driving":
 		r.Mode = maps.TravelModeDriving
-	case mode == "walking":
+	case "walking":
 		r.Mode = maps.TravelModeWalking
-	case mode == "bicycling":
+	case "bicycling":
 		r.Mode = maps.TravelModeBicycling
-	case mode == "transit":
+	case "transit":
 		r.Mode = maps.TravelModeTransit
+	case "":
+		// ignore
+	default:
+		log.Fatalf("Unknown mode '%s'", mode)
 	}
 }
 
 func lookupUnits(units string, r *maps.DirectionsRequest) {
-	switch {
-	case units == "metric":
+	switch units {
+	case "metric":
 		r.Units = maps.UnitsMetric
-	case units == "imperial":
+	case "imperial":
 		r.Units = maps.UnitsImperial
+	case "":
+		// ignore
+	default:
+		log.Fatalf("Unknown units '%s'", units)
 	}
 }
 
 func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.DirectionsRequest) {
-	switch {
-	case transitRoutingPreference == "fewer_transfers":
+	switch transitRoutingPreference {
+	case "fewer_transfers":
 		r.TransitRoutingPreference = maps.TransitRoutingPreferenceFewerTransfers
-	case transitRoutingPreference == "less_walking":
+	case "less_walking":
 		r.TransitRoutingPreference = maps.TransitRoutingPreferenceLessWalking
+	case "":
+		// ignore
+	default:
+		log.Fatalf("Unknown transit_routing_preference '%s'", transitRoutingPreference)
 	}
 }

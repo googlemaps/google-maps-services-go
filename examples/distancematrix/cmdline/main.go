@@ -80,65 +80,85 @@ func main() {
 
 	resp, err := r.Get(ctx)
 	if err != nil {
-		log.Fatalf("error %v", err)
+		log.Fatalf("fatal error: %s", err)
 	}
 
 	pretty.Println(resp)
 }
 
 func lookupMode(mode string, r *maps.DistanceMatrixRequest) {
-	switch {
-	case mode == "driving":
+	switch mode {
+	case "driving":
 		r.Mode = maps.TravelModeDriving
-	case mode == "walking":
+	case "walking":
 		r.Mode = maps.TravelModeWalking
-	case mode == "bicycling":
+	case "bicycling":
 		r.Mode = maps.TravelModeBicycling
-	case mode == "transit":
+	case "transit":
 		r.Mode = maps.TravelModeTransit
+	case "":
+		// ignore
+	default:
+		log.Fatalf("Unknown mode %s", mode)
 	}
 }
 
 func lookupAvoid(avoid string, r *maps.DistanceMatrixRequest) {
-	switch {
-	case avoid == "tolls":
+	switch avoid {
+	case "tolls":
 		r.Avoid = maps.AvoidTolls
-	case avoid == "highways":
+	case "highways":
 		r.Avoid = maps.AvoidHighways
-	case avoid == "ferries":
+	case "ferries":
 		r.Avoid = maps.AvoidFerries
+	case "":
+		//ignore
+	default:
+		log.Fatalf("Unknown avoid restriction %s", avoid)
 	}
 }
 
 func lookupUnits(units string, r *maps.DistanceMatrixRequest) {
-	switch {
-	case units == "metric":
+	switch units {
+	case "metric":
 		r.Units = maps.UnitsMetric
-	case units == "imperial":
+	case "imperial":
 		r.Units = maps.UnitsImperial
+	case "":
+		// ignore
+	default:
+		log.Fatalf("Unknown units %s", units)
 	}
 }
 
 func lookupTransitMode(transitMode string, r *maps.DistanceMatrixRequest) {
-	switch {
-	case transitMode == "bus":
+	switch transitMode {
+	case "bus":
 		r.TransitMode = maps.TransitModeBus
-	case transitMode == "subway":
+	case "subway":
 		r.TransitMode = maps.TransitModeSubway
-	case transitMode == "train":
+	case "train":
 		r.TransitMode = maps.TransitModeTrain
-	case transitMode == "tram":
+	case "tram":
 		r.TransitMode = maps.TransitModeTram
-	case transitMode == "rail":
+	case "rail":
 		r.TransitMode = maps.TransitModeRail
+	case "":
+		// ignore
+	default:
+		log.Fatalf("Unknown transit_mode %s", transitMode)
 	}
 }
 
 func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.DistanceMatrixRequest) {
-	switch {
-	case transitRoutingPreference == "fewer_transfers":
+	switch transitRoutingPreference {
+	case "fewer_transfers":
 		r.TransitRoutingPreference = maps.TransitRoutingPreferenceFewerTransfers
-	case transitRoutingPreference == "less_walking":
+	case "less_walking":
 		r.TransitRoutingPreference = maps.TransitRoutingPreferenceLessWalking
+	case "":
+		// ignore
+	default:
+		log.Fatalf("Unknown transit_routing_preference %s", transitRoutingPreference)
 	}
 }
