@@ -28,7 +28,8 @@ import (
 
 type contextKey struct{}
 
-func WithContext(parent context.Context, apiKey string, c *http.Client) context.Context {
+// WithContext  is the internal constructor for mapsContext.
+func WithContext(parent context.Context, apiKey string, c *http.Client, baseURL string) context.Context {
 	if c == nil {
 		panic("nil *http.Client passed to WithContext")
 	}
@@ -38,9 +39,13 @@ func WithContext(parent context.Context, apiKey string, c *http.Client) context.
 	if !strings.HasPrefix(apiKey, "AIza") {
 		panic("invalid API Key passed to WithContext")
 	}
+	if baseURL == "" {
+		panic("invalid base URL passed to WithContext")
+	}
 	return context.WithValue(parent, contextKey{}, &mapsContext{
 		APIKey:     apiKey,
 		HTTPClient: c,
+		BaseURL:    baseURL,
 	})
 }
 
@@ -49,6 +54,7 @@ const userAgent = "gmaps-golang/0.1"
 type mapsContext struct {
 	APIKey     string
 	HTTPClient *http.Client
+	BaseURL    string
 
 	mu  sync.Mutex             // guards svc
 	svc map[string]interface{} // e.g. "storage" => *rawStorage.Service
@@ -114,12 +120,19 @@ func cloneRequest(r *http.Request) *http.Request {
 	return r2
 }
 
+// APIKey retrieval for mapsContext
 func APIKey(ctx context.Context) string {
 	return mc(ctx).APIKey
 }
 
+// HTTPClient retrieval for mapsContext
 func HTTPClient(ctx context.Context) *http.Client {
 	return mc(ctx).HTTPClient
+}
+
+// BaseURL retrieval for mapsContext
+func BaseURL(ctx context.Context) string {
+	return mc(ctx).BaseURL
 }
 
 // mc returns the internal *mapsContext (cc) state for a context.Context.

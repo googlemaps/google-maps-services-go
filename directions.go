@@ -74,7 +74,9 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 		return nil, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
 	}
 
-	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/directions/json", nil)
+	baseURL := internal.BaseURL(ctx)
+
+	req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
 	if err != nil {
 		return nil, err
 	}
