@@ -28,7 +28,7 @@ import (
 
 type contextKey struct{}
 
-// WithContext  is the internal constructor for mapsContext.
+// WithContext is the internal constructor for mapsContext.
 func WithContext(parent context.Context, apiKey string, c *http.Client, baseURL string) context.Context {
 	if c == nil {
 		panic("nil *http.Client passed to WithContext")

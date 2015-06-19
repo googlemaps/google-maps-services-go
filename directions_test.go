@@ -175,9 +175,7 @@ func TestMissingOrigin(t *testing.T) {
 		Destination: "Parramatta",
 	}
 
-	_, err := r.Get(ctx)
-
-	if err == nil {
+	if _, err := r.Get(ctx); err == nil {
 		t.Errorf("Missing Origin should return error")
 	}
 }
@@ -189,9 +187,7 @@ func TestMissingDestination(t *testing.T) {
 		Origin: "Sydney",
 	}
 
-	_, err := r.Get(ctx)
-
-	if err == nil {
+	if _, err := r.Get(ctx); err == nil {
 		t.Errorf("Missing Destination should return error")
 	}
 }
@@ -205,9 +201,7 @@ func TestBadMode(t *testing.T) {
 		Mode:        "Not a Mode",
 	}
 
-	_, err := r.Get(ctx)
-
-	if err == nil {
+	if _, err := r.Get(ctx); err == nil {
 		t.Errorf("Bad Mode should return error")
 	}
 }
@@ -222,9 +216,7 @@ func TestDeclaringBothDepartureAndArrivalTime(t *testing.T) {
 		ArrivalTime:   "4pm",
 	}
 
-	_, err := r.Get(ctx)
-
-	if err == nil {
+	if _, err := r.Get(ctx); err == nil {
 		t.Errorf("Declaring both DepartureTime and ArrivalTime should return error")
 	}
 }
@@ -240,9 +232,7 @@ func TestTravelModeTransit(t *testing.T) {
 		TransitMode: transitModes,
 	}
 
-	_, err := r.Get(ctx)
-
-	if err == nil {
+	if _, err := r.Get(ctx); err == nil {
 		t.Errorf("Declaring TransitMode without Mode=Transit should return error")
 	}
 }
@@ -256,9 +246,7 @@ func TestTransitRoutingPreference(t *testing.T) {
 		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
 	}
 
-	_, err := r.Get(ctx)
-
-	if err == nil {
+	if _, err := r.Get(ctx); err == nil {
 		t.Errorf("Declaring TransitRoutingPreference without Mode=TravelModeTransit should return error")
 	}
 }
@@ -273,10 +261,7 @@ func TestFailingServer(t *testing.T) {
 		Destination: "Parramatta",
 	}
 
-	_, err := r.Get(ctx)
-
-	if err == nil {
+	if _, err := r.Get(ctx); err == nil {
 		t.Errorf("Failing server should return error")
 	}
-
 }
