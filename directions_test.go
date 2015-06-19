@@ -21,27 +21,14 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"reflect"
 	"testing"
 )
 
-// Test that two values are equal, log if not equal.
-func expect(t *testing.T, a interface{}, b interface{}) {
-	if a != b {
-		t.Errorf("Expected %v (type %v) - Got %v (type %v)", b, reflect.TypeOf(b), a, reflect.TypeOf(a))
-	}
-}
-
-// Test two values are not equal, log if they are equal.
-func refute(t *testing.T, a interface{}, b interface{}) {
-	if a == b {
-		t.Errorf("Did not expect %v (type %v) - Got %v (type %v)", b, reflect.TypeOf(b), a, reflect.TypeOf(a))
-	}
-}
+const apiKey = "AIzaNotReallyAnAPIKey"
 
 // Create a mock HTTP Server that will return a response with HTTP code and body.
-func mockServer(code int, body string) (*httptest.Server, *http.Client) {
+func mockServer(code int, body string) *httptest.Server {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(code)
@@ -49,14 +36,7 @@ func mockServer(code int, body string) (*httptest.Server, *http.Client) {
 		fmt.Fprintln(w, body)
 	}))
 
-	tr := &http.Transport{
-		Proxy: func(req *http.Request) (*url.URL, error) {
-			return url.Parse(server.URL)
-		},
-	}
-	httpClient := &http.Client{Transport: tr}
-
-	return server, httpClient
+	return server
 }
 
 func TestSydneyToParramatta(t *testing.T) {
@@ -124,21 +104,15 @@ func TestSydneyToParramatta(t *testing.T) {
                "via_waypoint" : []
             }
          ],
-         "overview_polyline" : {
-            "points" : ""
-         },
-         "summary" : "A4 and M4",
-         "warnings" : [],
-         "waypoint_order" : []
+         "summary" : "A4 and M4"
       }
    ],
    "status" : "OK"
 }`
 
-	apiKey := "AIzaNotReallyAnAPIKey"
-	server, client := mockServer(200, response)
+	server := mockServer(200, response)
 	defer server.Close()
-
+	client := &http.Client{}
 	ctx := NewContextWithBaseURL(apiKey, client, server.URL)
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
@@ -147,8 +121,12 @@ func TestSydneyToParramatta(t *testing.T) {
 
 	resp, err := r.Get(ctx)
 
-	expect(t, len(resp), 1)
-	expect(t, err, nil)
+	if len(resp) != 1 {
+		t.Errorf("Expected length of response was 1, actually %g", len(resp))
+	}
+	if err != nil {
+		t.Errorf("r.Get returned non nil error: %v", err)
+	}
 
 	var steps []*Step
 	steps = append(steps, &Step{
@@ -185,24 +163,120 @@ func TestSydneyToParramatta(t *testing.T) {
 		Copyrights: "Map data ©2015 Google",
 	}
 
-	// Attempting to directly compare &resp[0] and correctResponse failed, yet this works. Help...
-	expect(t, resp[0].Summary, correctResponse.Summary)
-	expect(t, resp[0].Legs[0].Steps[0].HTMLInstructions, correctResponse.Legs[0].Steps[0].HTMLInstructions)
-	expect(t, resp[0].Legs[0].Steps[0].Distance, correctResponse.Legs[0].Steps[0].Distance)
-	expect(t, resp[0].Legs[0].Steps[0].Duration, correctResponse.Legs[0].Steps[0].Duration)
-	expect(t, resp[0].Legs[0].Steps[0].StartLocation, correctResponse.Legs[0].Steps[0].StartLocation)
-	expect(t, resp[0].Legs[0].Steps[0].EndLocation, correctResponse.Legs[0].Steps[0].EndLocation)
-	expect(t, resp[0].Legs[0].Steps[0].Polyline, correctResponse.Legs[0].Steps[0].Polyline)
-	expect(t, resp[0].Legs[0].Steps[0].TransitDetails, correctResponse.Legs[0].Steps[0].TransitDetails)
-	expect(t, resp[0].Legs[0].Steps[0].TravelMode, correctResponse.Legs[0].Steps[0].TravelMode)
-	expect(t, resp[0].Legs[0].Distance, correctResponse.Legs[0].Distance)
-	expect(t, resp[0].Legs[0].Duration, correctResponse.Legs[0].Duration)
-	expect(t, resp[0].Legs[0].StartLocation, correctResponse.Legs[0].StartLocation)
-	expect(t, resp[0].Legs[0].EndLocation, correctResponse.Legs[0].EndLocation)
-	expect(t, resp[0].Legs[0].StartAddress, correctResponse.Legs[0].StartAddress)
-	expect(t, resp[0].Legs[0].EndAddress, correctResponse.Legs[0].EndAddress)
-	expect(t, resp[0].OverviewPolyline, correctResponse.OverviewPolyline)
-	expect(t, resp[0].Bounds, correctResponse.Bounds)
-	expect(t, resp[0].Copyrights, correctResponse.Copyrights)
+	if !reflect.DeepEqual(&resp[0], correctResponse) {
+		t.Errorf("Actual response != expected")
+	}
+}
+
+func TestMissingOrigin(t *testing.T) {
+	client := &http.Client{}
+	ctx := NewContext(apiKey, client)
+	r := &DirectionsRequest{
+		Destination: "Parramatta",
+	}
+
+	_, err := r.Get(ctx)
+
+	if err == nil {
+		t.Errorf("Missing Origin should return error")
+	}
+}
+
+func TestMissingDestination(t *testing.T) {
+	client := &http.Client{}
+	ctx := NewContext(apiKey, client)
+	r := &DirectionsRequest{
+		Origin: "Sydney",
+	}
+
+	_, err := r.Get(ctx)
+
+	if err == nil {
+		t.Errorf("Missing Destination should return error")
+	}
+}
+
+func TestBadMode(t *testing.T) {
+	client := &http.Client{}
+	ctx := NewContext(apiKey, client)
+	r := &DirectionsRequest{
+		Origin:      "Sydney",
+		Destination: "Parramatta",
+		Mode:        "Not a Mode",
+	}
+
+	_, err := r.Get(ctx)
+
+	if err == nil {
+		t.Errorf("Bad Mode should return error")
+	}
+}
+
+func TestDeclaringBothDepartureAndArrivalTime(t *testing.T) {
+	client := &http.Client{}
+	ctx := NewContext(apiKey, client)
+	r := &DirectionsRequest{
+		Origin:        "Sydney",
+		Destination:   "Parramatta",
+		DepartureTime: "Now",
+		ArrivalTime:   "4pm",
+	}
+
+	_, err := r.Get(ctx)
+
+	if err == nil {
+		t.Errorf("Declaring both DepartureTime and ArrivalTime should return error")
+	}
+}
+
+func TestTravelModeTransit(t *testing.T) {
+	client := &http.Client{}
+	ctx := NewContext(apiKey, client)
+	var transitModes []transitMode
+	transitModes = append(transitModes, TransitModeBus)
+	r := &DirectionsRequest{
+		Origin:      "Sydney",
+		Destination: "Parramatta",
+		TransitMode: transitModes,
+	}
+
+	_, err := r.Get(ctx)
+
+	if err == nil {
+		t.Errorf("Declaring TransitMode without Mode=Transit should return error")
+	}
+}
+
+func TestTransitRoutingPreference(t *testing.T) {
+	client := &http.Client{}
+	ctx := NewContext(apiKey, client)
+	r := &DirectionsRequest{
+		Origin:                   "Sydney",
+		Destination:              "Parramatta",
+		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
+	}
+
+	_, err := r.Get(ctx)
+
+	if err == nil {
+		t.Errorf("Declaring TransitRoutingPreference without Mode=TravelModeTransit should return error")
+	}
+}
+
+func TestFailingServer(t *testing.T) {
+	server := mockServer(500, `{"status" : "ERROR"}`)
+	defer server.Close()
+	client := &http.Client{}
+	ctx := NewContextWithBaseURL(apiKey, client, server.URL)
+	r := &DirectionsRequest{
+		Origin:      "Sydney",
+		Destination: "Parramatta",
+	}
+
+	_, err := r.Get(ctx)
+
+	if err == nil {
+		t.Errorf("Failing server should return error")
+	}
 
 }
