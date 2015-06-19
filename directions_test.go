@@ -39,7 +39,7 @@ func mockServer(code int, body string) *httptest.Server {
 	return server
 }
 
-func TestSydneyToParramatta(t *testing.T) {
+func TestDirectionsSydneyToParramatta(t *testing.T) {
 
 	// Route from Sydney to Parramatta with most steps elided.
 	response := `{
@@ -113,7 +113,7 @@ func TestSydneyToParramatta(t *testing.T) {
 	server := mockServer(200, response)
 	defer server.Close()
 	client := &http.Client{}
-	ctx := NewContextWithBaseURL(apiKey, client, server.URL)
+	ctx := newContextWithBaseURL(apiKey, client, server.URL)
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
@@ -168,7 +168,7 @@ func TestSydneyToParramatta(t *testing.T) {
 	}
 }
 
-func TestMissingOrigin(t *testing.T) {
+func TestDirectionsMissingOrigin(t *testing.T) {
 	client := &http.Client{}
 	ctx := NewContext(apiKey, client)
 	r := &DirectionsRequest{
@@ -180,7 +180,7 @@ func TestMissingOrigin(t *testing.T) {
 	}
 }
 
-func TestMissingDestination(t *testing.T) {
+func TestDirectionsMissingDestination(t *testing.T) {
 	client := &http.Client{}
 	ctx := NewContext(apiKey, client)
 	r := &DirectionsRequest{
@@ -192,7 +192,7 @@ func TestMissingDestination(t *testing.T) {
 	}
 }
 
-func TestBadMode(t *testing.T) {
+func TestDirectionsBadMode(t *testing.T) {
 	client := &http.Client{}
 	ctx := NewContext(apiKey, client)
 	r := &DirectionsRequest{
@@ -206,7 +206,7 @@ func TestBadMode(t *testing.T) {
 	}
 }
 
-func TestDeclaringBothDepartureAndArrivalTime(t *testing.T) {
+func TestDirectionsDeclaringBothDepartureAndArrivalTime(t *testing.T) {
 	client := &http.Client{}
 	ctx := NewContext(apiKey, client)
 	r := &DirectionsRequest{
@@ -221,7 +221,7 @@ func TestDeclaringBothDepartureAndArrivalTime(t *testing.T) {
 	}
 }
 
-func TestTravelModeTransit(t *testing.T) {
+func TestDirectionsTravelModeTransit(t *testing.T) {
 	client := &http.Client{}
 	ctx := NewContext(apiKey, client)
 	var transitModes []transitMode
@@ -237,7 +237,7 @@ func TestTravelModeTransit(t *testing.T) {
 	}
 }
 
-func TestTransitRoutingPreference(t *testing.T) {
+func TestDirectionsTransitRoutingPreference(t *testing.T) {
 	client := &http.Client{}
 	ctx := NewContext(apiKey, client)
 	r := &DirectionsRequest{
@@ -251,11 +251,11 @@ func TestTransitRoutingPreference(t *testing.T) {
 	}
 }
 
-func TestFailingServer(t *testing.T) {
+func TestDirectionsFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
 	client := &http.Client{}
-	ctx := NewContextWithBaseURL(apiKey, client, server.URL)
+	ctx := newContextWithBaseURL(apiKey, client, server.URL)
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",

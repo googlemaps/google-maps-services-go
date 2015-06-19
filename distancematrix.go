@@ -59,7 +59,7 @@ func (r *DistanceMatrixRequest) Get(ctx context.Context) (DistanceMatrixResponse
 		return response, errors.New("distancematrix: must not specify both DepartureTime and ArrivalTime")
 	}
 
-	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/distancematrix/json", nil)
+	req, err := http.NewRequest("GET", internal.BaseURL(ctx)+"/maps/api/distancematrix/json", nil)
 	if err != nil {
 		return response, err
 	}
