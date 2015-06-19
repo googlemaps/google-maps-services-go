@@ -44,26 +44,6 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 	if r.Mode != "" && TravelModeDriving != r.Mode && TravelModeWalking != r.Mode && TravelModeBicycling != r.Mode && TravelModeTransit != r.Mode {
 		return nil, fmt.Errorf("directions: unknown Mode: '%s'", r.Mode)
 	}
-	for _, avoid := range r.Avoid {
-		if avoid != AvoidTolls && avoid != AvoidHighways && avoid != AvoidFerries {
-			return nil, fmt.Errorf("directions: Unknown Avoid restriction '%s'", avoid)
-		}
-	}
-	if r.Units != "" && r.Units != UnitsMetric && r.Units != UnitsImperial {
-		return nil, fmt.Errorf("directions: Unknown Units '%s'", r.Units)
-	}
-	for _, transitMode := range r.TransitMode {
-		if transitMode != TransitModeBus && transitMode != TransitModeSubway && transitMode != TransitModeTrain && transitMode != TransitModeTram && transitMode != TransitModeRail {
-			return nil, fmt.Errorf("directions: Unknown TransitMode '%s'", r.TransitMode)
-		}
-	}
-	if r.TransitRoutingPreference != "" && r.TransitRoutingPreference != TransitRoutingPreferenceLessWalking && r.TransitRoutingPreference != TransitRoutingPreferenceFewerTransfers {
-		return nil, fmt.Errorf("directions: Unknown TransitRoutingPreference '%s'", r.TransitRoutingPreference)
-	}
-	if r.DepartureTime != "" && r.ArrivalTime != "" {
-		return nil, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
-	}
-
 	if r.DepartureTime != "" && r.ArrivalTime != "" {
 		return nil, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
 	}
@@ -74,7 +54,9 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 		return nil, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
 	}
 
-	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/directions/json", nil)
+	baseURL := internal.BaseURL(ctx)
+
+	req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
 	if err != nil {
 		return nil, err
 	}

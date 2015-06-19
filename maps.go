@@ -23,25 +23,37 @@ import (
 	"google.golang.org/maps/internal"
 )
 
+const baseURL = "https://maps.googleapis.com/"
+
 // NewContext returns a new context that uses the provided http.Client.
 // It mutates the client's original Transport to append the cloud
 // package's user-agent to the outgoing requests.
 // You can obtain the API Key from the Google Developers Console,
 // https://console.developers.google.com.
 func NewContext(apiKey string, c *http.Client) context.Context {
+	return NewContextWithBaseURL(apiKey, c, baseURL)
+}
+
+// NewContextWithBaseURL returns a new context in a similar way NewContext does,
+// but with a specified baseURL. Useful for testing.
+func NewContextWithBaseURL(apiKey string, c *http.Client, baseURL string) context.Context {
 	if c == nil {
 		panic("invalid nil *http.Client passed to NewContext")
 	}
-	return WithContext(context.Background(), apiKey, c)
+	return internalWithConstructor(context.Background(), apiKey, c, baseURL)
 }
 
 // WithContext returns a new context in a similar way NewContext does,
 // but initiates the new context with the specified parent.
 func WithContext(parent context.Context, apiKey string, c *http.Client) context.Context {
+	return internalWithConstructor(parent, apiKey, c, baseURL)
+}
+
+func internalWithConstructor(parent context.Context, apiKey string, c *http.Client, baseURL string) context.Context {
 	// TODO(bradfitz): delete internal.Transport. It's too wrappy for what it does.
 	// Do User-Agent some other way.
 	if _, ok := c.Transport.(*internal.Transport); !ok {
 		c.Transport = &internal.Transport{Base: c.Transport}
 	}
-	return internal.WithContext(parent, apiKey, c)
+	return internal.WithContext(parent, apiKey, c, baseURL)
 }
