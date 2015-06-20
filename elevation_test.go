@@ -78,7 +78,6 @@ func TestElevationDenver(t *testing.T) {
 
 func TestElevationSampledPath(t *testing.T) {
 
-	// Elevation of Denver, the mile high city
 	response := `{
   "results" : [
         {
