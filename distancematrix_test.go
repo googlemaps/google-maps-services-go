@@ -135,6 +135,21 @@ func TestDistanceMatrixMissingDestinations(t *testing.T) {
 	}
 }
 
+func TestDistanceMatrixDepartureAndArrivalTime(t *testing.T) {
+	client := &http.Client{}
+	ctx := NewContext(apiKey, client)
+	r := &DistanceMatrixRequest{
+		Origins:       []string{"Sydney", "Pyrmont"},
+		Destinations:  []string{},
+		DepartureTime: "now",
+		ArrivalTime:   "4pm",
+	}
+
+	if _, err := r.Get(ctx); err == nil {
+		t.Errorf("Having both Departure time and Arrival time should return error")
+	}
+}
+
 func TestDistanceMatrixFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()

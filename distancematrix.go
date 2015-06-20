@@ -40,21 +40,6 @@ func (r *DistanceMatrixRequest) Get(ctx context.Context) (DistanceMatrixResponse
 	if len(r.Destinations) == 0 {
 		return response, errors.New("distancematrix: Destinations must contain at least one end address")
 	}
-	if r.Mode != "" && TravelModeDriving != r.Mode && TravelModeWalking != r.Mode && TravelModeBicycling != r.Mode && TravelModeTransit != r.Mode {
-		return response, fmt.Errorf("distancematrix: unknown Mode: '%s'", r.Mode)
-	}
-	if r.Avoid != "" && r.Avoid != AvoidTolls && r.Avoid != AvoidHighways && r.Avoid != AvoidFerries {
-		return response, fmt.Errorf("distancematrix: Unknown Avoid restriction '%s'", r.Avoid)
-	}
-	if r.Units != "" && r.Units != UnitsMetric && r.Units != UnitsImperial {
-		return response, fmt.Errorf("distancematrix: Unknown Units '%s'", r.Units)
-	}
-	if r.TransitMode != "" && r.TransitMode != TransitModeBus && r.TransitMode != TransitModeSubway && r.TransitMode != TransitModeTrain && r.TransitMode != TransitModeTram && r.TransitMode != TransitModeRail {
-		return response, fmt.Errorf("distancematrix: Unknown TransitMode '%s'", r.TransitMode)
-	}
-	if r.TransitRoutingPreference != "" && r.TransitRoutingPreference != TransitRoutingPreferenceLessWalking && r.TransitRoutingPreference != TransitRoutingPreferenceFewerTransfers {
-		return response, fmt.Errorf("distancematrix: Unknown TransitRoutingPreference '%s'", r.TransitRoutingPreference)
-	}
 	if r.DepartureTime != "" && r.ArrivalTime != "" {
 		return response, errors.New("distancematrix: must not specify both DepartureTime and ArrivalTime")
 	}
