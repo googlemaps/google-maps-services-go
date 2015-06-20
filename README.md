@@ -14,8 +14,8 @@ APIs:
  - [Distance Matrix API]
  - [Elevation API]
  - [Geocoding API]
- - [Time Zone API]
  - [Roads API]
+ - [Time Zone API]
 
 Keep in mind that the same [terms and conditions](https://developers.google.com/maps/terms) apply
 to usage of the APIs when they're accessed through this library.
@@ -47,14 +47,14 @@ To generate a server key for your project:
     a Google Account.
  1. Select an existing project, or create a new project.
  1. Click **Enable an API**.
- 1. Browse for the API, and set its status to "On". The Python Client for Google Maps Services
+ 1. Browse for the API, and set its status to "On". The Golang Client for Google Maps Services
     accesses the following APIs:
     * Directions API
     * Distance Matrix API
     * Elevation API
     * Geocoding API
-    * Time Zone API
     * Roads API
+    * Time Zone API
  1. Once you've enabled the APIs, click **Credentials** from the left navigation of the Developer
     Console.
  1. In the "Public API access", click **Create new Key**.
@@ -99,8 +99,8 @@ TODO(brettmorgan): Implement features
 [Distance Matrix API]: https://developers.google.com/maps/documentation/distancematrix/
 [Elevation API]: https://developers.google.com/maps/documentation/elevation/
 [Geocoding API]: https://developers.google.com/maps/documentation/geocoding/
-[Time Zone API]: https://developers.google.com/maps/documentation/timezone/
 [Roads API]: https://developers.google.com/maps/documentation/roads/
+[Time Zone API]: https://developers.google.com/maps/documentation/timezone/
 
 [issues]: https://github.com/googlemaps/google-maps-services-python/issues
 [contrib]: https://github.com/googlemaps/google-maps-services-python/blob/master/CONTRIB.md
