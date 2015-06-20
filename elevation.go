@@ -32,7 +32,7 @@ import (
 func (r *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
 	var response elevationResponse
 
-	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/elevation/json", nil)
+	req, err := http.NewRequest("GET", internal.BaseURL(ctx)+"/maps/api/elevation/json", nil)
 	if err != nil {
 		return nil, err
 	}

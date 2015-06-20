@@ -33,7 +33,7 @@ import (
 func (r *TimezoneRequest) Get(ctx context.Context) (TimezoneResult, error) {
 	var response timezoneResponse
 
-	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/timezone/json", nil)
+	req, err := http.NewRequest("GET", internal.BaseURL(ctx)+"/maps/api/timezone/json", nil)
 	if err != nil {
 		return TimezoneResult{}, err
 	}

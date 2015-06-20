@@ -31,12 +31,12 @@ const baseURL = "https://maps.googleapis.com/"
 // You can obtain the API Key from the Google Developers Console,
 // https://console.developers.google.com.
 func NewContext(apiKey string, c *http.Client) context.Context {
-	return NewContextWithBaseURL(apiKey, c, baseURL)
+	return newContextWithBaseURL(apiKey, c, baseURL)
 }
 
-// NewContextWithBaseURL returns a new context in a similar way NewContext does,
+// newContextWithBaseURL returns a new context in a similar way NewContext does,
 // but with a specified baseURL. Useful for testing.
-func NewContextWithBaseURL(apiKey string, c *http.Client, baseURL string) context.Context {
+func newContextWithBaseURL(apiKey string, c *http.Client, baseURL string) context.Context {
 	if c == nil {
 		panic("invalid nil *http.Client passed to NewContext")
 	}

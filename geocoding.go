@@ -32,7 +32,7 @@ import (
 func (r *GeocodingRequest) Get(ctx context.Context) ([]GeocodingResult, error) {
 	var response geocodingResponse
 
-	req, err := http.NewRequest("GET", "https://maps.googleapis.com/maps/api/geocode/json", nil)
+	req, err := http.NewRequest("GET", internal.BaseURL(ctx)+"/maps/api/geocode/json", nil)
 	if err != nil {
 		return nil, err
 	}
