@@ -134,3 +134,18 @@ func TestDistanceMatrixMissingDestinations(t *testing.T) {
 		t.Errorf("Missing Destinations should return error")
 	}
 }
+
+func TestDistanceMatrixFailingServer(t *testing.T) {
+	server := mockServer(500, `{"status" : "ERROR"}`)
+	defer server.Close()
+	client := &http.Client{}
+	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	r := &DistanceMatrixRequest{
+		Origins:      []string{"Sydney", "Pyrmont"},
+		Destinations: []string{},
+	}
+
+	if _, err := r.Get(ctx); err == nil {
+		t.Errorf("Failing server should return error")
+	}
+}
