@@ -1,0 +1,383 @@
+// Copyright 2015 Google Inc. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// More information about Google Directions API is available on
+// https://developers.google.com/maps/documentation/directions/
+
+package maps // import "google.golang.org/maps"
+
+import (
+	"net/http"
+	"reflect"
+	"testing"
+)
+
+func TestGeocodingGoogleHQ(t *testing.T) {
+	response := `{
+    "results": [
+        {
+            "address_components": [
+                {
+                    "long_name": "1600",
+                    "short_name": "1600",
+                    "types": [
+                        "street_number"
+                    ]
+                },
+                {
+                    "long_name": "Amphitheatre Pkwy",
+                    "short_name": "Amphitheatre Pkwy",
+                    "types": [
+                        "route"
+                    ]
+                },
+                {
+                    "long_name": "Mountain View",
+                    "short_name": "Mountain View",
+                    "types": [
+                        "locality",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Santa Clara County",
+                    "short_name": "Santa Clara County",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "California",
+                    "short_name": "CA",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "United States",
+                    "short_name": "US",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "94043",
+                    "short_name": "94043",
+                    "types": [
+                        "postal_code"
+                    ]
+                }
+            ],
+            "formatted_address": "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+            "geometry": {
+                "location": {
+                    "lat": 37.4224764,
+                    "lng": -122.0842499
+                },
+                "location_type": "ROOFTOP",
+                "viewport": {
+                    "northeast": {
+                        "lat": 37.4238253802915,
+                        "lng": -122.0829009197085
+                    },
+                    "southwest": {
+                        "lat": 37.4211274197085,
+                        "lng": -122.0855988802915
+                    }
+                }
+            },
+            "place_id": "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
+            "types": [
+                "street_address"
+            ]
+        }
+    ],
+    "status": "OK"
+}`
+
+	server := mockServer(200, response)
+	defer server.Close()
+	client := &http.Client{}
+	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	r := &GeocodingRequest{
+		Address: "1600 Amphitheatre Parkway, Mountain View, CA",
+	}
+
+	resp, err := r.Get(ctx)
+
+	if len(resp) != 1 {
+		t.Errorf("Expected 1 result, got %v", len(resp))
+	}
+	if err != nil {
+		t.Errorf("r.Get returned non nil error: %v", err)
+	}
+
+	correctResponse := GeocodingResult{
+		AddressComponents: []AddressComponent{
+			AddressComponent{
+				LongName:  "1600",
+				ShortName: "1600",
+				Types:     []string{"street_number"},
+			},
+			AddressComponent{
+				LongName:  "Amphitheatre Pkwy",
+				ShortName: "Amphitheatre Pkwy",
+				Types:     []string{"route"},
+			},
+			AddressComponent{
+				LongName:  "Mountain View",
+				ShortName: "Mountain View",
+				Types:     []string{"locality", "political"},
+			},
+			AddressComponent{
+				LongName:  "Santa Clara County",
+				ShortName: "Santa Clara County",
+				Types:     []string{"administrative_area_level_2", "political"},
+			},
+			AddressComponent{
+				LongName:  "California",
+				ShortName: "CA",
+				Types:     []string{"administrative_area_level_1", "political"},
+			},
+			AddressComponent{
+				LongName:  "United States",
+				ShortName: "US",
+				Types:     []string{"country", "political"},
+			},
+			AddressComponent{
+				LongName:  "94043",
+				ShortName: "94043",
+				Types:     []string{"postal_code"},
+			},
+		},
+		FormattedAddress: "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+		Geometry: AddressGeometry{
+			Location:     LatLng{Lat: 37.4224764, Lng: -122.0842499},
+			LocationType: "ROOFTOP",
+			Viewport: LatLngBounds{
+				NorthEast: LatLng{Lat: 37.4238253802915, Lng: -122.0829009197085},
+				SouthWest: LatLng{Lat: 37.4211274197085, Lng: -122.0855988802915},
+			},
+			Types: nil,
+		},
+		PlaceID: "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
+		Types:   []string{"street_address"},
+	}
+
+	if !reflect.DeepEqual(resp[0], correctResponse) {
+		t.Errorf("Actual response != expected")
+	}
+}
+
+func TestGeocodingReverseGeocoding(t *testing.T) {
+
+	response := `{
+    "results": [
+        {
+            "address_components": [
+                {
+                    "long_name": "277",
+                    "short_name": "277",
+                    "types": [
+                        "street_number"
+                    ]
+                },
+                {
+                    "long_name": "Bedford Avenue",
+                    "short_name": "Bedford Ave",
+                    "types": [
+                        "route"
+                    ]
+                },
+                {
+                    "long_name": "Williamsburg",
+                    "short_name": "Williamsburg",
+                    "types": [
+                        "neighborhood",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Brooklyn",
+                    "short_name": "Brooklyn",
+                    "types": [
+                        "sublocality",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Kings",
+                    "short_name": "Kings",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "New York",
+                    "short_name": "NY",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "United States",
+                    "short_name": "US",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "11211",
+                    "short_name": "11211",
+                    "types": [
+                        "postal_code"
+                    ]
+                }
+            ],
+            "formatted_address": "277 Bedford Avenue, Brooklyn, NY 11211, USA",
+            "geometry": {
+                "location": {
+                    "lat": 40.714232,
+                    "lng": -73.9612889
+                },
+                "location_type": "ROOFTOP",
+                "viewport": {
+                    "northeast": {
+                        "lat": 40.7155809802915,
+                        "lng": -73.9599399197085
+                    },
+                    "southwest": {
+                        "lat": 40.7128830197085,
+                        "lng": -73.96263788029151
+                    }
+                }
+            },
+            "place_id": "ChIJd8BlQ2BZwokRAFUEcm_qrcA",
+            "types": [
+                "street_address"
+            ]
+        }
+    ],
+    "status": "OK"
+}`
+
+	server := mockServer(200, response)
+	defer server.Close()
+	client := &http.Client{}
+	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	r := &GeocodingRequest{
+		LatLng: &LatLng{Lat: 40.714224, Lng: -73.961452},
+	}
+
+	resp, err := r.Get(ctx)
+
+	if len(resp) != 1 {
+		t.Errorf("Expected 1 result, got %v", len(resp))
+	}
+	if err != nil {
+		t.Errorf("r.Get returned non nil error: %v", err)
+	}
+
+	correctResponse := GeocodingResult{
+		AddressComponents: []AddressComponent{
+			AddressComponent{
+				LongName:  "277",
+				ShortName: "277",
+				Types:     []string{"street_number"},
+			},
+			AddressComponent{
+				LongName:  "Bedford Avenue",
+				ShortName: "Bedford Ave",
+				Types:     []string{"route"},
+			},
+			AddressComponent{
+				LongName:  "Williamsburg",
+				ShortName: "Williamsburg",
+				Types:     []string{"neighborhood", "political"},
+			},
+			AddressComponent{
+				LongName:  "Brooklyn",
+				ShortName: "Brooklyn",
+				Types:     []string{"sublocality", "political"},
+			},
+			AddressComponent{
+				LongName:  "Kings",
+				ShortName: "Kings",
+				Types:     []string{"administrative_area_level_2", "political"},
+			},
+			AddressComponent{
+				LongName:  "New York",
+				ShortName: "NY",
+				Types:     []string{"administrative_area_level_1", "political"},
+			},
+			AddressComponent{
+				LongName:  "United States",
+				ShortName: "US",
+				Types:     []string{"country", "political"},
+			},
+			AddressComponent{
+				LongName:  "11211",
+				ShortName: "11211",
+				Types:     []string{"postal_code"},
+			},
+		},
+		FormattedAddress: "277 Bedford Avenue, Brooklyn, NY 11211, USA",
+		Geometry: AddressGeometry{
+			Location:     LatLng{Lat: 40.714232, Lng: -73.9612889},
+			LocationType: "ROOFTOP",
+			Viewport: LatLngBounds{
+				NorthEast: LatLng{Lat: 40.7155809802915, Lng: -73.9599399197085},
+				SouthWest: LatLng{Lat: 40.7128830197085, Lng: -73.96263788029151},
+			},
+			Types: nil,
+		},
+		PlaceID: "ChIJd8BlQ2BZwokRAFUEcm_qrcA",
+		Types:   []string{"street_address"},
+	}
+
+	if !reflect.DeepEqual(resp[0], correctResponse) {
+		t.Errorf("Actual response != expected")
+	}
+}
+
+func TestGeocodingEmptyRequest(t *testing.T) {
+	client := &http.Client{}
+	ctx := NewContext(apiKey, client)
+	r := &GeocodingRequest{}
+
+	if _, err := r.Get(ctx); err == nil {
+		t.Errorf("Missing Address, Address Components, and LatLng should return error")
+	}
+
+}
+
+func TestGeocodingFailingServer(t *testing.T) {
+	server := mockServer(500, `{"status" : "ERROR"}`)
+	defer server.Close()
+	client := &http.Client{}
+	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	r := &GeocodingRequest{
+		Address: "Sydney Town Hall",
+	}
+
+	if _, err := r.Get(ctx); err == nil {
+		t.Errorf("Failing server should return error")
+	}
+}
