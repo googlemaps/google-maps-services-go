@@ -76,7 +76,7 @@ func TestDistanceMatrixSydPyrToPar(t *testing.T) {
 	resp, err := r.Get(ctx)
 
 	if err != nil {
-		t.Errorf("r.Get returned non nil error: %v", err)
+		t.Errorf("r.Get returned non nil error, was %+v", err)
 	}
 
 	correctResponse := DistanceMatrixResponse{
@@ -105,7 +105,7 @@ func TestDistanceMatrixSydPyrToPar(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(resp, correctResponse) {
-		t.Errorf("Actual response != expected")
+		t.Errorf("expected %+v, was %+v", correctResponse, resp)
 	}
 }
 

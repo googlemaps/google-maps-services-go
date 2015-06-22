@@ -122,10 +122,10 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 	resp, err := r.Get(ctx)
 
 	if len(resp) != 1 {
-		t.Errorf("Expected length of response was 1, actually %g", len(resp))
+		t.Errorf("Expected length of response is 1, was %+v", len(resp))
 	}
 	if err != nil {
-		t.Errorf("r.Get returned non nil error: %v", err)
+		t.Errorf("r.Get returned non nil error, was %+v", err)
 	}
 
 	var steps []*Step
@@ -164,7 +164,7 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(&resp[0], correctResponse) {
-		t.Errorf("Actual response != expected")
+		t.Errorf("expected %+v, was %+v", correctResponse, &resp[0])
 	}
 }
 

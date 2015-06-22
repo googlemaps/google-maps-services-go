@@ -120,7 +120,7 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 	resp, err := r.Get(ctx)
 
 	if len(resp) != 1 {
-		t.Errorf("Expected 1 result, got %v", len(resp))
+		t.Errorf("Expected length of response is 1, was %+v", len(resp))
 	}
 	if err != nil {
 		t.Errorf("r.Get returned non nil error: %v", err)
@@ -179,7 +179,7 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(resp[0], correctResponse) {
-		t.Errorf("Actual response != expected")
+		t.Errorf("expected %+v, was %+v", correctResponse, resp[0])
 	}
 }
 
@@ -289,7 +289,7 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 	resp, err := r.Get(ctx)
 
 	if len(resp) != 1 {
-		t.Errorf("Expected 1 result, got %v", len(resp))
+		t.Errorf("expected %+v, was %+v", 1, len(resp))
 	}
 	if err != nil {
 		t.Errorf("r.Get returned non nil error: %v", err)
@@ -353,7 +353,7 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(resp[0], correctResponse) {
-		t.Errorf("Actual response != expected")
+		t.Errorf("expected %+v, was %+v", correctResponse, resp[0])
 	}
 }
 

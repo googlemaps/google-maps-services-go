@@ -237,7 +237,7 @@ func TestSnapToRoad(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(resp, correctResponse) {
-		t.Errorf("Actual response != expected")
+		t.Errorf("expected %+v, was %+v", correctResponse, resp)
 	}
 }
 
@@ -369,7 +369,7 @@ func TestSpeedLimit(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(resp, correctResponse) {
-		t.Errorf("Actual response != expected")
+		t.Errorf("expected %+v, was %+v", correctResponse, resp)
 	}
 }
 

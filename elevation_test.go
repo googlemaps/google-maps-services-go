@@ -56,10 +56,10 @@ func TestElevationDenver(t *testing.T) {
 	resp, err := r.Get(ctx)
 
 	if len(resp) != 1 {
-		t.Errorf("Expected 1 result, got %v", len(resp))
+		t.Errorf("Expected length of response is 1, was %+v", len(resp))
 	}
 	if err != nil {
-		t.Errorf("r.Get returned non nil error: %v", err)
+		t.Errorf("r.Get returned non nil error, was %+v", err)
 	}
 
 	correctResponse := ElevationResult{
@@ -72,7 +72,7 @@ func TestElevationDenver(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(resp[0], correctResponse) {
-		t.Errorf("Actual response != expected")
+		t.Errorf("expected %+v, was %+v", correctResponse, resp[0])
 	}
 }
 
@@ -123,10 +123,10 @@ func TestElevationSampledPath(t *testing.T) {
 	resp, err := r.Get(ctx)
 
 	if len(resp) != 3 {
-		t.Errorf("Expected 3 results, got %v", len(resp))
+		t.Errorf("Expected length of response is 3, was %+v", len(resp))
 	}
 	if err != nil {
-		t.Errorf("r.Get returned non nil error: %v", err)
+		t.Errorf("r.Get returned non nil error, was %+v", err)
 	}
 
 	correctResponse := ElevationResult{
@@ -139,7 +139,7 @@ func TestElevationSampledPath(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(resp[0], correctResponse) {
-		t.Errorf("Actual response != expected")
+		t.Errorf("expected %+v, was %+v", correctResponse, resp[0])
 	}
 }
 
