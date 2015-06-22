@@ -50,7 +50,7 @@ func WithContext(parent context.Context, apiKey string, c *http.Client, baseURL,
 	})
 }
 
-const userAgent = "gmaps-golang/0.1"
+const userAgent = "GoogleGeoApiClientGo/0.1"
 
 type mapsContext struct {
 	APIKey       string
