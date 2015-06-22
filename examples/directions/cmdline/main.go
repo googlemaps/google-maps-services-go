@@ -108,8 +108,6 @@ func main() {
 		}
 	}
 
-	pretty.Println(r)
-
 	ctx := maps.NewContext(*apiKey, client)
 	resp, err := r.Get(ctx)
 	if err != nil {

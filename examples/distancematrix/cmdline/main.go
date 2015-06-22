@@ -76,8 +76,6 @@ func main() {
 	lookupTransitMode(*transitMode, r)
 	lookupTransitRoutingPreference(*transitRoutingPreference, r)
 
-	pretty.Println(r)
-
 	resp, err := r.Get(ctx)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)

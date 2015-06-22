@@ -29,7 +29,7 @@ import (
 type contextKey struct{}
 
 // WithContext is the internal constructor for mapsContext.
-func WithContext(parent context.Context, apiKey string, c *http.Client, baseURL string) context.Context {
+func WithContext(parent context.Context, apiKey string, c *http.Client, baseURL, roadsBaseURL string) context.Context {
 	if c == nil {
 		panic("nil *http.Client passed to WithContext")
 	}
@@ -43,18 +43,20 @@ func WithContext(parent context.Context, apiKey string, c *http.Client, baseURL 
 		panic("invalid base URL passed to WithContext")
 	}
 	return context.WithValue(parent, contextKey{}, &mapsContext{
-		APIKey:     apiKey,
-		HTTPClient: c,
-		BaseURL:    baseURL,
+		APIKey:       apiKey,
+		HTTPClient:   c,
+		BaseURL:      baseURL,
+		RoadsBaseURL: roadsBaseURL,
 	})
 }
 
 const userAgent = "gmaps-golang/0.1"
 
 type mapsContext struct {
-	APIKey     string
-	HTTPClient *http.Client
-	BaseURL    string
+	APIKey       string
+	HTTPClient   *http.Client
+	BaseURL      string
+	RoadsBaseURL string
 
 	mu  sync.Mutex             // guards svc
 	svc map[string]interface{} // e.g. "storage" => *rawStorage.Service
@@ -133,6 +135,11 @@ func HTTPClient(ctx context.Context) *http.Client {
 // BaseURL retrieval for mapsContext
 func BaseURL(ctx context.Context) string {
 	return mc(ctx).BaseURL
+}
+
+// RoadsBaseURL retrieval for mapsContext
+func RoadsBaseURL(ctx context.Context) string {
+	return mc(ctx).RoadsBaseURL
 }
 
 // mc returns the internal *mapsContext (cc) state for a context.Context.

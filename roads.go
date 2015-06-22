@@ -31,7 +31,7 @@ import (
 func (r *SnapToRoadRequest) Get(ctx context.Context) (SnapToRoadResponse, error) {
 	var response SnapToRoadResponse
 
-	req, err := http.NewRequest("GET", internal.BaseURL(ctx)+"/v1/snapToRoads", nil)
+	req, err := http.NewRequest("GET", internal.RoadsBaseURL(ctx)+"/v1/snapToRoads", nil)
 	if err != nil {
 		return response, err
 	}
@@ -98,7 +98,7 @@ type SnappedPoint struct {
 func (r *SpeedLimitsRequest) Get(ctx context.Context) (SpeedLimitsResponse, error) {
 	var response SpeedLimitsResponse
 
-	req, err := http.NewRequest("GET", internal.BaseURL(ctx)+"/v1/speedLimits", nil)
+	req, err := http.NewRequest("GET", internal.RoadsBaseURL(ctx)+"/v1/speedLimits", nil)
 	if err != nil {
 		return response, err
 	}
