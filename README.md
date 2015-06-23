@@ -86,7 +86,39 @@ https://developers.google.com/maps/.
  - [Roads API]
 
 ## Usage
-TODO(brettmorgan): Make a sample app to include here.
+Sample usage of the Directions API:
+
+```
+package main
+
+import (
+	"log"
+	"net/http"
+
+	"github.com/kr/pretty"
+
+	"google.golang.org/maps"
+)
+
+func main() {
+	client := &http.Client{}
+
+	apiKey := "Insert-API-Key-Here"
+
+	r := &maps.DirectionsRequest{
+		Origin:      "Sydney",
+		Destination: "Perth",
+	}
+
+	ctx := maps.NewContext(apiKey, client)
+	resp, err := r.Get(ctx)
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+
+	pretty.Println(resp)
+}
+```
 
 ## Features
 TODO(brettmorgan): Implement features
