@@ -25,7 +25,7 @@ import (
 )
 
 // Rate limit requests to 10 requests per second
-var throttle = time.Tick(100 * time.Millisecond)
+var throttle = time.Tick(time.Second / 10)
 
 func httpDo(ctx context.Context, req *http.Request, f func(*http.Response, error) error) error {
 	// Run the HTTP request in a goroutine and pass the response to f.
