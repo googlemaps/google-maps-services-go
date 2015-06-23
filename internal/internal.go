@@ -29,7 +29,7 @@ import (
 type contextKey struct{}
 
 // WithContext is the internal constructor for mapsContext.
-func WithContext(parent context.Context, apiKey string, c *http.Client, baseURL, roadsBaseURL string) context.Context {
+func WithContext(parent context.Context, apiKey string, c *http.Client, overrideBaseURL string) context.Context {
 	if c == nil {
 		panic("nil *http.Client passed to WithContext")
 	}
@@ -39,24 +39,19 @@ func WithContext(parent context.Context, apiKey string, c *http.Client, baseURL,
 	if !strings.HasPrefix(apiKey, "AIza") {
 		panic("invalid API Key passed to WithContext")
 	}
-	if baseURL == "" {
-		panic("invalid base URL passed to WithContext")
-	}
 	return context.WithValue(parent, contextKey{}, &mapsContext{
-		APIKey:       apiKey,
-		HTTPClient:   c,
-		BaseURL:      baseURL,
-		RoadsBaseURL: roadsBaseURL,
+		APIKey:          apiKey,
+		HTTPClient:      c,
+		OverrideBaseURL: overrideBaseURL,
 	})
 }
 
 const userAgent = "GoogleGeoApiClientGo/0.1"
 
 type mapsContext struct {
-	APIKey       string
-	HTTPClient   *http.Client
-	BaseURL      string
-	RoadsBaseURL string
+	APIKey          string
+	HTTPClient      *http.Client
+	OverrideBaseURL string
 
 	mu  sync.Mutex             // guards svc
 	svc map[string]interface{} // e.g. "storage" => *rawStorage.Service
@@ -132,14 +127,9 @@ func HTTPClient(ctx context.Context) *http.Client {
 	return mc(ctx).HTTPClient
 }
 
-// BaseURL retrieval for mapsContext
-func BaseURL(ctx context.Context) string {
-	return mc(ctx).BaseURL
-}
-
-// RoadsBaseURL retrieval for mapsContext
-func RoadsBaseURL(ctx context.Context) string {
-	return mc(ctx).RoadsBaseURL
+// OverrideBaseURL retrieval for mapsContext
+func OverrideBaseURL(ctx context.Context) string {
+	return mc(ctx).OverrideBaseURL
 }
 
 // mc returns the internal *mapsContext (cc) state for a context.Context.

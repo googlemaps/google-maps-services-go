@@ -31,7 +31,12 @@ import (
 func (r *SnapToRoadRequest) Get(ctx context.Context) (SnapToRoadResponse, error) {
 	var response SnapToRoadResponse
 
-	req, err := http.NewRequest("GET", internal.RoadsBaseURL(ctx)+"/v1/snapToRoads", nil)
+	baseURL := "https://roads.googleapis.com/"
+	if internal.OverrideBaseURL(ctx) != "" {
+		baseURL = internal.OverrideBaseURL(ctx)
+	}
+
+	req, err := http.NewRequest("GET", baseURL+"/v1/snapToRoads", nil)
 	if err != nil {
 		return response, err
 	}
@@ -98,7 +103,12 @@ type SnappedPoint struct {
 func (r *SpeedLimitsRequest) Get(ctx context.Context) (SpeedLimitsResponse, error) {
 	var response SpeedLimitsResponse
 
-	req, err := http.NewRequest("GET", internal.RoadsBaseURL(ctx)+"/v1/speedLimits", nil)
+	baseURL := "https://roads.googleapis.com/"
+	if internal.OverrideBaseURL(ctx) != "" {
+		baseURL = internal.OverrideBaseURL(ctx)
+	}
+
+	req, err := http.NewRequest("GET", baseURL+"/v1/speedLimits", nil)
 	if err != nil {
 		return response, err
 	}
