@@ -23,37 +23,35 @@ import (
 	"google.golang.org/maps/internal"
 )
 
-const baseURL = "https://maps.googleapis.com/"
-
 // NewContext returns a new context that uses the provided http.Client.
 // It mutates the client's original Transport to append the cloud
 // package's user-agent to the outgoing requests.
 // You can obtain the API Key from the Google Developers Console,
 // https://console.developers.google.com.
 func NewContext(apiKey string, c *http.Client) context.Context {
-	return newContextWithBaseURL(apiKey, c, baseURL)
+	return internalWithConstructor(context.Background(), apiKey, c, "")
 }
 
 // newContextWithBaseURL returns a new context in a similar way NewContext does,
-// but with a specified baseURL. Useful for testing.
-func newContextWithBaseURL(apiKey string, c *http.Client, baseURL string) context.Context {
+// but with a specified baseURL. Used only for testing.
+func newContextWithBaseURL(apiKey string, c *http.Client, overrideBaseURL string) context.Context {
 	if c == nil {
 		panic("invalid nil *http.Client passed to NewContext")
 	}
-	return internalWithConstructor(context.Background(), apiKey, c, baseURL)
+	return internalWithConstructor(context.Background(), apiKey, c, overrideBaseURL)
 }
 
 // WithContext returns a new context in a similar way NewContext does,
 // but initiates the new context with the specified parent.
 func WithContext(parent context.Context, apiKey string, c *http.Client) context.Context {
-	return internalWithConstructor(parent, apiKey, c, baseURL)
+	return internalWithConstructor(parent, apiKey, c, "")
 }
 
-func internalWithConstructor(parent context.Context, apiKey string, c *http.Client, baseURL string) context.Context {
+func internalWithConstructor(parent context.Context, apiKey string, c *http.Client, overrideBaseURL string) context.Context {
 	// TODO(bradfitz): delete internal.Transport. It's too wrappy for what it does.
 	// Do User-Agent some other way.
 	if _, ok := c.Transport.(*internal.Transport); !ok {
 		c.Transport = &internal.Transport{Base: c.Transport}
 	}
-	return internal.WithContext(parent, apiKey, c, baseURL)
+	return internal.WithContext(parent, apiKey, c, overrideBaseURL)
 }
