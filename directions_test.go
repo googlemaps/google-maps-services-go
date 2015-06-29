@@ -112,14 +112,13 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c := newClientWithBaseURL(&http.Client{}, apiKey, server.URL)
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
 	}
 
-	resp, err := r.Get(ctx)
+	resp, err := c.GetDirections(r)
 
 	if len(resp) != 1 {
 		t.Errorf("Expected length of response is 1, was %+v", len(resp))
@@ -169,46 +168,42 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 }
 
 func TestDirectionsMissingOrigin(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c := NewClient(&http.Client{}, apiKey)
 	r := &DirectionsRequest{
 		Destination: "Parramatta",
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetDirections(r); err == nil {
 		t.Errorf("Missing Origin should return error")
 	}
 }
 
 func TestDirectionsMissingDestination(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c := NewClient(&http.Client{}, apiKey)
 	r := &DirectionsRequest{
 		Origin: "Sydney",
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetDirections(r); err == nil {
 		t.Errorf("Missing Destination should return error")
 	}
 }
 
 func TestDirectionsBadMode(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c := NewClient(&http.Client{}, apiKey)
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
 		Mode:        "Not a Mode",
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetDirections(r); err == nil {
 		t.Errorf("Bad Mode should return error")
 	}
 }
 
 func TestDirectionsDeclaringBothDepartureAndArrivalTime(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c := NewClient(&http.Client{}, apiKey)
 	r := &DirectionsRequest{
 		Origin:        "Sydney",
 		Destination:   "Parramatta",
@@ -216,14 +211,13 @@ func TestDirectionsDeclaringBothDepartureAndArrivalTime(t *testing.T) {
 		ArrivalTime:   "4pm",
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetDirections(r); err == nil {
 		t.Errorf("Declaring both DepartureTime and ArrivalTime should return error")
 	}
 }
 
 func TestDirectionsTravelModeTransit(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c := NewClient(&http.Client{}, apiKey)
 	var transitModes []transitMode
 	transitModes = append(transitModes, TransitModeBus)
 	r := &DirectionsRequest{
@@ -232,21 +226,20 @@ func TestDirectionsTravelModeTransit(t *testing.T) {
 		TransitMode: transitModes,
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetDirections(r); err == nil {
 		t.Errorf("Declaring TransitMode without Mode=Transit should return error")
 	}
 }
 
 func TestDirectionsTransitRoutingPreference(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c := NewClient(&http.Client{}, apiKey)
 	r := &DirectionsRequest{
 		Origin:                   "Sydney",
 		Destination:              "Parramatta",
 		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetDirections(r); err == nil {
 		t.Errorf("Declaring TransitRoutingPreference without Mode=TravelModeTransit should return error")
 	}
 }
@@ -254,14 +247,13 @@ func TestDirectionsTransitRoutingPreference(t *testing.T) {
 func TestDirectionsFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c := newClientWithBaseURL(&http.Client{}, apiKey, server.URL)
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetDirections(r); err == nil {
 		t.Errorf("Failing server should return error")
 	}
 }

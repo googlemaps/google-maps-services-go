@@ -54,11 +54,12 @@ func usageAndExit(msg string) {
 
 func main() {
 	flag.Parse()
-	client := &http.Client{}
 
 	if *apiKey == "" {
 		usageAndExit("Please specify an API Key.")
 	}
+
+	client := maps.NewClient(&http.Client{}, *apiKey)
 
 	r := &maps.DirectionsRequest{
 		Origin:        *origin,
@@ -108,8 +109,7 @@ func main() {
 		}
 	}
 
-	ctx := maps.NewContext(*apiKey, client)
-	resp, err := r.Get(ctx)
+	resp, err := client.GetDirections(r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}

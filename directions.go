@@ -25,14 +25,10 @@ import (
 	"net/url"
 	"strings"
 	"time"
-
-	"google.golang.org/maps/internal"
-
-	"golang.org/x/net/context"
 )
 
-// Get issues the Directions request and retrieves the Response
-func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
+// GetDirections issues the Directions request and retrieves the Response
+func (c *Client) GetDirections(r *DirectionsRequest) ([]Route, error) {
 	var response DirectionsResponse
 
 	if r.Origin == "" {
@@ -55,8 +51,8 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 	}
 
 	baseURL := "https://maps.googleapis.com/"
-	if internal.OverrideBaseURL(ctx) != "" {
-		baseURL = internal.OverrideBaseURL(ctx)
+	if c.baseURL != "" {
+		baseURL = c.baseURL
 	}
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
@@ -66,7 +62,7 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 	q := req.URL.Query()
 	q.Set("origin", r.Origin)
 	q.Set("destination", r.Destination)
-	q.Set("key", internal.APIKey(ctx))
+	q.Set("key", c.apiKey)
 	if r.Mode != "" {
 		q.Set("mode", string(r.Mode))
 	}
@@ -101,7 +97,7 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 	}
 	req.URL.RawQuery = q.Encode()
 
-	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
+	err = c.httpDo(req, func(resp *http.Response, err error) error {
 		if err != nil {
 			return err
 		}
@@ -112,6 +108,7 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 		}
 		return nil
 	})
+
 	if err != nil {
 		return nil, err
 	}
