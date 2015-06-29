@@ -102,7 +102,7 @@ import (
 
 func main() {
 
-  apiKey := "Insert-API-Key-Here"
+	apiKey := "Insert-API-Key-Here"
 	client := maps.NewClient(&http.Client{}, apiKey)
 
 	r := &maps.DirectionsRequest{
