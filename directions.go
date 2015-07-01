@@ -114,12 +114,7 @@ func (c *Client) GetDirections(ctx context.Context, r *DirectionsRequest) ([]Rou
 			return
 		}
 		defer resp.Body.Close()
-		// TODO(brettmorgan): extract as:
-		// err := c.mafeDo(req, &resp)
-		// if err != nil {
-		//   return nil, err
-		// }
-		// return resp, nil
+
 		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 			chResult <- directionsResponse{nil, err}
 			return
