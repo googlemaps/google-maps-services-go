@@ -20,9 +20,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strings"
+
+	"golang.org/x/net/context"
 
 	"github.com/kr/pretty"
 	"google.golang.org/maps"
@@ -51,11 +52,13 @@ func usageAndExit(msg string) {
 
 func main() {
 	flag.Parse()
-	client := &http.Client{}
 	if *apiKey == "" {
 		usageAndExit("Please specify an API Key.")
 	}
-	ctx := maps.NewContext(*apiKey, client)
+	client, err := maps.NewClient(maps.WithAPIKey(*apiKey))
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
 
 	r := &maps.DistanceMatrixRequest{
 		Language:      *language,
@@ -76,7 +79,7 @@ func main() {
 	lookupTransitMode(*transitMode, r)
 	lookupTransitRoutingPreference(*transitRoutingPreference, r)
 
-	resp, err := r.Get(ctx)
+	resp, err := client.GetDistanceMatrix(context.Background(), r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}

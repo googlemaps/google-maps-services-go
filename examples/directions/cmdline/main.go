@@ -60,7 +60,7 @@ func main() {
 		usageAndExit("Please specify an API Key.")
 	}
 
-	client, err := maps.NewClient(maps.APIKey(*apiKey))
+	client, err := maps.NewClient(maps.WithAPIKey(*apiKey))
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}

@@ -18,9 +18,10 @@
 package maps // import "google.golang.org/maps"
 
 import (
-	"net/http"
 	"reflect"
 	"testing"
+
+	"golang.org/x/net/context"
 )
 
 func TestDistanceMatrixSydPyrToPar(t *testing.T) {
@@ -66,14 +67,13 @@ func TestDistanceMatrixSydPyrToPar(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &DistanceMatrixRequest{
 		Origins:      []string{"Sydney", "Pyrmont"},
 		Destinations: []string{"Parramatta"},
 	}
 
-	resp, err := r.Get(ctx)
+	resp, err := c.GetDistanceMatrix(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("r.Get returned non nil error, was %+v", err)
@@ -110,34 +110,31 @@ func TestDistanceMatrixSydPyrToPar(t *testing.T) {
 }
 
 func TestDistanceMatrixMissingOrigins(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &DistanceMatrixRequest{
 		Origins:      []string{},
 		Destinations: []string{"Parramatta"},
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetDistanceMatrix(context.Background(), r); err == nil {
 		t.Errorf("Missing Origins should return error")
 	}
 }
 
 func TestDistanceMatrixMissingDestinations(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &DistanceMatrixRequest{
 		Origins:      []string{"Sydney", "Pyrmont"},
 		Destinations: []string{},
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetDistanceMatrix(context.Background(), r); err == nil {
 		t.Errorf("Missing Destinations should return error")
 	}
 }
 
 func TestDistanceMatrixDepartureAndArrivalTime(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &DistanceMatrixRequest{
 		Origins:       []string{"Sydney", "Pyrmont"},
 		Destinations:  []string{},
@@ -145,7 +142,7 @@ func TestDistanceMatrixDepartureAndArrivalTime(t *testing.T) {
 		ArrivalTime:   "4pm",
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetDistanceMatrix(context.Background(), r); err == nil {
 		t.Errorf("Having both Departure time and Arrival time should return error")
 	}
 }
@@ -153,14 +150,13 @@ func TestDistanceMatrixDepartureAndArrivalTime(t *testing.T) {
 func TestDistanceMatrixFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &DistanceMatrixRequest{
 		Origins:      []string{"Sydney", "Pyrmont"},
 		Destinations: []string{},
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetDistanceMatrix(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
 	}
 }

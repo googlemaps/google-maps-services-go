@@ -26,11 +26,15 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
-	"google.golang.org/maps/internal"
 )
 
-// Get makes a Distance Matrix API request
-func (r *DistanceMatrixRequest) Get(ctx context.Context) (DistanceMatrixResponse, error) {
+type distanceMatrixResponse struct {
+	matrix DistanceMatrixResponse
+	err    error
+}
+
+// GetDistanceMatrix makes a Distance Matrix API request
+func (c *Client) GetDistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (DistanceMatrixResponse, error) {
 	var raw rawDistanceMatrixResponse
 	var response DistanceMatrixResponse
 
@@ -45,67 +49,83 @@ func (r *DistanceMatrixRequest) Get(ctx context.Context) (DistanceMatrixResponse
 	}
 
 	baseURL := "https://maps.googleapis.com/"
-	if internal.OverrideBaseURL(ctx) != "" {
-		baseURL = internal.OverrideBaseURL(ctx)
+	if c.baseURL != "" {
+		baseURL = c.baseURL
 	}
 
-	req, err := http.NewRequest("GET", baseURL+"/maps/api/distancematrix/json", nil)
-	if err != nil {
-		return response, err
-	}
-	q := req.URL.Query()
-	q.Set("origins", strings.Join(r.Origins, "|"))
-	q.Set("destinations", strings.Join(r.Destinations, "|"))
-	q.Set("key", internal.APIKey(ctx))
-	if r.Mode != "" {
-		q.Set("mode", string(r.Mode))
-	}
-	if r.Language != "" {
-		q.Set("language", r.Language)
-	}
-	if r.Avoid != "" {
-		q.Set("avoid", string(r.Avoid))
-	}
-	if r.Units != "" {
-		q.Set("units", string(r.Units))
-	}
-	if r.DepartureTime != "" {
-		q.Set("departure_time", r.DepartureTime)
-	}
-	if r.ArrivalTime != "" {
-		q.Set("arrival_time", r.ArrivalTime)
-	}
-	if r.TransitMode != "" {
-		q.Set("transit_mode", string(r.TransitMode))
-	}
-	if r.TransitRoutingPreference != "" {
-		q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
-	}
+	chResult := make(chan distanceMatrixResponse)
 
-	req.URL.RawQuery = q.Encode()
-
-	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
+	go func() {
+		req, err := http.NewRequest("GET", baseURL+"/maps/api/distancematrix/json", nil)
 		if err != nil {
-			return err
+			chResult <- distanceMatrixResponse{response, err}
+			return
+		}
+		q := req.URL.Query()
+		q.Set("origins", strings.Join(r.Origins, "|"))
+		q.Set("destinations", strings.Join(r.Destinations, "|"))
+		q.Set("key", c.apiKey)
+		if r.Mode != "" {
+			q.Set("mode", string(r.Mode))
+		}
+		if r.Language != "" {
+			q.Set("language", r.Language)
+		}
+		if r.Avoid != "" {
+			q.Set("avoid", string(r.Avoid))
+		}
+		if r.Units != "" {
+			q.Set("units", string(r.Units))
+		}
+		if r.DepartureTime != "" {
+			q.Set("departure_time", r.DepartureTime)
+		}
+		if r.ArrivalTime != "" {
+			q.Set("arrival_time", r.ArrivalTime)
+		}
+		if r.TransitMode != "" {
+			q.Set("transit_mode", string(r.TransitMode))
+		}
+		if r.TransitRoutingPreference != "" {
+			q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
+		}
+
+		req.URL.RawQuery = q.Encode()
+
+		resp, err := c.httpDo(req)
+		if err != nil {
+			chResult <- distanceMatrixResponse{response, err}
+			return
 		}
 		defer resp.Body.Close()
-
 		if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
-			return err
+			chResult <- distanceMatrixResponse{response, err}
+			return
 		}
-		return nil
-	})
-	if err != nil {
-		return response, err
-	}
-	if raw.Status != "OK" {
-		return response, fmt.Errorf("distancematrix: %s - %s", raw.Status, raw.ErrorMessage)
-	}
 
-	response.DestinationAddresses = raw.DestinationAddresses
-	response.OriginAddresses = raw.OriginAddresses
-	response.Rows = raw.Rows
-	return response, nil
+		if err != nil {
+			chResult <- distanceMatrixResponse{response, err}
+			return
+		}
+		if raw.Status != "OK" {
+			err = fmt.Errorf("distancematrix: %s - %s", raw.Status, raw.ErrorMessage)
+			chResult <- distanceMatrixResponse{response, err}
+			return
+		}
+
+		response.DestinationAddresses = raw.DestinationAddresses
+		response.OriginAddresses = raw.OriginAddresses
+		response.Rows = raw.Rows
+		chResult <- distanceMatrixResponse{response, nil}
+		return
+	}()
+
+	select {
+	case resp := <-chResult:
+		return resp.matrix, resp.err
+	case <-ctx.Done():
+		return DistanceMatrixResponse{}, ctx.Err()
+	}
 }
 
 // DistanceMatrixRequest is the request struct for Distance Matrix APi
