@@ -17,7 +17,10 @@
 
 package maps // import "google.golang.org/maps"
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 // Client may be used to make requests to the Google Maps WebService APIs
 type Client struct {
@@ -28,12 +31,39 @@ type Client struct {
 
 // NewClient constructs a new Client which can make requests to the Google Maps WebService APIs.
 // The supplied http.Client is used for making requests to the Maps WebService APIs
-func NewClient(client *http.Client, apiKey string) *Client {
+func NewClient(options ...func(*Client)) (*Client, error) {
 	c := &Client{
-		httpClient: client,
-		apiKey:     apiKey,
+		httpClient: http.DefaultClient,
 	}
-	return c
+	for _, option := range options {
+		option(c)
+	}
+	// TODO(brettmorgan): extend this to handle M4B credentials
+	if c.apiKey == "" {
+		return nil, fmt.Errorf("map.Client with no API Key or credentials")
+	}
+
+	return c, nil
+}
+
+// HTTPClient configures a Maps API client with a http.Client to make requests over.
+func HTTPClient(c *http.Client) func(*Client) {
+	return func(client *Client) {
+		client.httpClient = c
+	}
+}
+
+func baseURL(url string) func(*Client) {
+	return func(client *Client) {
+		client.baseURL = url
+	}
+}
+
+// APIKey configures a Maps API client with an API Key
+func APIKey(apiKey string) func(*Client) {
+	return func(client *Client) {
+		client.apiKey = apiKey
+	}
 }
 
 func newClientWithBaseURL(client *http.Client, apiKey string, baseURL string) *Client {
@@ -45,7 +75,7 @@ func newClientWithBaseURL(client *http.Client, apiKey string, baseURL string) *C
 	return c
 }
 
-func (client *Client) httpDo(req *http.Request, f func(*http.Response, error) error) error {
-	resp, err := client.httpClient.Do(req)
-	return f(resp, err)
+func (client *Client) httpDo(req *http.Request) (resp *http.Response, err error) {
+	resp, err = client.httpClient.Do(req)
+	return
 }

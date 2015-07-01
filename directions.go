@@ -97,21 +97,15 @@ func (c *Client) GetDirections(r *DirectionsRequest) ([]Route, error) {
 	}
 	req.URL.RawQuery = q.Encode()
 
-	err = c.httpDo(req, func(resp *http.Response, err error) error {
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-
-		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			return err
-		}
-		return nil
-	})
-
+	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
 	if response.Status != "OK" {
 		return nil, fmt.Errorf("directions: %s - %s", response.Status, response.ErrorMessage)
 	}

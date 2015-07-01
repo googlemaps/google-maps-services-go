@@ -20,7 +20,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 
@@ -59,7 +58,10 @@ func main() {
 		usageAndExit("Please specify an API Key.")
 	}
 
-	client := maps.NewClient(&http.Client{}, *apiKey)
+	client, err := maps.NewClient(maps.APIKey(*apiKey))
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
 
 	r := &maps.DirectionsRequest{
 		Origin:        *origin,
