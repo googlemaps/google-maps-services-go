@@ -29,9 +29,11 @@ type Client struct {
 	baseURL    string
 }
 
+type clientOption func(*Client)
+
 // NewClient constructs a new Client which can make requests to the Google Maps WebService APIs.
 // The supplied http.Client is used for making requests to the Maps WebService APIs
-func NewClient(options ...func(*Client)) (*Client, error) {
+func NewClient(options ...clientOption) (*Client, error) {
 	c := &Client{
 		httpClient: http.DefaultClient,
 	}
@@ -40,7 +42,7 @@ func NewClient(options ...func(*Client)) (*Client, error) {
 	}
 	// TODO(brettmorgan): extend this to handle M4B credentials
 	if c.apiKey == "" {
-		return nil, fmt.Errorf("map.Client with no API Key or credentials")
+		return nil, fmt.Errorf("maps.Client with no API Key or credentials")
 	}
 
 	return c, nil
@@ -75,7 +77,6 @@ func newClientWithBaseURL(client *http.Client, apiKey string, baseURL string) *C
 	return c
 }
 
-func (client *Client) httpDo(req *http.Request) (resp *http.Response, err error) {
-	resp, err = client.httpClient.Do(req)
-	return
+func (client *Client) httpDo(req *http.Request) (*http.Response, error) {
+	return client.httpClient.Do(req)
 }
