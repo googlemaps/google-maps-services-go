@@ -98,6 +98,8 @@ import (
 	"github.com/kr/pretty"
 
 	"google.golang.org/maps"
+
+	"golang.org/x/net/context"
 )
 
 func main() {
@@ -110,7 +112,8 @@ func main() {
 		Destination: "Perth",
 	}
 
-	resp, err := client.GetDirections(r)
+	ctx := context.Background()
+	resp, err := client.GetDirections(ctx, r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
