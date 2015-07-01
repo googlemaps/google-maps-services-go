@@ -23,6 +23,8 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"golang.org/x/net/context"
 )
 
 const apiKey = "AIzaNotReallyAnAPIKey"
@@ -118,7 +120,7 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 		Destination: "Parramatta",
 	}
 
-	resp, err := c.GetDirections(r)
+	resp, err := c.GetDirections(context.Background(), r)
 
 	if len(resp) != 1 {
 		t.Errorf("Expected length of response is 1, was %+v", len(resp))
@@ -173,7 +175,7 @@ func TestDirectionsMissingOrigin(t *testing.T) {
 		Destination: "Parramatta",
 	}
 
-	if _, err := c.GetDirections(r); err == nil {
+	if _, err := c.GetDirections(context.Background(), r); err == nil {
 		t.Errorf("Missing Origin should return error")
 	}
 }
@@ -184,7 +186,7 @@ func TestDirectionsMissingDestination(t *testing.T) {
 		Origin: "Sydney",
 	}
 
-	if _, err := c.GetDirections(r); err == nil {
+	if _, err := c.GetDirections(context.Background(), r); err == nil {
 		t.Errorf("Missing Destination should return error")
 	}
 }
@@ -197,7 +199,7 @@ func TestDirectionsBadMode(t *testing.T) {
 		Mode:        "Not a Mode",
 	}
 
-	if _, err := c.GetDirections(r); err == nil {
+	if _, err := c.GetDirections(context.Background(), r); err == nil {
 		t.Errorf("Bad Mode should return error")
 	}
 }
@@ -211,7 +213,7 @@ func TestDirectionsDeclaringBothDepartureAndArrivalTime(t *testing.T) {
 		ArrivalTime:   "4pm",
 	}
 
-	if _, err := c.GetDirections(r); err == nil {
+	if _, err := c.GetDirections(context.Background(), r); err == nil {
 		t.Errorf("Declaring both DepartureTime and ArrivalTime should return error")
 	}
 }
@@ -226,7 +228,7 @@ func TestDirectionsTravelModeTransit(t *testing.T) {
 		TransitMode: transitModes,
 	}
 
-	if _, err := c.GetDirections(r); err == nil {
+	if _, err := c.GetDirections(context.Background(), r); err == nil {
 		t.Errorf("Declaring TransitMode without Mode=Transit should return error")
 	}
 }
@@ -239,7 +241,7 @@ func TestDirectionsTransitRoutingPreference(t *testing.T) {
 		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
 	}
 
-	if _, err := c.GetDirections(r); err == nil {
+	if _, err := c.GetDirections(context.Background(), r); err == nil {
 		t.Errorf("Declaring TransitRoutingPreference without Mode=TravelModeTransit should return error")
 	}
 }
@@ -253,7 +255,7 @@ func TestDirectionsFailingServer(t *testing.T) {
 		Destination: "Parramatta",
 	}
 
-	if _, err := c.GetDirections(r); err == nil {
+	if _, err := c.GetDirections(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
 	}
 }

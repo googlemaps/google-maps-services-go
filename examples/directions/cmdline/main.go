@@ -23,6 +23,8 @@ import (
 	"os"
 	"strings"
 
+	"golang.org/x/net/context"
+
 	"github.com/kr/pretty"
 	"google.golang.org/maps"
 )
@@ -111,7 +113,7 @@ func main() {
 		}
 	}
 
-	resp, err := client.GetDirections(r)
+	resp, err := client.GetDirections(context.Background(), r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
