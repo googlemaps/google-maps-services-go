@@ -246,6 +246,20 @@ func TestDirectionsTransitRoutingPreference(t *testing.T) {
 	}
 }
 
+func TestDirectionsWithCancelledContext(t *testing.T) {
+	c, _ := NewClient(APIKey(apiKey))
+	r := &DirectionsRequest{
+		Origin:      "Sydney",
+		Destination: "Parramatta",
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := c.GetDirections(ctx, r); err == nil {
+		t.Errorf("Cancelled context should return non-nil err")
+	}
+}
+
 func TestDirectionsFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
