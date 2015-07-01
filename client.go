@@ -48,21 +48,22 @@ func NewClient(options ...clientOption) (*Client, error) {
 	return c, nil
 }
 
-// HTTPClient configures a Maps API client with a http.Client to make requests over.
-func HTTPClient(c *http.Client) func(*Client) {
+// WithHTTPClient configures a Maps API client with a http.Client to make requests over.
+func WithHTTPClient(c *http.Client) func(*Client) {
 	return func(client *Client) {
 		client.httpClient = c
 	}
 }
 
-func baseURL(url string) func(*Client) {
+// withBaseURL is for testing only.
+func withBaseURL(url string) func(*Client) {
 	return func(client *Client) {
 		client.baseURL = url
 	}
 }
 
-// APIKey configures a Maps API client with an API Key
-func APIKey(apiKey string) func(*Client) {
+// WithAPIKey configures a Maps API client with an API Key
+func WithAPIKey(apiKey string) func(*Client) {
 	return func(client *Client) {
 		client.apiKey = apiKey
 	}

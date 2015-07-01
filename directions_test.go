@@ -114,7 +114,7 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(APIKey(apiKey), baseURL(server.URL))
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
@@ -170,7 +170,7 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 }
 
 func TestDirectionsMissingOrigin(t *testing.T) {
-	c, _ := NewClient(APIKey(apiKey))
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &DirectionsRequest{
 		Destination: "Parramatta",
 	}
@@ -181,7 +181,7 @@ func TestDirectionsMissingOrigin(t *testing.T) {
 }
 
 func TestDirectionsMissingDestination(t *testing.T) {
-	c, _ := NewClient(APIKey(apiKey))
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &DirectionsRequest{
 		Origin: "Sydney",
 	}
@@ -192,7 +192,7 @@ func TestDirectionsMissingDestination(t *testing.T) {
 }
 
 func TestDirectionsBadMode(t *testing.T) {
-	c, _ := NewClient(APIKey(apiKey))
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
@@ -205,7 +205,7 @@ func TestDirectionsBadMode(t *testing.T) {
 }
 
 func TestDirectionsDeclaringBothDepartureAndArrivalTime(t *testing.T) {
-	c, _ := NewClient(APIKey(apiKey))
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &DirectionsRequest{
 		Origin:        "Sydney",
 		Destination:   "Parramatta",
@@ -219,7 +219,7 @@ func TestDirectionsDeclaringBothDepartureAndArrivalTime(t *testing.T) {
 }
 
 func TestDirectionsTravelModeTransit(t *testing.T) {
-	c, _ := NewClient(APIKey(apiKey))
+	c, _ := NewClient(WithAPIKey(apiKey))
 	var transitModes []transitMode
 	transitModes = append(transitModes, TransitModeBus)
 	r := &DirectionsRequest{
@@ -234,7 +234,7 @@ func TestDirectionsTravelModeTransit(t *testing.T) {
 }
 
 func TestDirectionsTransitRoutingPreference(t *testing.T) {
-	c, _ := NewClient(APIKey(apiKey))
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &DirectionsRequest{
 		Origin:                   "Sydney",
 		Destination:              "Parramatta",
@@ -247,7 +247,7 @@ func TestDirectionsTransitRoutingPreference(t *testing.T) {
 }
 
 func TestDirectionsWithCancelledContext(t *testing.T) {
-	c, _ := NewClient(APIKey(apiKey))
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
@@ -263,7 +263,7 @@ func TestDirectionsWithCancelledContext(t *testing.T) {
 func TestDirectionsFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	c, _ := NewClient(APIKey(apiKey), baseURL(server.URL))
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
