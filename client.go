@@ -68,15 +68,6 @@ func APIKey(apiKey string) func(*Client) {
 	}
 }
 
-func newClientWithBaseURL(client *http.Client, apiKey string, baseURL string) *Client {
-	c := &Client{
-		httpClient: client,
-		apiKey:     apiKey,
-		baseURL:    baseURL,
-	}
-	return c
-}
-
 func (client *Client) httpDo(req *http.Request) (*http.Response, error) {
 	return client.httpClient.Do(req)
 }

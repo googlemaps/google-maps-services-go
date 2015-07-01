@@ -114,7 +114,7 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c := newClientWithBaseURL(&http.Client{}, apiKey, server.URL)
+	c, _ := NewClient(APIKey(apiKey), baseURL(server.URL))
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
