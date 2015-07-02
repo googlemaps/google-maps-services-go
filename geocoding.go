@@ -25,16 +25,15 @@ import (
 	"strings"
 
 	"golang.org/x/net/context"
-	"google.golang.org/maps/internal"
 )
 
-// Get makes a Geocoding API request
-func (r *GeocodingRequest) Get(ctx context.Context) ([]GeocodingResult, error) {
+// GetGeocoding makes a Geocoding API request
+func (c *Client) GetGeocoding(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
 	var response geocodingResponse
 
 	baseURL := "https://maps.googleapis.com/"
-	if internal.OverrideBaseURL(ctx) != "" {
-		baseURL = internal.OverrideBaseURL(ctx)
+	if c.baseURL != "" {
+		baseURL = c.baseURL
 	}
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/geocode/json", nil)
@@ -42,7 +41,7 @@ func (r *GeocodingRequest) Get(ctx context.Context) ([]GeocodingResult, error) {
 		return nil, err
 	}
 	q := req.URL.Query()
-	q.Set("key", internal.APIKey(ctx))
+	q.Set("key", c.apiKey)
 
 	if r.Address == "" && len(r.components) == 0 && r.LatLng == nil {
 		return nil, errors.New("geocoding: You must specify at least one of Address or Components for a geocoding request, or LatLng for a reverse geocoding request")
@@ -82,26 +81,41 @@ func (r *GeocodingRequest) Get(ctx context.Context) ([]GeocodingResult, error) {
 	}
 
 	req.URL.RawQuery = q.Encode()
+	chResult := make(chan geocodingResponse)
 
-	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
+	go func() {
+
+		err = httpDo(ctx, req, func(resp *http.Response, err error) error {
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+
+			if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+				return err
+			}
+			return nil
+		})
 		if err != nil {
-			return err
+			chResult <- geocodingResponse{nil, "", "", err}
+			return
 		}
-		defer resp.Body.Close()
-
-		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			return err
+		if response.Status != "OK" {
+			err = fmt.Errorf("geocoding: %s - %s", response.Status, response.ErrorMessage)
+			chResult <- geocodingResponse{nil, "", "", err}
+			return
 		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	if response.Status != "OK" {
-		return nil, fmt.Errorf("geocoding: %s - %s", response.Status, response.ErrorMessage)
-	}
 
-	return response.Results, nil
+		chResult <- response
+		return
+	}()
+
+	select {
+	case resp := <-chResult:
+		return resp.Results, resp.err
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
 }
 
 type componentFilter string
@@ -175,6 +189,8 @@ type geocodingResponse struct {
 	Status string `json:"status"`
 	// ErrorMessage is the explanatory field added when Status is an error.
 	ErrorMessage string `json:"error_message"`
+
+	err error
 }
 
 // GeocodingResult is a single geocoded address

@@ -137,13 +137,27 @@ func TestDistanceMatrixDepartureAndArrivalTime(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &DistanceMatrixRequest{
 		Origins:       []string{"Sydney", "Pyrmont"},
-		Destinations:  []string{},
+		Destinations:  []string{"Parramatta", "Perth"},
 		DepartureTime: "now",
 		ArrivalTime:   "4pm",
 	}
 
 	if _, err := c.GetDistanceMatrix(context.Background(), r); err == nil {
 		t.Errorf("Having both Departure time and Arrival time should return error")
+	}
+}
+
+func TestDistanceMatrixWithCancelledContext(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &DistanceMatrixRequest{
+		Origins:      []string{"Sydney", "Pyrmont"},
+		Destinations: []string{"Parramatta", "Perth"},
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := c.GetDistanceMatrix(ctx, r); err == nil {
+		t.Errorf("Cancelled context should return non-nil err")
 	}
 }
 

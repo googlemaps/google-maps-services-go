@@ -18,9 +18,10 @@
 package maps // import "google.golang.org/maps"
 
 import (
-	"net/http"
 	"reflect"
 	"testing"
+
+	"golang.org/x/net/context"
 )
 
 func TestGeocodingGoogleHQ(t *testing.T) {
@@ -111,13 +112,12 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &GeocodingRequest{
 		Address: "1600 Amphitheatre Parkway, Mountain View, CA",
 	}
 
-	resp, err := r.Get(ctx)
+	resp, err := c.GetGeocoding(context.Background(), r)
 
 	if len(resp) != 1 {
 		t.Errorf("Expected length of response is 1, was %+v", len(resp))
@@ -280,13 +280,12 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &GeocodingRequest{
 		LatLng: &LatLng{Lat: 40.714224, Lng: -73.961452},
 	}
 
-	resp, err := r.Get(ctx)
+	resp, err := c.GetGeocoding(context.Background(), r)
 
 	if len(resp) != 1 {
 		t.Errorf("expected %+v, was %+v", 1, len(resp))
@@ -358,26 +357,36 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 }
 
 func TestGeocodingEmptyRequest(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &GeocodingRequest{}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetGeocoding(context.Background(), r); err == nil {
 		t.Errorf("Missing Address, Address Components, and LatLng should return error")
 	}
+}
 
+func TestGeocodingWithCancelledContext(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &GeocodingRequest{
+		Address: "Sydney Town Hall",
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := c.GetGeocoding(ctx, r); err == nil {
+		t.Errorf("Cancelled context should return non-nil err")
+	}
 }
 
 func TestGeocodingFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &GeocodingRequest{
 		Address: "Sydney Town Hall",
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetGeocoding(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
 	}
 }
