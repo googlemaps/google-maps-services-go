@@ -18,33 +18,13 @@
 package internal
 
 import (
-	"fmt"
 	"net/http"
-	"strings"
 	"sync"
 
 	"golang.org/x/net/context"
 )
 
 type contextKey struct{}
-
-// WithContext is the internal constructor for mapsContext.
-func WithContext(parent context.Context, apiKey string, c *http.Client, overrideBaseURL string) context.Context {
-	if c == nil {
-		panic("nil *http.Client passed to WithContext")
-	}
-	if apiKey == "" {
-		panic("empty API Key passed to WithContext")
-	}
-	if !strings.HasPrefix(apiKey, "AIza") {
-		panic("invalid API Key passed to WithContext")
-	}
-	return context.WithValue(parent, contextKey{}, &mapsContext{
-		APIKey:          apiKey,
-		HTTPClient:      c,
-		OverrideBaseURL: overrideBaseURL,
-	})
-}
 
 const userAgent = "GoogleGeoApiClientGo/0.1"
 
@@ -78,58 +58,6 @@ func (c *mapsContext) service(name string, fill func(*http.Client) interface{}) 
 	v := fill(c.HTTPClient)
 	c.svc[name] = v
 	return v
-}
-
-// Transport is an http.RoundTripper that appends
-// Google Cloud client's user-agent to the original
-// request's user-agent header.
-type Transport struct {
-	// Base represents the actual http.RoundTripper
-	// the requests will be delegated to.
-	Base http.RoundTripper
-}
-
-// RoundTrip appends a user-agent to the existing user-agent
-// header and delegates the request to the base http.RoundTripper.
-func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	req = cloneRequest(req)
-	ua := req.Header.Get("User-Agent")
-	if ua == "" {
-		ua = userAgent
-	} else {
-		ua = fmt.Sprintf("%s;%s", ua, userAgent)
-	}
-	req.Header.Set("User-Agent", ua)
-	return t.Base.RoundTrip(req)
-}
-
-// cloneRequest returns a clone of the provided *http.Request.
-// The clone is a shallow copy of the struct and its Header map.
-func cloneRequest(r *http.Request) *http.Request {
-	// shallow copy of the struct
-	r2 := new(http.Request)
-	*r2 = *r
-	// deep copy of the Header
-	r2.Header = make(http.Header)
-	for k, s := range r.Header {
-		r2.Header[k] = s
-	}
-	return r2
-}
-
-// APIKey retrieval for mapsContext
-func APIKey(ctx context.Context) string {
-	return mc(ctx).APIKey
-}
-
-// HTTPClient retrieval for mapsContext
-func HTTPClient(ctx context.Context) *http.Client {
-	return mc(ctx).HTTPClient
-}
-
-// OverrideBaseURL retrieval for mapsContext
-func OverrideBaseURL(ctx context.Context) string {
-	return mc(ctx).OverrideBaseURL
 }
 
 // mc returns the internal *mapsContext (cc) state for a context.Context.
