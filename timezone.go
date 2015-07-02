@@ -68,7 +68,7 @@ func (c *Client) GetTimezone(ctx context.Context, r *TimezoneRequest) (TimezoneR
 			return
 		}
 		if response.Status != "OK" {
-			chResult <- timezoneResponse{err: fmt.Errorf("geocoding: %s - %s", response.Status, response.ErrorMessage)}
+			chResult <- timezoneResponse{err: fmt.Errorf("timezone: %s - %s", response.Status, response.ErrorMessage)}
 			return
 		}
 
