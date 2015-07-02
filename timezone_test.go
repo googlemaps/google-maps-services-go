@@ -18,12 +18,12 @@
 package maps // import "google.golang.org/maps"
 
 import (
-	"net/http"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/kr/pretty"
+	"golang.org/x/net/context"
 )
 
 func TestTimezoneNevada(t *testing.T) {
@@ -38,8 +38,7 @@ func TestTimezoneNevada(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &TimezoneRequest{
 		Location: &LatLng{
 			Lat: 39.6034810,
@@ -48,7 +47,7 @@ func TestTimezoneNevada(t *testing.T) {
 		Timestamp: time.Unix(1331161200, 0),
 	}
 
-	resp, err := r.Get(ctx)
+	resp, err := c.GetTimezone(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("r.Get returned non nil error: %v", err)
@@ -69,27 +68,41 @@ func TestTimezoneNevada(t *testing.T) {
 }
 
 func TestTimezoneLocationMissing(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &TimezoneRequest{
 		Timestamp: time.Unix(1331161200, 0),
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetTimezone(context.Background(), r); err == nil {
 		t.Errorf("Missing Location should return error")
+	}
+}
+
+func TestTimezoneWithCancelledContext(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &TimezoneRequest{
+		Location: &LatLng{
+			Lat: 39.6034810,
+			Lng: -119.6822510,
+		},
+		Timestamp: time.Unix(1331161200, 0),
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := c.GetTimezone(ctx, r); err == nil {
+		t.Errorf("Cancelled context should return error")
 	}
 }
 
 func TestTimezoneFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &TimezoneRequest{
 		Location: &LatLng{Lat: 36.578581, Lng: -118.291994},
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetTimezone(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
 	}
 }

@@ -20,13 +20,13 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/kr/pretty"
+	"golang.org/x/net/context"
 	"google.golang.org/maps"
 )
 
@@ -46,11 +46,13 @@ func usageAndExit(msg string) {
 
 func main() {
 	flag.Parse()
-	client := &http.Client{}
 	if *apiKey == "" {
 		usageAndExit("Please specify an API Key.")
 	}
-	ctx := maps.NewContext(*apiKey, client)
+	client, err := maps.NewClient(maps.WithAPIKey(*apiKey))
+	if err != nil {
+		log.Fatalf("error %v", err)
+	}
 	t, err := strconv.Atoi(*timestamp)
 	if err != nil {
 		usageAndExit(fmt.Sprintf("Could not convert timestamp to int: %v", err))
@@ -65,7 +67,7 @@ func main() {
 
 	pretty.Println(r)
 
-	resp, err := r.Get(ctx)
+	resp, err := client.GetTimezone(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}
