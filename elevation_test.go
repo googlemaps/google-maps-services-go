@@ -18,9 +18,10 @@
 package maps // import "google.golang.org/maps"
 
 import (
-	"net/http"
 	"reflect"
 	"testing"
+
+	"golang.org/x/net/context"
 )
 
 func TestElevationDenver(t *testing.T) {
@@ -42,8 +43,7 @@ func TestElevationDenver(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &ElevationRequest{
 		Locations: []LatLng{
 			LatLng{
@@ -53,7 +53,7 @@ func TestElevationDenver(t *testing.T) {
 		},
 	}
 
-	resp, err := r.Get(ctx)
+	resp, err := c.GetElevation(context.Background(), r)
 
 	if len(resp) != 1 {
 		t.Errorf("Expected length of response is 1, was %+v", len(resp))
@@ -110,8 +110,7 @@ func TestElevationSampledPath(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &ElevationRequest{
 		Path: []LatLng{
 			LatLng{Lat: 36.578581, Lng: -118.291994},
@@ -120,7 +119,7 @@ func TestElevationSampledPath(t *testing.T) {
 		Samples: 3,
 	}
 
-	resp, err := r.Get(ctx)
+	resp, err := c.GetElevation(context.Background(), r)
 
 	if len(resp) != 3 {
 		t.Errorf("Expected length of response is 3, was %+v", len(resp))
@@ -144,18 +143,16 @@ func TestElevationSampledPath(t *testing.T) {
 }
 
 func TestElevationNoPathOrLocations(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &ElevationRequest{}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetElevation(context.Background(), r); err == nil {
 		t.Errorf("Missing both Path and Locations should return error")
 	}
 }
 
 func TestElevationPathWithNoSamples(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &ElevationRequest{
 		Path: []LatLng{
 			LatLng{Lat: 36.578581, Lng: -118.291994},
@@ -163,7 +160,7 @@ func TestElevationPathWithNoSamples(t *testing.T) {
 		},
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetElevation(context.Background(), r); err == nil {
 		t.Errorf("Missing both Path and Locations should return error")
 	}
 }
@@ -171,8 +168,7 @@ func TestElevationPathWithNoSamples(t *testing.T) {
 func TestElevationFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &ElevationRequest{
 		Path: []LatLng{
 			LatLng{Lat: 36.578581, Lng: -118.291994},
@@ -181,7 +177,23 @@ func TestElevationFailingServer(t *testing.T) {
 		Samples: 3,
 	}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetElevation(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
+	}
+}
+
+func TestElevationCancelledContext(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &ElevationRequest{
+		Path: []LatLng{
+			LatLng{Lat: 36.578581, Lng: -118.291994},
+			LatLng{Lat: 36.23998, Lng: -116.83171},
+		},
+		Samples: 3,
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := c.GetElevation(ctx, r); err == nil {
+		t.Errorf("Cancelled context should return non-nil err")
 	}
 }

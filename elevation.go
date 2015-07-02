@@ -25,16 +25,27 @@ import (
 	"strconv"
 
 	"golang.org/x/net/context"
-	"google.golang.org/maps/internal"
 )
 
-// Get makes an Elevation API request
-func (r *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
+type elevationResponse struct {
+	// Results is the Elevation results array
+	Results []ElevationResult `json:"results"`
+
+	// Status indicating if this request was successful
+	Status string `json:"status"`
+	// ErrorMessage is the explanatory field added when Status is an error.
+	ErrorMessage string `json:"error_message"`
+
+	err error
+}
+
+// GetElevations makes an Elevation API request
+func (c *Client) GetElevation(ctx context.Context, r *ElevationRequest) ([]ElevationResult, error) {
 	var response elevationResponse
 
 	baseURL := "https://maps.googleapis.com/"
-	if internal.OverrideBaseURL(ctx) != "" {
-		baseURL = internal.OverrideBaseURL(ctx)
+	if c.baseURL != "" {
+		baseURL = c.baseURL
 	}
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/elevation/json", nil)
@@ -42,7 +53,7 @@ func (r *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
 		return nil, err
 	}
 	q := req.URL.Query()
-	q.Set("key", internal.APIKey(ctx))
+	q.Set("key", c.apiKey)
 
 	if len(r.Path) == 0 && len(r.Locations) == 0 {
 		return nil, errors.New("elevation: Provide either Path or Locations")
@@ -62,26 +73,36 @@ func (r *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
 	}
 
 	req.URL.RawQuery = q.Encode()
+	chResult := make(chan elevationResponse)
 
-	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
+	go func() {
+		resp, err := c.httpDo(req)
 		if err != nil {
-			return err
+			chResult <- elevationResponse{nil, "", "", err}
+			return
 		}
 		defer resp.Body.Close()
-
 		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			return err
+			chResult <- elevationResponse{nil, "", "", err}
+			return
 		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	if response.Status != "OK" {
-		return nil, fmt.Errorf("distancematrix: %s - %s", response.Status, response.ErrorMessage)
-	}
 
-	return response.Results, nil
+		if response.Status != "OK" {
+			err = fmt.Errorf("distancematrix: %s - %s", response.Status, response.ErrorMessage)
+			chResult <- elevationResponse{nil, "", "", err}
+			return
+		}
+
+		chResult <- response
+		return
+	}()
+
+	select {
+	case resp := <-chResult:
+		return resp.Results, resp.err
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
 }
 
 // ElevationRequest is the request structure for Elevation API. Either Locations or Path must be set.
@@ -92,16 +113,6 @@ type ElevationRequest struct {
 	Path []LatLng
 	// Samples specifies the number of sample points along a path for which to return elevation data. Required if Path is supplied.
 	Samples int
-}
-
-type elevationResponse struct {
-	// Results is the Elevation results array
-	Results []ElevationResult `json:"results"`
-
-	// Status indicating if this request was successful
-	Status string `json:"status"`
-	// ErrorMessage is the explanatory field added when Status is an error.
-	ErrorMessage string `json:"error_message"`
 }
 
 // ElevationResult is a single elevation at a specific location

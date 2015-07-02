@@ -129,10 +129,9 @@ func (c *Client) GetDirections(ctx context.Context, r *DirectionsRequest) ([]Rou
 		return
 	}()
 
-	var dirResp directionsResponse
 	select {
-	case dirResp = <-chResult:
-		return dirResp.routes, dirResp.err
+	case resp := <-chResult:
+		return resp.routes, resp.err
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
