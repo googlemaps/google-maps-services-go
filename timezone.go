@@ -29,7 +29,27 @@ import (
 )
 
 // GetTimezone makes a Timezone API request
-func (c *Client) GetTimezone(ctx context.Context, r *TimezoneRequest) (TimezoneResult, error) {
+func (c *Client) GetTimezone(ctx context.Context, r *TimezoneRequest) (*TimezoneResult, error) {
+	if r.Location == nil {
+		return nil, errors.New("timezone: You must specify Location")
+	}
+
+	chResult := make(chan timezoneResultWithError)
+
+	go func() {
+		result, err := c.doGetTimezone(r)
+		chResult <- timezoneResultWithError{result, err}
+	}()
+
+	select {
+	case result := <-chResult:
+		return result.timezone, result.err
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+func (c *Client) doGetTimezone(r *TimezoneRequest) (*TimezoneResult, error) {
 	baseURL := "https://maps.googleapis.com/"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -37,14 +57,10 @@ func (c *Client) GetTimezone(ctx context.Context, r *TimezoneRequest) (TimezoneR
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/timezone/json", nil)
 	if err != nil {
-		return TimezoneResult{}, err
+		return nil, err
 	}
 	q := req.URL.Query()
 	q.Set("key", c.apiKey)
-
-	if r.Location == nil {
-		return TimezoneResult{}, errors.New("timezone: You must specify Location")
-	}
 
 	q.Set("location", r.Location.String())
 	q.Set("timestamp", strconv.FormatInt(r.Timestamp.Unix(), 10))
@@ -53,40 +69,33 @@ func (c *Client) GetTimezone(ctx context.Context, r *TimezoneRequest) (TimezoneR
 	}
 
 	req.URL.RawQuery = q.Encode()
-	chResult := make(chan timezoneResponse)
-
-	go func() {
-		resp, err := c.httpDo(req)
-		if err != nil {
-			chResult <- timezoneResponse{err: err}
-			return
-		}
-
-		var response timezoneResponse
-		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			chResult <- timezoneResponse{err: err}
-			return
-		}
-		if response.Status != "OK" {
-			chResult <- timezoneResponse{err: fmt.Errorf("timezone: %s - %s", response.Status, response.ErrorMessage)}
-			return
-		}
-
-		chResult <- response
-	}()
-
-	select {
-	case resp := <-chResult:
-		return TimezoneResult{
-			DstOffset:    resp.DstOffset,
-			RawOffset:    resp.RawOffset,
-			TimeZoneID:   resp.TimeZoneID,
-			TimeZoneName: resp.TimeZoneName,
-		}, resp.err
-	case <-ctx.Done():
-		return TimezoneResult{}, ctx.Err()
+	resp, err := c.httpDo(req)
+	if err != nil {
+		return nil, err
 	}
 
+	response := &timezoneResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(response); err != nil {
+		return nil, err
+	}
+	if response.Status != "OK" {
+		err := fmt.Errorf("timezone: %s - %s", response.Status, response.ErrorMessage)
+		return nil, err
+	}
+
+	var result = &TimezoneResult{
+		DstOffset:    response.DstOffset,
+		RawOffset:    response.RawOffset,
+		TimeZoneID:   response.TimeZoneID,
+		TimeZoneName: response.TimeZoneName,
+	}
+
+	return result, nil
+}
+
+type timezoneResultWithError struct {
+	timezone *TimezoneResult
+	err      error
 }
 
 // TimezoneRequest is the request structure for Timezone API.
@@ -113,8 +122,6 @@ type timezoneResponse struct {
 	Status string `json:"status"`
 	// ErrorMessage is the explanatory field added when Status is an error.
 	ErrorMessage string `json:"error_message"`
-
-	err error
 }
 
 // TimezoneResult is a single geocoded address

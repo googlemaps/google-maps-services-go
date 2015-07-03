@@ -29,21 +29,21 @@ import (
 )
 
 type distanceMatrixResponse struct {
-	matrix DistanceMatrixResponse
+	matrix *DistanceMatrixResponse
 	err    error
 }
 
 // GetDistanceMatrix makes a Distance Matrix API request
-func (c *Client) GetDistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (DistanceMatrixResponse, error) {
+func (c *Client) GetDistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
 
 	if len(r.Origins) == 0 {
-		return DistanceMatrixResponse{}, errors.New("distancematrix: Origins must contain at least one start address")
+		return nil, errors.New("distancematrix: Origins must contain at least one start address")
 	}
 	if len(r.Destinations) == 0 {
-		return DistanceMatrixResponse{}, errors.New("distancematrix: Destinations must contain at least one end address")
+		return nil, errors.New("distancematrix: Destinations must contain at least one end address")
 	}
 	if r.DepartureTime != "" && r.ArrivalTime != "" {
-		return DistanceMatrixResponse{}, errors.New("distancematrix: must not specify both DepartureTime and ArrivalTime")
+		return nil, errors.New("distancematrix: must not specify both DepartureTime and ArrivalTime")
 	}
 
 	chResult := make(chan distanceMatrixResponse)
@@ -57,21 +57,19 @@ func (c *Client) GetDistanceMatrix(ctx context.Context, r *DistanceMatrixRequest
 	case resp := <-chResult:
 		return resp.matrix, resp.err
 	case <-ctx.Done():
-		return DistanceMatrixResponse{}, ctx.Err()
+		return nil, ctx.Err()
 	}
 }
 
-func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (DistanceMatrixResponse, error) {
+func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
 	baseURL := "https://maps.googleapis.com/"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 
-	var response DistanceMatrixResponse
-
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/distancematrix/json", nil)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
 	q := req.URL.Query()
 	q.Set("origins", strings.Join(r.Origins, "|"))
@@ -106,22 +104,25 @@ func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (DistanceMatrixRe
 
 	resp, err := c.httpDo(req)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	var raw rawDistanceMatrixResponse
 	err = json.NewDecoder(resp.Body).Decode(&raw)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
 	if raw.Status != "OK" {
 		err = fmt.Errorf("distancematrix: %s - %s", raw.Status, raw.ErrorMessage)
-		return response, err
+		return nil, err
 	}
 
-	response.DestinationAddresses = raw.DestinationAddresses
-	response.OriginAddresses = raw.OriginAddresses
-	response.Rows = raw.Rows
+	response := &DistanceMatrixResponse{
+		DestinationAddresses: raw.DestinationAddresses,
+		OriginAddresses:      raw.OriginAddresses,
+		Rows:                 raw.Rows,
+	}
+
 	return response, nil
 }
 

@@ -53,7 +53,7 @@ func TestTimezoneNevada(t *testing.T) {
 		t.Errorf("r.Get returned non nil error: %v", err)
 	}
 
-	correctResponse := TimezoneResult{
+	correctResponse := &TimezoneResult{
 		DstOffset:    0,
 		RawOffset:    -28800,
 		TimeZoneID:   "America/Los_Angeles",
