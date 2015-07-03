@@ -20,12 +20,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/kr/pretty"
+	"golang.org/x/net/context"
 	"google.golang.org/maps"
 )
 
@@ -50,11 +50,13 @@ func usageAndExit(msg string) {
 
 func main() {
 	flag.Parse()
-	client := &http.Client{}
 	if *apiKey == "" {
 		usageAndExit("Please specify an API Key.")
 	}
-	ctx := maps.NewContext(*apiKey, client)
+	client, err := maps.NewClient(maps.WithAPIKey(*apiKey))
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
 	r := &maps.GeocodingRequest{
 		Address:  *address,
 		Language: *language,
@@ -67,7 +69,7 @@ func main() {
 	parseResultType(*resultType, r)
 	parseLocationType(*locationType, r)
 
-	resp, err := r.Get(ctx)
+	resp, err := client.GetGeocoding(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}

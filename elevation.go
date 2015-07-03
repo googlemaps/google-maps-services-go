@@ -25,16 +25,44 @@ import (
 	"strconv"
 
 	"golang.org/x/net/context"
-	"google.golang.org/maps/internal"
 )
 
-// Get makes an Elevation API request
-func (r *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
-	var response elevationResponse
+// GetElevation makes an Elevation API request
+func (c *Client) GetElevation(ctx context.Context, r *ElevationRequest) ([]ElevationResult, error) {
 
+	if len(r.Path) == 0 && len(r.Locations) == 0 {
+		return nil, errors.New("elevation: Provide either Path or Locations")
+	}
+
+	// Sampled path request
+	if len(r.Path) > 0 && r.Samples == 0 {
+		return nil, errors.New("elevation: Sampled Path Request requires Samples to be specifed")
+	}
+
+	chResult := make(chan elevationResultWithError)
+
+	go func() {
+		elevations, err := c.doGetElevation(r)
+		chResult <- elevationResultWithError{elevations, err}
+	}()
+
+	select {
+	case resp := <-chResult:
+		return resp.elevations, resp.err
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+type elevationResultWithError struct {
+	elevations []ElevationResult
+	err        error
+}
+
+func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) {
 	baseURL := "https://maps.googleapis.com/"
-	if internal.OverrideBaseURL(ctx) != "" {
-		baseURL = internal.OverrideBaseURL(ctx)
+	if c.baseURL != "" {
+		baseURL = c.baseURL
 	}
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/elevation/json", nil)
@@ -42,17 +70,9 @@ func (r *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
 		return nil, err
 	}
 	q := req.URL.Query()
-	q.Set("key", internal.APIKey(ctx))
-
-	if len(r.Path) == 0 && len(r.Locations) == 0 {
-		return nil, errors.New("elevation: Provide either Path or Locations")
-	}
+	q.Set("key", c.apiKey)
 
 	if len(r.Path) > 0 {
-		// Sampled path request
-		if r.Samples == 0 {
-			return nil, errors.New("elevation: Sampled Path Request requires Samples to be specifed")
-		}
 		q.Set("path", fmt.Sprintf("enc:%s", Encode(r.Path)))
 		q.Set("samples", strconv.Itoa(r.Samples))
 	}
@@ -63,25 +83,32 @@ func (r *ElevationRequest) Get(ctx context.Context) ([]ElevationResult, error) {
 
 	req.URL.RawQuery = q.Encode()
 
-	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-
-		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			return err
-		}
-		return nil
-	})
+	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+	var response elevationResponse
+
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
 	if response.Status != "OK" {
-		return nil, fmt.Errorf("distancematrix: %s - %s", response.Status, response.ErrorMessage)
+		err = fmt.Errorf("distancematrix: %s - %s", response.Status, response.ErrorMessage)
+		return nil, err
 	}
 
 	return response.Results, nil
+}
+
+type elevationResponse struct {
+	// Results is the Elevation results array
+	Results []ElevationResult `json:"results"`
+	// Status indicating if this request was successful
+	Status string `json:"status"`
+	// ErrorMessage is the explanatory field added when Status is an error.
+	ErrorMessage string `json:"error_message"`
 }
 
 // ElevationRequest is the request structure for Elevation API. Either Locations or Path must be set.
@@ -92,16 +119,6 @@ type ElevationRequest struct {
 	Path []LatLng
 	// Samples specifies the number of sample points along a path for which to return elevation data. Required if Path is supplied.
 	Samples int
-}
-
-type elevationResponse struct {
-	// Results is the Elevation results array
-	Results []ElevationResult `json:"results"`
-
-	// Status indicating if this request was successful
-	Status string `json:"status"`
-	// ErrorMessage is the explanatory field added when Status is an error.
-	ErrorMessage string `json:"error_message"`
 }
 
 // ElevationResult is a single elevation at a specific location

@@ -20,12 +20,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/kr/pretty"
+	"golang.org/x/net/context"
 	"google.golang.org/maps"
 )
 
@@ -45,11 +45,13 @@ func usageAndExit(msg string) {
 
 func main() {
 	flag.Parse()
-	client := &http.Client{}
 	if *apiKey == "" {
 		usageAndExit("Please specify an API Key.")
 	}
-	ctx := maps.NewContext(*apiKey, client)
+	client, err := maps.NewClient(maps.WithAPIKey(*apiKey))
+	if err != nil {
+		log.Fatalf("error %v", err)
+	}
 	r := &maps.SpeedLimitsRequest{}
 
 	if *units == "KPH" {
@@ -65,9 +67,7 @@ func main() {
 	parsePath(*path, r)
 	parsePlaceIds(*placeIds, r)
 
-	pretty.Println(r)
-
-	resp, err := r.Get(ctx)
+	resp, err := client.GetSpeedLimits(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}

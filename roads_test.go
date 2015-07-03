@@ -18,9 +18,10 @@
 package maps // import "google.golang.org/maps"
 
 import (
-	"net/http"
 	"reflect"
 	"testing"
+
+	"golang.org/x/net/context"
 )
 
 func TestSnapToRoad(t *testing.T) {
@@ -134,8 +135,7 @@ func TestSnapToRoad(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &SnapToRoadRequest{
 		Path: []LatLng{
 			LatLng{Lat: -35.27801, Lng: 149.12958},
@@ -149,7 +149,7 @@ func TestSnapToRoad(t *testing.T) {
 		},
 	}
 
-	resp, err := r.Get(ctx)
+	resp, err := c.GetSnapToRoad(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("r.Get returned non nil error: %v", err)
@@ -242,12 +242,33 @@ func TestSnapToRoad(t *testing.T) {
 }
 
 func TestSnapToRoadNoPath(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &SnapToRoadRequest{}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetSnapToRoad(context.Background(), r); err == nil {
 		t.Errorf("Empty path should return error")
+	}
+}
+
+func TestSnapToRoadWithCancelledContext(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &SnapToRoadRequest{
+		Path: []LatLng{
+			LatLng{Lat: -35.27801, Lng: 149.12958},
+			LatLng{Lat: -35.28032, Lng: 149.12907},
+			LatLng{Lat: -35.28099, Lng: 149.12929},
+			LatLng{Lat: -35.28144, Lng: 149.12984},
+			LatLng{Lat: -35.28194, Lng: 149.13003},
+			LatLng{Lat: -35.28282, Lng: 149.12956},
+			LatLng{Lat: -35.28302, Lng: 149.12881},
+			LatLng{Lat: -35.28473, Lng: 149.12836},
+		},
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := c.GetSnapToRoad(ctx, r); err == nil {
+		t.Errorf("Cancelled context should return non-nil err")
 	}
 }
 
@@ -323,8 +344,7 @@ func TestSpeedLimit(t *testing.T) {
 }`
 	server := mockServer(200, response)
 	defer server.Close()
-	client := &http.Client{}
-	ctx := newContextWithBaseURL(apiKey, client, server.URL)
+	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
 	r := &SpeedLimitsRequest{
 		PlaceID: []string{
 			"ChIJ1Wi6I2pNFmsRQL9GbW7qABM",
@@ -343,7 +363,7 @@ func TestSpeedLimit(t *testing.T) {
 		},
 	}
 
-	resp, err := r.Get(ctx)
+	resp, err := c.GetSpeedLimits(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("r.Get returned non nil error: %v", err)
@@ -374,11 +394,37 @@ func TestSpeedLimit(t *testing.T) {
 }
 
 func TestSpeedLimitsNoPlaceIDs(t *testing.T) {
-	client := &http.Client{}
-	ctx := NewContext(apiKey, client)
+	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &SpeedLimitsRequest{}
 
-	if _, err := r.Get(ctx); err == nil {
+	if _, err := c.GetSpeedLimits(context.Background(), r); err == nil {
 		t.Errorf("Empty PlaceIDs should return error")
+	}
+}
+
+func TestSpeedLimitsWithCancelledContext(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &SpeedLimitsRequest{
+		PlaceID: []string{
+			"ChIJ1Wi6I2pNFmsRQL9GbW7qABM",
+			"ChIJ58xCoGlNFmsRUEZUbW7qABM",
+			"ChIJ9RhaiGlNFmsR0IxAbW7qABM",
+			"ChIJabjuhGlNFmsREIxAbW7qABM",
+			"ChIJcSAlFWpNFmsRMHlUbW7qABM",
+			"ChIJI2FUTGhNFmsRcHpAbW7qABM",
+			"ChIJiy6YT2hNFmsRkHZAbW7qABM",
+			"ChIJoR7CemhNFmsRQB9QbW7qABM",
+			"ChIJP2m_FWpNFmsRIHlUbW7qABM",
+			"ChIJtV7La2pNFmsRAGpHbW7qABM",
+			"ChIJW5JAZmpNFmsRegG0-Jc80sM",
+			"ChIJW9R7smlNFmsRMH1AbW7qABM",
+			"ChIJy8c0r2lNFmsRQEZUbW7qABM",
+		},
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := c.GetSpeedLimits(ctx, r); err == nil {
+		t.Errorf("Cancelled context should return non-nil err")
 	}
 }

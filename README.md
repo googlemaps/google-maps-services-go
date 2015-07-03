@@ -88,7 +88,7 @@ https://developers.google.com/maps/.
 ## Usage
 Sample usage of the Directions API:
 
-```
+```go
 package main
 
 import (
@@ -98,20 +98,22 @@ import (
 	"github.com/kr/pretty"
 
 	"google.golang.org/maps"
+
+	"golang.org/x/net/context"
 )
 
 func main() {
-	client := &http.Client{}
 
 	apiKey := "Insert-API-Key-Here"
+	client := maps.NewClient(&http.Client{}, apiKey)
 
 	r := &maps.DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Perth",
 	}
 
-	ctx := maps.NewContext(apiKey, client)
-	resp, err := r.Get(ctx)
+	ctx := context.Background()
+	resp, err := client.GetDirections(ctx, r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}

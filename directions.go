@@ -26,15 +26,16 @@ import (
 	"strings"
 	"time"
 
-	"google.golang.org/maps/internal"
-
 	"golang.org/x/net/context"
 )
 
-// Get issues the Directions request and retrieves the Response
-func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
-	var response DirectionsResponse
+type directionsResponse struct {
+	routes []Route
+	err    error
+}
 
+// GetDirections issues the Directions request and retrieves the Response
+func (c *Client) GetDirections(ctx context.Context, r *DirectionsRequest) ([]Route, error) {
 	if r.Origin == "" {
 		return nil, errors.New("directions: Origin required")
 	}
@@ -54,9 +55,25 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 		return nil, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
 	}
 
+	chResult := make(chan directionsResponse)
+
+	go func() {
+		routes, err := c.doGetDirections(r)
+		chResult <- directionsResponse{routes, err}
+	}()
+
+	select {
+	case resp := <-chResult:
+		return resp.routes, resp.err
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
 	baseURL := "https://maps.googleapis.com/"
-	if internal.OverrideBaseURL(ctx) != "" {
-		baseURL = internal.OverrideBaseURL(ctx)
+	if c.baseURL != "" {
+		baseURL = c.baseURL
 	}
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
@@ -66,7 +83,7 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 	q := req.URL.Query()
 	q.Set("origin", r.Origin)
 	q.Set("destination", r.Destination)
-	q.Set("key", internal.APIKey(ctx))
+	q.Set("key", c.apiKey)
 	if r.Mode != "" {
 		q.Set("mode", string(r.Mode))
 	}
@@ -101,24 +118,21 @@ func (r *DirectionsRequest) Get(ctx context.Context) ([]Route, error) {
 	}
 	req.URL.RawQuery = q.Encode()
 
-	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-
-		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			return err
-		}
-		return nil
-	})
+	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err
 	}
-	if response.Status != "OK" {
-		return nil, fmt.Errorf("directions: %s - %s", response.Status, response.ErrorMessage)
+	defer resp.Body.Close()
+
+	var response DirectionsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
 	}
 
+	if response.Status != "OK" {
+		err = fmt.Errorf("directions: %s - %s", response.Status, response.ErrorMessage)
+		return nil, err
+	}
 	return response.Routes, nil
 }
 

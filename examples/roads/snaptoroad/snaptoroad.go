@@ -20,10 +20,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	"golang.org/x/net/context"
 
 	"github.com/kr/pretty"
 	"google.golang.org/maps"
@@ -44,11 +45,13 @@ func usageAndExit(msg string) {
 
 func main() {
 	flag.Parse()
-	client := &http.Client{}
 	if *apiKey == "" {
 		usageAndExit("Please specify an API Key.")
 	}
-	ctx := maps.NewContext(*apiKey, client)
+	client, err := maps.NewClient(maps.WithAPIKey(*apiKey))
+	if err != nil {
+		log.Fatalf("error %v", err)
+	}
 	r := &maps.SnapToRoadRequest{
 		Interpolate: *interpolate,
 	}
@@ -58,9 +61,7 @@ func main() {
 	}
 	parsePath(*path, r)
 
-	pretty.Println(r)
-
-	resp, err := r.Get(ctx)
+	resp, err := client.GetSnapToRoad(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}

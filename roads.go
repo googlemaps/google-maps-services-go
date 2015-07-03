@@ -24,16 +24,40 @@ import (
 	"strings"
 
 	"golang.org/x/net/context"
-	"google.golang.org/maps/internal"
 )
 
-// Get makes a SnapToRoad API request
-func (r *SnapToRoadRequest) Get(ctx context.Context) (SnapToRoadResponse, error) {
-	var response SnapToRoadResponse
+type snapToRoadResponse struct {
+	response SnapToRoadResponse
+	err      error
+}
 
+// GetSnapToRoad makes a SnapToRoad API request
+func (c *Client) GetSnapToRoad(ctx context.Context, r *SnapToRoadRequest) (SnapToRoadResponse, error) {
+
+	if len(r.Path) == 0 {
+		return SnapToRoadResponse{}, errors.New("snapToRoad: You must specify a Path")
+	}
+
+	chResult := make(chan snapToRoadResponse)
+
+	go func() {
+		resp, err := c.doGetSnapToRoad(r)
+		chResult <- snapToRoadResponse{resp, err}
+	}()
+
+	select {
+	case resp := <-chResult:
+		return resp.response, resp.err
+	case <-ctx.Done():
+		return SnapToRoadResponse{}, ctx.Err()
+	}
+}
+
+func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (SnapToRoadResponse, error) {
+	var response SnapToRoadResponse
 	baseURL := "https://roads.googleapis.com/"
-	if internal.OverrideBaseURL(ctx) != "" {
-		baseURL = internal.OverrideBaseURL(ctx)
+	if c.baseURL != "" {
+		baseURL = c.baseURL
 	}
 
 	req, err := http.NewRequest("GET", baseURL+"/v1/snapToRoads", nil)
@@ -41,11 +65,7 @@ func (r *SnapToRoadRequest) Get(ctx context.Context) (SnapToRoadResponse, error)
 		return response, err
 	}
 	q := req.URL.Query()
-	q.Set("key", internal.APIKey(ctx))
-
-	if len(r.Path) == 0 {
-		return response, errors.New("snapToRoad: You must specify a Path")
-	}
+	q.Set("key", c.apiKey)
 
 	var p []string
 	for _, e := range r.Path {
@@ -59,17 +79,13 @@ func (r *SnapToRoadRequest) Get(ctx context.Context) (SnapToRoadResponse, error)
 
 	req.URL.RawQuery = q.Encode()
 
-	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
+	resp, err := c.httpDo(req)
+	if err != nil {
+		return response, err
+	}
+	defer resp.Body.Close()
 
-		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			return err
-		}
-		return nil
-	})
+	err = json.NewDecoder(resp.Body).Decode(&response)
 	return response, err
 }
 
@@ -99,13 +115,39 @@ type SnappedPoint struct {
 	PlaceID string `json:"placeId"`
 }
 
-// Get makes a SpeedLimits API request
-func (r *SpeedLimitsRequest) Get(ctx context.Context) (SpeedLimitsResponse, error) {
+type speedLimitsResponse struct {
+	response SpeedLimitsResponse
+	err      error
+}
+
+// GetSpeedLimits makes a SpeedLimits API request
+func (c *Client) GetSpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (SpeedLimitsResponse, error) {
+
+	if len(r.Path) == 0 && len(r.PlaceID) == 0 {
+		return SpeedLimitsResponse{}, errors.New("speedLimits: You must specify a Path or PlaceID")
+	}
+
+	chResult := make(chan speedLimitsResponse)
+
+	go func() {
+		resp, err := c.doGetSpeedLimits(r)
+		chResult <- speedLimitsResponse{resp, err}
+	}()
+
+	select {
+	case resp := <-chResult:
+		return resp.response, resp.err
+	case <-ctx.Done():
+		return SpeedLimitsResponse{}, ctx.Err()
+	}
+}
+
+func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (SpeedLimitsResponse, error) {
 	var response SpeedLimitsResponse
 
 	baseURL := "https://roads.googleapis.com/"
-	if internal.OverrideBaseURL(ctx) != "" {
-		baseURL = internal.OverrideBaseURL(ctx)
+	if c.baseURL != "" {
+		baseURL = c.baseURL
 	}
 
 	req, err := http.NewRequest("GET", baseURL+"/v1/speedLimits", nil)
@@ -113,11 +155,7 @@ func (r *SpeedLimitsRequest) Get(ctx context.Context) (SpeedLimitsResponse, erro
 		return response, err
 	}
 	q := req.URL.Query()
-	q.Set("key", internal.APIKey(ctx))
-
-	if len(r.Path) == 0 && len(r.PlaceID) == 0 {
-		return response, errors.New("speedLimits: You must specify a Path or PlaceID")
-	}
+	q.Set("key", c.apiKey)
 
 	var p []string
 	for _, e := range r.Path {
@@ -136,17 +174,13 @@ func (r *SpeedLimitsRequest) Get(ctx context.Context) (SpeedLimitsResponse, erro
 
 	req.URL.RawQuery = q.Encode()
 
-	err = httpDo(ctx, req, func(resp *http.Response, err error) error {
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
+	resp, err := c.httpDo(req)
+	if err != nil {
+		return response, err
+	}
+	defer resp.Body.Close()
 
-		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			return err
-		}
-		return nil
-	})
+	err = json.NewDecoder(resp.Body).Decode(&response)
 	return response, err
 }
 
