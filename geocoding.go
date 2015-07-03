@@ -29,6 +29,32 @@ import (
 
 // GetGeocoding makes a Geocoding API request
 func (c *Client) GetGeocoding(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
+
+	if r.Address == "" && len(r.components) == 0 && r.LatLng == nil {
+		return nil, errors.New("geocoding: You must specify at least one of Address or Components for a geocoding request, or LatLng for a reverse geocoding request")
+	}
+
+	chResult := make(chan geocodingResultWithError)
+
+	go func() {
+		results, err := c.doGetGeocoding(r)
+		chResult <- geocodingResultWithError{results, err}
+	}()
+
+	select {
+	case resp := <-chResult:
+		return resp.Results, resp.err
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+type geocodingResultWithError struct {
+	Results []GeocodingResult
+	err     error
+}
+
+func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) {
 	var response geocodingResponse
 
 	baseURL := "https://maps.googleapis.com/"
@@ -42,10 +68,6 @@ func (c *Client) GetGeocoding(ctx context.Context, r *GeocodingRequest) ([]Geoco
 	}
 	q := req.URL.Query()
 	q.Set("key", c.apiKey)
-
-	if r.Address == "" && len(r.components) == 0 && r.LatLng == nil {
-		return nil, errors.New("geocoding: You must specify at least one of Address or Components for a geocoding request, or LatLng for a reverse geocoding request")
-	}
 
 	if r.Address != "" {
 		q.Set("address", r.Address)
@@ -81,41 +103,22 @@ func (c *Client) GetGeocoding(ctx context.Context, r *GeocodingRequest) ([]Geoco
 	}
 
 	req.URL.RawQuery = q.Encode()
-	chResult := make(chan geocodingResponse)
-
-	go func() {
-
-		err = httpDo(ctx, req, func(resp *http.Response, err error) error {
-			if err != nil {
-				return err
-			}
-			defer resp.Body.Close()
-
-			if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-				return err
-			}
-			return nil
-		})
-		if err != nil {
-			chResult <- geocodingResponse{nil, "", "", err}
-			return
-		}
-		if response.Status != "OK" {
-			err = fmt.Errorf("geocoding: %s - %s", response.Status, response.ErrorMessage)
-			chResult <- geocodingResponse{nil, "", "", err}
-			return
-		}
-
-		chResult <- response
-		return
-	}()
-
-	select {
-	case resp := <-chResult:
-		return resp.Results, resp.err
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	resp, err := c.httpDo(req)
+	if err != nil {
+		return nil, err
 	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return nil, err
+	}
+	if response.Status != "OK" {
+		err = fmt.Errorf("geocoding: %s - %s", response.Status, response.ErrorMessage)
+		return nil, err
+	}
+
+	return response.Results, nil
 }
 
 type componentFilter string

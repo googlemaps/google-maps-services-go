@@ -36,8 +36,6 @@ type directionsResponse struct {
 
 // GetDirections issues the Directions request and retrieves the Response
 func (c *Client) GetDirections(ctx context.Context, r *DirectionsRequest) ([]Route, error) {
-	var response DirectionsResponse
-
 	if r.Origin == "" {
 		return nil, errors.New("directions: Origin required")
 	}
@@ -57,76 +55,11 @@ func (c *Client) GetDirections(ctx context.Context, r *DirectionsRequest) ([]Rou
 		return nil, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
 	}
 
-	baseURL := "https://maps.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-
 	chResult := make(chan directionsResponse)
 
 	go func() {
-		req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
-		if err != nil {
-			chResult <- directionsResponse{nil, err}
-			return
-		}
-		q := req.URL.Query()
-		q.Set("origin", r.Origin)
-		q.Set("destination", r.Destination)
-		q.Set("key", c.apiKey)
-		if r.Mode != "" {
-			q.Set("mode", string(r.Mode))
-		}
-		if len(r.Waypoints) != 0 {
-			q.Set("waypoints", strings.Join(r.Waypoints, "|"))
-		}
-		if r.Alternatives {
-			q.Set("alternatives", "true")
-		}
-		if len(r.Avoid) > 0 {
-			var avoid []string
-			for _, a := range r.Avoid {
-				avoid = append(avoid, string(a))
-			}
-			q.Set("avoid", strings.Join(avoid, "|"))
-		}
-		if r.Language != "" {
-			q.Set("language", r.Language)
-		}
-		if r.Units != "" {
-			q.Set("units", string(r.Units))
-		}
-		if r.Region != "" {
-			q.Set("region", r.Region)
-		}
-		if len(r.TransitMode) != 0 {
-			var transitMode []string
-			for _, t := range r.TransitMode {
-				transitMode = append(transitMode, string(t))
-			}
-			q.Set("transit_mode", strings.Join(transitMode, "|"))
-		}
-		req.URL.RawQuery = q.Encode()
-
-		resp, err := c.httpDo(req)
-		if err != nil {
-			chResult <- directionsResponse{nil, err}
-			return
-		}
-		defer resp.Body.Close()
-
-		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-			chResult <- directionsResponse{nil, err}
-			return
-		}
-
-		if response.Status != "OK" {
-			err = fmt.Errorf("directions: %s - %s", response.Status, response.ErrorMessage)
-			chResult <- directionsResponse{nil, err}
-			return
-		}
-		chResult <- directionsResponse{response.Routes, nil}
-		return
+		routes, err := c.doGetDirections(r)
+		chResult <- directionsResponse{routes, err}
 	}()
 
 	select {
@@ -135,6 +68,72 @@ func (c *Client) GetDirections(ctx context.Context, r *DirectionsRequest) ([]Rou
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
+}
+
+func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
+	baseURL := "https://maps.googleapis.com/"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+
+	req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
+	if err != nil {
+		return nil, err
+	}
+	q := req.URL.Query()
+	q.Set("origin", r.Origin)
+	q.Set("destination", r.Destination)
+	q.Set("key", c.apiKey)
+	if r.Mode != "" {
+		q.Set("mode", string(r.Mode))
+	}
+	if len(r.Waypoints) != 0 {
+		q.Set("waypoints", strings.Join(r.Waypoints, "|"))
+	}
+	if r.Alternatives {
+		q.Set("alternatives", "true")
+	}
+	if len(r.Avoid) > 0 {
+		var avoid []string
+		for _, a := range r.Avoid {
+			avoid = append(avoid, string(a))
+		}
+		q.Set("avoid", strings.Join(avoid, "|"))
+	}
+	if r.Language != "" {
+		q.Set("language", r.Language)
+	}
+	if r.Units != "" {
+		q.Set("units", string(r.Units))
+	}
+	if r.Region != "" {
+		q.Set("region", r.Region)
+	}
+	if len(r.TransitMode) != 0 {
+		var transitMode []string
+		for _, t := range r.TransitMode {
+			transitMode = append(transitMode, string(t))
+		}
+		q.Set("transit_mode", strings.Join(transitMode, "|"))
+	}
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := c.httpDo(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var response DirectionsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	if response.Status != "OK" {
+		err = fmt.Errorf("directions: %s - %s", response.Status, response.ErrorMessage)
+		return nil, err
+	}
+	return response.Routes, nil
 }
 
 // DirectionsRequest is the functional options struct for directions.Get

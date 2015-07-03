@@ -33,8 +33,28 @@ type snapToRoadResponse struct {
 
 // GetSnapToRoad makes a SnapToRoad API request
 func (c *Client) GetSnapToRoad(ctx context.Context, r *SnapToRoadRequest) (SnapToRoadResponse, error) {
-	var response SnapToRoadResponse
 
+	if len(r.Path) == 0 {
+		return SnapToRoadResponse{}, errors.New("snapToRoad: You must specify a Path")
+	}
+
+	chResult := make(chan snapToRoadResponse)
+
+	go func() {
+		resp, err := c.doGetSnapToRoad(r)
+		chResult <- snapToRoadResponse{resp, err}
+	}()
+
+	select {
+	case resp := <-chResult:
+		return resp.response, resp.err
+	case <-ctx.Done():
+		return SnapToRoadResponse{}, ctx.Err()
+	}
+}
+
+func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (SnapToRoadResponse, error) {
+	var response SnapToRoadResponse
 	baseURL := "https://roads.googleapis.com/"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -47,10 +67,6 @@ func (c *Client) GetSnapToRoad(ctx context.Context, r *SnapToRoadRequest) (SnapT
 	q := req.URL.Query()
 	q.Set("key", c.apiKey)
 
-	if len(r.Path) == 0 {
-		return response, errors.New("snapToRoad: You must specify a Path")
-	}
-
 	var p []string
 	for _, e := range r.Path {
 		p = append(p, e.String())
@@ -62,27 +78,15 @@ func (c *Client) GetSnapToRoad(ctx context.Context, r *SnapToRoadRequest) (SnapT
 	}
 
 	req.URL.RawQuery = q.Encode()
-	chResult := make(chan snapToRoadResponse)
 
-	go func() {
-		resp, err := c.httpDo(req)
-		if err != nil {
-			chResult <- snapToRoadResponse{response, err}
-			return
-		}
-		defer resp.Body.Close()
-
-		err = json.NewDecoder(resp.Body).Decode(&response)
-		chResult <- snapToRoadResponse{response, err}
-		return
-	}()
-
-	select {
-	case resp := <-chResult:
-		return resp.response, resp.err
-	case <-ctx.Done():
-		return response, ctx.Err()
+	resp, err := c.httpDo(req)
+	if err != nil {
+		return response, err
 	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	return response, err
 }
 
 // SnapToRoadRequest is the request structure for the Roads Snap to Road API.
@@ -118,6 +122,27 @@ type speedLimitsResponse struct {
 
 // GetSpeedLimits makes a SpeedLimits API request
 func (c *Client) GetSpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (SpeedLimitsResponse, error) {
+
+	if len(r.Path) == 0 && len(r.PlaceID) == 0 {
+		return SpeedLimitsResponse{}, errors.New("speedLimits: You must specify a Path or PlaceID")
+	}
+
+	chResult := make(chan speedLimitsResponse)
+
+	go func() {
+		resp, err := c.doGetSpeedLimits(r)
+		chResult <- speedLimitsResponse{resp, err}
+	}()
+
+	select {
+	case resp := <-chResult:
+		return resp.response, resp.err
+	case <-ctx.Done():
+		return SpeedLimitsResponse{}, ctx.Err()
+	}
+}
+
+func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (SpeedLimitsResponse, error) {
 	var response SpeedLimitsResponse
 
 	baseURL := "https://roads.googleapis.com/"
@@ -131,10 +156,6 @@ func (c *Client) GetSpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (Spe
 	}
 	q := req.URL.Query()
 	q.Set("key", c.apiKey)
-
-	if len(r.Path) == 0 && len(r.PlaceID) == 0 {
-		return response, errors.New("speedLimits: You must specify a Path or PlaceID")
-	}
 
 	var p []string
 	for _, e := range r.Path {
@@ -152,27 +173,15 @@ func (c *Client) GetSpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (Spe
 	}
 
 	req.URL.RawQuery = q.Encode()
-	chResult := make(chan speedLimitsResponse)
 
-	go func() {
-		resp, err := c.httpDo(req)
-		if err != nil {
-			chResult <- speedLimitsResponse{response, err}
-			return
-		}
-		defer resp.Body.Close()
-
-		err = json.NewDecoder(resp.Body).Decode(&response)
-		chResult <- speedLimitsResponse{response, err}
-		return
-	}()
-
-	select {
-	case resp := <-chResult:
-		return resp.response, resp.err
-	case <-ctx.Done():
-		return response, ctx.Err()
+	resp, err := c.httpDo(req)
+	if err != nil {
+		return response, err
 	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	return response, err
 }
 
 type speedLimitUnit string

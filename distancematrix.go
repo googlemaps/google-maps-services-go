@@ -35,89 +35,22 @@ type distanceMatrixResponse struct {
 
 // GetDistanceMatrix makes a Distance Matrix API request
 func (c *Client) GetDistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (DistanceMatrixResponse, error) {
-	var raw rawDistanceMatrixResponse
-	var response DistanceMatrixResponse
 
 	if len(r.Origins) == 0 {
-		return response, errors.New("distancematrix: Origins must contain at least one start address")
+		return DistanceMatrixResponse{}, errors.New("distancematrix: Origins must contain at least one start address")
 	}
 	if len(r.Destinations) == 0 {
-		return response, errors.New("distancematrix: Destinations must contain at least one end address")
+		return DistanceMatrixResponse{}, errors.New("distancematrix: Destinations must contain at least one end address")
 	}
 	if r.DepartureTime != "" && r.ArrivalTime != "" {
-		return response, errors.New("distancematrix: must not specify both DepartureTime and ArrivalTime")
-	}
-
-	baseURL := "https://maps.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
+		return DistanceMatrixResponse{}, errors.New("distancematrix: must not specify both DepartureTime and ArrivalTime")
 	}
 
 	chResult := make(chan distanceMatrixResponse)
 
 	go func() {
-		req, err := http.NewRequest("GET", baseURL+"/maps/api/distancematrix/json", nil)
-		if err != nil {
-			chResult <- distanceMatrixResponse{response, err}
-			return
-		}
-		q := req.URL.Query()
-		q.Set("origins", strings.Join(r.Origins, "|"))
-		q.Set("destinations", strings.Join(r.Destinations, "|"))
-		q.Set("key", c.apiKey)
-		if r.Mode != "" {
-			q.Set("mode", string(r.Mode))
-		}
-		if r.Language != "" {
-			q.Set("language", r.Language)
-		}
-		if r.Avoid != "" {
-			q.Set("avoid", string(r.Avoid))
-		}
-		if r.Units != "" {
-			q.Set("units", string(r.Units))
-		}
-		if r.DepartureTime != "" {
-			q.Set("departure_time", r.DepartureTime)
-		}
-		if r.ArrivalTime != "" {
-			q.Set("arrival_time", r.ArrivalTime)
-		}
-		if r.TransitMode != "" {
-			q.Set("transit_mode", string(r.TransitMode))
-		}
-		if r.TransitRoutingPreference != "" {
-			q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
-		}
-
-		req.URL.RawQuery = q.Encode()
-
-		resp, err := c.httpDo(req)
-		if err != nil {
-			chResult <- distanceMatrixResponse{response, err}
-			return
-		}
-		defer resp.Body.Close()
-		if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
-			chResult <- distanceMatrixResponse{response, err}
-			return
-		}
-
-		if err != nil {
-			chResult <- distanceMatrixResponse{response, err}
-			return
-		}
-		if raw.Status != "OK" {
-			err = fmt.Errorf("distancematrix: %s - %s", raw.Status, raw.ErrorMessage)
-			chResult <- distanceMatrixResponse{response, err}
-			return
-		}
-
-		response.DestinationAddresses = raw.DestinationAddresses
-		response.OriginAddresses = raw.OriginAddresses
-		response.Rows = raw.Rows
-		chResult <- distanceMatrixResponse{response, nil}
-		return
+		matrix, err := c.doGetDistanceMatrix(r)
+		chResult <- distanceMatrixResponse{matrix, err}
 	}()
 
 	select {
@@ -126,6 +59,73 @@ func (c *Client) GetDistanceMatrix(ctx context.Context, r *DistanceMatrixRequest
 	case <-ctx.Done():
 		return DistanceMatrixResponse{}, ctx.Err()
 	}
+}
+
+func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (DistanceMatrixResponse, error) {
+	baseURL := "https://maps.googleapis.com/"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+
+	var response DistanceMatrixResponse
+
+	req, err := http.NewRequest("GET", baseURL+"/maps/api/distancematrix/json", nil)
+	if err != nil {
+		return response, err
+	}
+	q := req.URL.Query()
+	q.Set("origins", strings.Join(r.Origins, "|"))
+	q.Set("destinations", strings.Join(r.Destinations, "|"))
+	q.Set("key", c.apiKey)
+	if r.Mode != "" {
+		q.Set("mode", string(r.Mode))
+	}
+	if r.Language != "" {
+		q.Set("language", r.Language)
+	}
+	if r.Avoid != "" {
+		q.Set("avoid", string(r.Avoid))
+	}
+	if r.Units != "" {
+		q.Set("units", string(r.Units))
+	}
+	if r.DepartureTime != "" {
+		q.Set("departure_time", r.DepartureTime)
+	}
+	if r.ArrivalTime != "" {
+		q.Set("arrival_time", r.ArrivalTime)
+	}
+	if r.TransitMode != "" {
+		q.Set("transit_mode", string(r.TransitMode))
+	}
+	if r.TransitRoutingPreference != "" {
+		q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
+	}
+
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := c.httpDo(req)
+	if err != nil {
+		return response, err
+	}
+	defer resp.Body.Close()
+	var raw rawDistanceMatrixResponse
+	if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
+		return response, err
+	}
+
+	if err != nil {
+		return response, err
+	}
+	if raw.Status != "OK" {
+		err = fmt.Errorf("distancematrix: %s - %s", raw.Status, raw.ErrorMessage)
+		return response, err
+	}
+
+	response.DestinationAddresses = raw.DestinationAddresses
+	response.OriginAddresses = raw.OriginAddresses
+	response.Rows = raw.Rows
+	return response, nil
 }
 
 // DistanceMatrixRequest is the request struct for Distance Matrix APi
