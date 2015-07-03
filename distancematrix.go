@@ -110,10 +110,7 @@ func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (DistanceMatrixRe
 	}
 	defer resp.Body.Close()
 	var raw rawDistanceMatrixResponse
-	if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
-		return response, err
-	}
-
+	err = json.NewDecoder(resp.Body).Decode(&raw)
 	if err != nil {
 		return response, err
 	}
