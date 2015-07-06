@@ -79,7 +79,7 @@ func TestDistanceMatrixSydPyrToPar(t *testing.T) {
 		t.Errorf("r.Get returned non nil error, was %+v", err)
 	}
 
-	correctResponse := DistanceMatrixResponse{
+	correctResponse := &DistanceMatrixResponse{
 		OriginAddresses:      []string{"Sydney NSW, Australia", "Pyrmont NSW, Australia"},
 		DestinationAddresses: []string{"Parramatta NSW, Australia"},
 		Rows: []DistanceMatrixElementsRow{

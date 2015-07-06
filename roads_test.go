@@ -161,7 +161,7 @@ func TestSnapToRoad(t *testing.T) {
 	index2 := 2
 	index7 := 7
 
-	correctResponse := SnapToRoadResponse{
+	correctResponse := &SnapToRoadResponse{
 		SnappedPoints: []SnappedPoint{
 			SnappedPoint{
 				Location:      LatLng{Lat: -35.2784167, Lng: 149.1294692},
@@ -369,7 +369,7 @@ func TestSpeedLimit(t *testing.T) {
 		t.Errorf("r.Get returned non nil error: %v", err)
 	}
 
-	correctResponse := SpeedLimitsResponse{
+	correctResponse := &SpeedLimitsResponse{
 		SpeedLimits: []SpeedLimit{
 			SpeedLimit{PlaceID: "ChIJ1Wi6I2pNFmsRQL9GbW7qABM", SpeedLimit: 60, Units: "KPH"},
 			SpeedLimit{PlaceID: "ChIJ58xCoGlNFmsRUEZUbW7qABM", SpeedLimit: 60, Units: "KPH"},
