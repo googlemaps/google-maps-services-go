@@ -29,10 +29,10 @@ var signature = "de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9"
 
 func TestSigner(t *testing.T) {
 	s, err := hex.DecodeString(signature)
-	expected := base64.URLEncoding.EncodeToString(s)
 	if err != nil {
 		t.Errorf("Couldn't decode expected signature: %+v", err)
 	}
+	expected := base64.URLEncoding.EncodeToString(s)
 	generated, err := GenerateSignature(signingKey, message)
 	if err != nil {
 		t.Errorf("Couldn't generate actual signature: %+v", err)
