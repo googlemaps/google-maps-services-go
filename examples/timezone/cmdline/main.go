@@ -32,6 +32,8 @@ import (
 
 var (
 	apiKey    = flag.String("key", "", "API Key for using Google Maps API.")
+	clientID  = flag.String("client_id", "", "ClientID for Maps for Work API access.")
+	signature = flag.String("signature", "", "Signature for Maps for Work API access.")
 	location  = flag.String("location", "", "a comma-separated lat,lng tuple (eg. location=-33.86,151.20), representing the location to look up.")
 	timestamp = flag.String("timestamp", "", "specifies the desired time as seconds since midnight, January 1, 1970 UTC.")
 	language  = flag.String("language", "", "The language in which to return results.")
@@ -46,10 +48,20 @@ func usageAndExit(msg string) {
 
 func main() {
 	flag.Parse()
-	if *apiKey == "" {
-		usageAndExit("Please specify an API Key.")
+
+	var client *maps.Client
+	var err error
+	if *apiKey != "" {
+		client, err = maps.NewClient(maps.WithAPIKey(*apiKey))
+	} else if *clientID != "" || *signature != "" {
+		client, err = maps.NewClient(maps.WithClientIDAndSignature(*clientID, *signature))
+	} else {
+		usageAndExit("Please specify an API Key, or Client ID and Signature.")
 	}
-	client, err := maps.NewClient(maps.WithAPIKey(*apiKey))
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}
@@ -65,11 +77,9 @@ func main() {
 
 	parseLocation(*location, r)
 
-	pretty.Println(r)
-
 	resp, err := client.GetTimezone(context.Background(), r)
 	if err != nil {
-		log.Fatalf("error %v", err)
+		log.Fatalf("error: %v", err)
 	}
 
 	pretty.Println(resp)

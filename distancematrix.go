@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
+	"google.golang.org/maps/internal"
 )
 
 type distanceMatrixResponse struct {
@@ -74,7 +75,6 @@ func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixR
 	q := req.URL.Query()
 	q.Set("origins", strings.Join(r.Origins, "|"))
 	q.Set("destinations", strings.Join(r.Destinations, "|"))
-	q.Set("key", c.apiKey)
 	if r.Mode != "" {
 		q.Set("mode", string(r.Mode))
 	}
@@ -99,8 +99,16 @@ func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixR
 	if r.TransitRoutingPreference != "" {
 		q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
 	}
-
-	req.URL.RawQuery = q.Encode()
+	if c.apiKey != "" {
+		q.Set("key", c.apiKey)
+		req.URL.RawQuery = q.Encode()
+	} else {
+		query, err := internal.SignURL(req.URL.Path, c.clientID, c.signature, q)
+		if err != nil {
+			return nil, err
+		}
+		req.URL.RawQuery = query
+	}
 
 	resp, err := c.httpDo(req)
 	if err != nil {

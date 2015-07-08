@@ -118,16 +118,14 @@ func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
 	}
 	if c.apiKey != "" {
 		q.Set("key", c.apiKey)
+		req.URL.RawQuery = q.Encode()
 	} else {
-		q.Set("client", c.clientID)
-		message := fmt.Sprintf("%s?%s", req.URL.Path, q.Encode())
-		s, err := internal.GenerateSignature(c.signature, message)
+		query, err := internal.SignURL(req.URL.Path, c.clientID, c.signature, q)
 		if err != nil {
 			return nil, err
 		}
-		q.Set("signature", s)
+		req.URL.RawQuery = query
 	}
-	req.URL.RawQuery = q.Encode()
 
 	resp, err := c.httpDo(req)
 	if err != nil {

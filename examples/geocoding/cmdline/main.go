@@ -31,6 +31,8 @@ import (
 
 var (
 	apiKey       = flag.String("key", "", "API Key for using Google Maps API.")
+	clientID     = flag.String("client_id", "", "ClientID for Maps for Work API access.")
+	signature    = flag.String("signature", "", "Signature for Maps for Work API access.")
 	address      = flag.String("address", "", "The street address that you want to geocode, in the format used by the national postal service of the country concerned.")
 	components   = flag.String("components", "", "A component filter for which you wish to obtain a geocode.")
 	bounds       = flag.String("bounds", "", "The bounding box of the viewport within which to bias geocode results more prominently.")
@@ -50,13 +52,20 @@ func usageAndExit(msg string) {
 
 func main() {
 	flag.Parse()
-	if *apiKey == "" {
-		usageAndExit("Please specify an API Key.")
+
+	var client *maps.Client
+	var err error
+	if *apiKey != "" {
+		client, err = maps.NewClient(maps.WithAPIKey(*apiKey))
+	} else if *clientID != "" || *signature != "" {
+		client, err = maps.NewClient(maps.WithClientIDAndSignature(*clientID, *signature))
+	} else {
+		usageAndExit("Please specify an API Key, or Client ID and Signature.")
 	}
-	client, err := maps.NewClient(maps.WithAPIKey(*apiKey))
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
+
 	r := &maps.GeocodingRequest{
 		Address:  *address,
 		Language: *language,

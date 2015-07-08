@@ -20,6 +20,7 @@ package maps // import "google.golang.org/maps"
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -64,8 +65,11 @@ func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (*SnapToRoadResponse, err
 		return nil, err
 	}
 	q := req.URL.Query()
-	q.Set("key", c.apiKey)
-
+	if c.apiKey != "" {
+		q.Set("key", c.apiKey)
+	} else {
+		return nil, fmt.Errorf("Roads API requires an API Key, it doesn't work with Client ID and Signature")
+	}
 	var p []string
 	for _, e := range r.Path {
 		p = append(p, e.String())
@@ -154,7 +158,11 @@ func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (*SpeedLimitsResponse, 
 		return nil, err
 	}
 	q := req.URL.Query()
-	q.Set("key", c.apiKey)
+	if c.apiKey != "" {
+		q.Set("key", c.apiKey)
+	} else {
+		return nil, fmt.Errorf("Roads API requires an API Key, it doesn't work with Client ID and Signature")
+	}
 
 	var p []string
 	for _, e := range r.Path {

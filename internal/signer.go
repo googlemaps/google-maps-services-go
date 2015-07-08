@@ -18,6 +18,8 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
+	"fmt"
+	"net/url"
 )
 
 // GenerateSignature builds the digital signature for a key and a message.
@@ -32,4 +34,16 @@ func GenerateSignature(key, message string) (string, error) {
 	mac := hmac.New(sha1.New, k)
 	mac.Write([]byte(message))
 	return base64.URLEncoding.EncodeToString(mac.Sum(nil)), nil
+}
+
+// SignURL signs a url with GenerateSignature.
+func SignURL(path, clientID, signature string, q url.Values) (string, error) {
+	q.Set("client", clientID)
+	encodedQuery := q.Encode()
+	message := fmt.Sprintf("%s?%s", path, encodedQuery)
+	s, err := GenerateSignature(signature, message)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s&signature=%s", encodedQuery, s), nil
 }

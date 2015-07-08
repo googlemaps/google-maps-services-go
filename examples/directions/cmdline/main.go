@@ -67,7 +67,6 @@ func main() {
 	} else {
 		usageAndExit("Please specify an API Key, or Client ID and Signature.")
 	}
-
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
