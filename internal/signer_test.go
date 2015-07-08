@@ -33,7 +33,7 @@ func TestSigner(t *testing.T) {
 		t.Errorf("Couldn't decode expected signature: %+v", err)
 	}
 	expected := base64.URLEncoding.EncodeToString(s)
-	generated, err := GenerateSignature(signingKey, message)
+	generated, err := generateSignature(signingKey, message)
 	if err != nil {
 		t.Errorf("Couldn't generate actual signature: %+v", err)
 	}
