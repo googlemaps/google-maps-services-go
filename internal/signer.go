@@ -22,9 +22,7 @@ import (
 	"net/url"
 )
 
-// GenerateSignature builds the digital signature for a key and a message.
-// The key is assumed to be in URL safe base64 encoding.
-// See: https://developers.google.com/maps/documentation/business/webservices/auth#digital_signatures
+// generateSignature builds the digital signature for a key and a message.
 func generateSignature(key, message string) (string, error) {
 	k, err := base64.URLEncoding.DecodeString(key)
 	if err != nil {
@@ -37,6 +35,8 @@ func generateSignature(key, message string) (string, error) {
 }
 
 // SignURL signs a url with a clientID and signature.
+// The signature is assumed to be in URL safe base64 encoding.
+// See: https://developers.google.com/maps/documentation/business/webservices/auth#digital_signatures
 func SignURL(path, clientID, signature string, q url.Values) (string, error) {
 	q.Set("client", clientID)
 	encodedQuery := q.Encode()
