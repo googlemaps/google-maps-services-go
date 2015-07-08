@@ -121,7 +121,7 @@ func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
 	} else {
 		q.Set("client", c.clientID)
 		message := fmt.Sprintf("%s?%s", req.URL.Path, q.Encode())
-		s, err := internal.GenerateSignature(c.clientID, message)
+		s, err := internal.GenerateSignature(c.signature, message)
 		if err != nil {
 			return nil, err
 		}
