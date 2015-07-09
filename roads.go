@@ -20,7 +20,6 @@ package maps // import "google.golang.org/maps"
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -65,11 +64,6 @@ func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (*SnapToRoadResponse, err
 		return nil, err
 	}
 	q := req.URL.Query()
-	if c.apiKey != "" {
-		q.Set("key", c.apiKey)
-	} else {
-		return nil, fmt.Errorf("Must provide API key for this API. It does not accept enterprise credentials.")
-	}
 	var p []string
 	for _, e := range r.Path {
 		p = append(p, e.String())
@@ -79,8 +73,11 @@ func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (*SnapToRoadResponse, err
 	if r.Interpolate {
 		q.Set("interpolate", "true")
 	}
-
-	req.URL.RawQuery = q.Encode()
+	query, err := c.generateAuthQuery(req.URL.Path, q, false)
+	if err != nil {
+		return nil, err
+	}
+	req.URL.RawQuery = query
 
 	resp, err := c.httpDo(req)
 	if err != nil {
@@ -158,12 +155,6 @@ func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (*SpeedLimitsResponse, 
 		return nil, err
 	}
 	q := req.URL.Query()
-	if c.apiKey != "" {
-		q.Set("key", c.apiKey)
-	} else {
-		return nil, fmt.Errorf("Must provide API key for this API. It does not accept enterprise credentials.")
-	}
-
 	var p []string
 	for _, e := range r.Path {
 		p = append(p, e.String())
@@ -178,8 +169,11 @@ func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (*SpeedLimitsResponse, 
 	if r.Units != "" {
 		q.Set("units", string(r.Units))
 	}
-
-	req.URL.RawQuery = q.Encode()
+	query, err := c.generateAuthQuery(req.URL.Path, q, false)
+	if err != nil {
+		return nil, err
+	}
+	req.URL.RawQuery = query
 
 	resp, err := c.httpDo(req)
 	if err != nil {

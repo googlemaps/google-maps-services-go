@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
-	"google.golang.org/maps/internal"
 )
 
 // GetTimezone makes a Timezone API request
@@ -67,16 +66,12 @@ func (c *Client) doGetTimezone(r *TimezoneRequest) (*TimezoneResult, error) {
 	if r.Language != "" {
 		q.Set("language", r.Language)
 	}
-	if c.apiKey != "" {
-		q.Set("key", c.apiKey)
-		req.URL.RawQuery = q.Encode()
-	} else {
-		query, err := internal.SignURL(req.URL.Path, c.clientID, c.signature, q)
-		if err != nil {
-			return nil, err
-		}
-		req.URL.RawQuery = query
+	query, err := c.generateAuthQuery(req.URL.Path, q, true)
+	if err != nil {
+		return nil, err
 	}
+	req.URL.RawQuery = query
+
 	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err

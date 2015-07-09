@@ -21,6 +21,9 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"net/url"
+
+	"google.golang.org/maps/internal"
 )
 
 // Client may be used to make requests to the Google Maps WebService APIs
@@ -138,4 +141,19 @@ func cloneRequest(r *http.Request) *http.Request {
 		r2.Header[k] = s
 	}
 	return r2
+}
+
+func (client *Client) generateAuthQuery(path string, q url.Values, acceptClientID bool) (string, error) {
+	if client.apiKey != "" {
+		q.Set("key", client.apiKey)
+		return q.Encode(), nil
+	}
+	if acceptClientID {
+		query, err := internal.SignURL(path, client.clientID, client.signature, q)
+		if err != nil {
+			return "", err
+		}
+		return query, nil
+	}
+	return "", fmt.Errorf("Must provide API key for this API. It does not accept enterprise credentials.")
 }

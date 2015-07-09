@@ -25,7 +25,6 @@ import (
 	"strings"
 
 	"golang.org/x/net/context"
-	"google.golang.org/maps/internal"
 )
 
 // GetGeocoding makes a Geocoding API request
@@ -101,16 +100,11 @@ func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) 
 	if r.Language != "" {
 		q.Set("language", r.Language)
 	}
-	if c.apiKey != "" {
-		q.Set("key", c.apiKey)
-		req.URL.RawQuery = q.Encode()
-	} else {
-		query, err := internal.SignURL(req.URL.Path, c.clientID, c.signature, q)
-		if err != nil {
-			return nil, err
-		}
-		req.URL.RawQuery = query
+	query, err := c.generateAuthQuery(req.URL.Path, q, true)
+	if err != nil {
+		return nil, err
 	}
+	req.URL.RawQuery = query
 
 	resp, err := c.httpDo(req)
 	if err != nil {
