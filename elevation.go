@@ -25,7 +25,6 @@ import (
 	"strconv"
 
 	"golang.org/x/net/context"
-	"google.golang.org/maps/internal"
 )
 
 // GetElevation makes an Elevation API request
@@ -80,16 +79,11 @@ func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) 
 	if len(r.Locations) > 0 {
 		q.Set("locations", fmt.Sprintf("enc:%s", Encode(r.Locations)))
 	}
-	if c.apiKey != "" {
-		q.Set("key", c.apiKey)
-		req.URL.RawQuery = q.Encode()
-	} else {
-		query, err := internal.SignURL(req.URL.Path, c.clientID, c.signature, q)
-		if err != nil {
-			return nil, err
-		}
-		req.URL.RawQuery = query
+	query, err := c.generateAuthQuery(req.URL.Path, q, true)
+	if err != nil {
+		return nil, err
 	}
+	req.URL.RawQuery = query
 
 	resp, err := c.httpDo(req)
 	if err != nil {

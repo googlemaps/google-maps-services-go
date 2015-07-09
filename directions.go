@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
-	"google.golang.org/maps/internal"
 )
 
 type directionsResponse struct {
@@ -116,16 +115,11 @@ func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
 		}
 		q.Set("transit_mode", strings.Join(transitMode, "|"))
 	}
-	if c.apiKey != "" {
-		q.Set("key", c.apiKey)
-		req.URL.RawQuery = q.Encode()
-	} else {
-		query, err := internal.SignURL(req.URL.Path, c.clientID, c.signature, q)
-		if err != nil {
-			return nil, err
-		}
-		req.URL.RawQuery = query
+	query, err := c.generateAuthQuery(req.URL.Path, q, true)
+	if err != nil {
+		return nil, err
 	}
+	req.URL.RawQuery = query
 
 	resp, err := c.httpDo(req)
 	if err != nil {
