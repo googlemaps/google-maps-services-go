@@ -67,7 +67,6 @@ func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) 
 		return nil, err
 	}
 	q := req.URL.Query()
-	q.Set("key", c.apiKey)
 
 	if r.Address != "" {
 		q.Set("address", r.Address)
@@ -101,8 +100,12 @@ func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) 
 	if r.Language != "" {
 		q.Set("language", r.Language)
 	}
+	query, err := c.generateAuthQuery(req.URL.Path, q, true)
+	if err != nil {
+		return nil, err
+	}
+	req.URL.RawQuery = query
 
-	req.URL.RawQuery = q.Encode()
 	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err

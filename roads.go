@@ -64,8 +64,6 @@ func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (*SnapToRoadResponse, err
 		return nil, err
 	}
 	q := req.URL.Query()
-	q.Set("key", c.apiKey)
-
 	var p []string
 	for _, e := range r.Path {
 		p = append(p, e.String())
@@ -75,8 +73,11 @@ func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (*SnapToRoadResponse, err
 	if r.Interpolate {
 		q.Set("interpolate", "true")
 	}
-
-	req.URL.RawQuery = q.Encode()
+	query, err := c.generateAuthQuery(req.URL.Path, q, false)
+	if err != nil {
+		return nil, err
+	}
+	req.URL.RawQuery = query
 
 	resp, err := c.httpDo(req)
 	if err != nil {
@@ -154,8 +155,6 @@ func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (*SpeedLimitsResponse, 
 		return nil, err
 	}
 	q := req.URL.Query()
-	q.Set("key", c.apiKey)
-
 	var p []string
 	for _, e := range r.Path {
 		p = append(p, e.String())
@@ -170,8 +169,11 @@ func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (*SpeedLimitsResponse, 
 	if r.Units != "" {
 		q.Set("units", string(r.Units))
 	}
-
-	req.URL.RawQuery = q.Encode()
+	query, err := c.generateAuthQuery(req.URL.Path, q, false)
+	if err != nil {
+		return nil, err
+	}
+	req.URL.RawQuery = query
 
 	resp, err := c.httpDo(req)
 	if err != nil {

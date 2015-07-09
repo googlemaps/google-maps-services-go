@@ -83,7 +83,6 @@ func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
 	q := req.URL.Query()
 	q.Set("origin", r.Origin)
 	q.Set("destination", r.Destination)
-	q.Set("key", c.apiKey)
 	if r.Mode != "" {
 		q.Set("mode", string(r.Mode))
 	}
@@ -116,7 +115,11 @@ func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
 		}
 		q.Set("transit_mode", strings.Join(transitMode, "|"))
 	}
-	req.URL.RawQuery = q.Encode()
+	query, err := c.generateAuthQuery(req.URL.Path, q, true)
+	if err != nil {
+		return nil, err
+	}
+	req.URL.RawQuery = query
 
 	resp, err := c.httpDo(req)
 	if err != nil {

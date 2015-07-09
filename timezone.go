@@ -60,15 +60,18 @@ func (c *Client) doGetTimezone(r *TimezoneRequest) (*TimezoneResult, error) {
 		return nil, err
 	}
 	q := req.URL.Query()
-	q.Set("key", c.apiKey)
 
 	q.Set("location", r.Location.String())
 	q.Set("timestamp", strconv.FormatInt(r.Timestamp.Unix(), 10))
 	if r.Language != "" {
 		q.Set("language", r.Language)
 	}
+	query, err := c.generateAuthQuery(req.URL.Path, q, true)
+	if err != nil {
+		return nil, err
+	}
+	req.URL.RawQuery = query
 
-	req.URL.RawQuery = q.Encode()
 	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err

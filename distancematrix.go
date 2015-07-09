@@ -74,7 +74,6 @@ func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixR
 	q := req.URL.Query()
 	q.Set("origins", strings.Join(r.Origins, "|"))
 	q.Set("destinations", strings.Join(r.Destinations, "|"))
-	q.Set("key", c.apiKey)
 	if r.Mode != "" {
 		q.Set("mode", string(r.Mode))
 	}
@@ -99,8 +98,11 @@ func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixR
 	if r.TransitRoutingPreference != "" {
 		q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
 	}
-
-	req.URL.RawQuery = q.Encode()
+	query, err := c.generateAuthQuery(req.URL.Path, q, true)
+	if err != nil {
+		return nil, err
+	}
+	req.URL.RawQuery = query
 
 	resp, err := c.httpDo(req)
 	if err != nil {

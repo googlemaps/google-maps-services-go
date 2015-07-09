@@ -70,7 +70,6 @@ func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) 
 		return nil, err
 	}
 	q := req.URL.Query()
-	q.Set("key", c.apiKey)
 
 	if len(r.Path) > 0 {
 		q.Set("path", fmt.Sprintf("enc:%s", Encode(r.Path)))
@@ -80,8 +79,11 @@ func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) 
 	if len(r.Locations) > 0 {
 		q.Set("locations", fmt.Sprintf("enc:%s", Encode(r.Locations)))
 	}
-
-	req.URL.RawQuery = q.Encode()
+	query, err := c.generateAuthQuery(req.URL.Path, q, true)
+	if err != nil {
+		return nil, err
+	}
+	req.URL.RawQuery = query
 
 	resp, err := c.httpDo(req)
 	if err != nil {

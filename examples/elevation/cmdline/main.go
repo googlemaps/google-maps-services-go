@@ -20,17 +20,19 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/kr/pretty"
+	"golang.org/x/net/context"
 	"google.golang.org/maps"
 )
 
 var (
 	apiKey    = flag.String("key", "", "API Key for using Google Maps API.")
+	clientID  = flag.String("client_id", "", "ClientID for Maps for Work API access.")
+	signature = flag.String("signature", "", "Signature for Maps for Work API access.")
 	locations = flag.String("locations", "", "defines the location(s) on the earth from which to return elevation data. This parameter takes either a single location as a comma-separated pair or multiple latitude/longitude pairs passed as an array or as an encoded polyline.")
 	path      = flag.String("path", "", "defines a path on the earth for which to return elevation data.")
 	samples   = flag.Int("samples", 0, "specifies the number of sample points along a path for which to return elevation data.")
@@ -45,15 +47,24 @@ func usageAndExit(msg string) {
 
 func main() {
 	flag.Parse()
-	client := &http.Client{}
-	if *apiKey == "" {
-		usageAndExit("Please specify an API Key.")
+
+	var client *maps.Client
+	var err error
+	if *apiKey != "" {
+		client, err = maps.NewClient(maps.WithAPIKey(*apiKey))
+	} else if *clientID != "" || *signature != "" {
+		client, err = maps.NewClient(maps.WithClientIDAndSignature(*clientID, *signature))
+	} else {
+		usageAndExit("Please specify an API Key, or Client ID and Signature.")
 	}
-	ctx := maps.NewContext(*apiKey, client)
-	eReq := &maps.ElevationRequest{}
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+
+	r := &maps.ElevationRequest{}
 
 	if *samples > 0 {
-		eReq.Samples = *samples
+		r.Samples = *samples
 	}
 
 	if *locations != "" {
@@ -61,7 +72,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Could not parse locations: %#v", err)
 		}
-		eReq.Locations = l
+		r.Locations = l
 	}
 
 	if *path != "" {
@@ -69,10 +80,10 @@ func main() {
 		if err != nil {
 			log.Fatalf("Could not parse path: %#v", err)
 		}
-		eReq.Path = p
+		r.Path = p
 	}
 
-	resp, err := eReq.Get(ctx)
+	resp, err := client.GetElevation(context.Background(), r)
 	if err != nil {
 		log.Fatalf("Could not request elevations: %v", err)
 	}
