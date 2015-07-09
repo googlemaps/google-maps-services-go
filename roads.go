@@ -68,7 +68,7 @@ func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (*SnapToRoadResponse, err
 	if c.apiKey != "" {
 		q.Set("key", c.apiKey)
 	} else {
-		return nil, fmt.Errorf("Roads API requires an API Key, it doesn't work with Client ID and Signature")
+		return nil, fmt.Errorf("Must provide API key for this API. It does not accept enterprise credentials.")
 	}
 	var p []string
 	for _, e := range r.Path {
@@ -161,7 +161,7 @@ func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (*SpeedLimitsResponse, 
 	if c.apiKey != "" {
 		q.Set("key", c.apiKey)
 	} else {
-		return nil, fmt.Errorf("Roads API requires an API Key, it doesn't work with Client ID and Signature")
+		return nil, fmt.Errorf("Must provide API key for this API. It does not accept enterprise credentials.")
 	}
 
 	var p []string
