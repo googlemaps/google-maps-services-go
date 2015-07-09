@@ -21,15 +21,18 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 // Client may be used to make requests to the Google Maps WebService APIs
 type Client struct {
-	httpClient *http.Client
-	apiKey     string
-	baseURL    string
-	clientID   string
-	signature  string
+	httpClient        *http.Client
+	apiKey            string
+	baseURL           string
+	clientID          string
+	signature         string
+	requestsPerSecond int
+	rateLimiter       chan time.Time
 }
 
 type clientOption func(*Client) error
@@ -37,7 +40,7 @@ type clientOption func(*Client) error
 // NewClient constructs a new Client which can make requests to the Google Maps WebService APIs.
 // The supplied http.Client is used for making requests to the Maps WebService APIs
 func NewClient(options ...clientOption) (*Client, error) {
-	c := &Client{}
+	c := &Client{requestsPerSecond: 10}
 	WithHTTPClient(&http.Client{})(c)
 	for _, option := range options {
 		err := option(c)
@@ -48,6 +51,15 @@ func NewClient(options ...clientOption) (*Client, error) {
 	if c.apiKey == "" && (c.clientID == "" || c.signature == "") {
 		return nil, fmt.Errorf("maps.Client with no API Key or credentials")
 	}
+
+	// Implement a bursty rate limiter.
+	// Allow up to 1 second worth of requests to be made at once.
+	c.rateLimiter = make(chan time.Time, c.requestsPerSecond)
+	go func() {
+		for t := range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
+			c.rateLimiter <- t
+		}
+	}()
 
 	return c, nil
 }
@@ -97,7 +109,17 @@ func WithClientIDAndSignature(clientID, signature string) func(*Client) error {
 	}
 }
 
+// WithRateLimit configures the rate limit for back end requests.
+// Default is to limit to 10 requests per second.
+func WithRateLimit(requestsPerSecond int) func(*Client) error {
+	return func(client *Client) error {
+		client.requestsPerSecond = requestsPerSecond
+		return nil
+	}
+}
+
 func (client *Client) httpDo(req *http.Request) (*http.Response, error) {
+	<-client.rateLimiter
 	return client.httpClient.Do(req)
 }
 
