@@ -58,11 +58,11 @@ func NewClient(options ...clientOption) (*Client, error) {
 	// Implement a bursty rate limiter.
 	// Allow up to 1 second worth of requests to be made at once.
 	c.rateLimiter = make(chan time.Time, c.requestsPerSecond)
+	// Prefill rateLimiter with 1 seconds worth of requests.
+	for i := 0; i < c.requestsPerSecond; i++ {
+		c.rateLimiter <- time.Now()
+	}
 	go func() {
-		// Prefill rateLimiter with 1 seconds worth of requests.
-		for i := 0; i < c.requestsPerSecond; i++ {
-			c.rateLimiter <- time.Now()
-		}
 		// Refill rateLimiter continuously
 		for t := range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
 			c.rateLimiter <- t
