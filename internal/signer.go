@@ -22,7 +22,7 @@ import (
 	"net/url"
 )
 
-// generateSignature generates the HMAC-SHA1 signature for a key and a message.
+// generateSignature generates the base64 URL-encoded HMAC-SHA1 signature for the key and plaintext message.
 func generateSignature(key []byte, message string) (string, error) {
 	mac := hmac.New(sha1.New, key)
 	mac.Write([]byte(message))
