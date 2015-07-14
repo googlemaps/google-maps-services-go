@@ -24,7 +24,7 @@ import (
 // HMAC_SHA1("key", "The quick brown fox jumps over the lazy dog")
 //     = 0xde7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9
 var message = "The quick brown fox jumps over the lazy dog"
-var signingKey = base64.URLEncoding.EncodeToString([]byte("key"))
+var signingKey = []byte("key")
 var signature = "de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9"
 
 func TestSigner(t *testing.T) {
