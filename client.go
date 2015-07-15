@@ -31,21 +31,13 @@ type requestQuota struct{}
 
 // Client may be used to make requests to the Google Maps WebService APIs
 type Client struct {
-<<<<<<< HEAD
 	httpClient        *http.Client
 	apiKey            string
 	baseURL           string
 	clientID          string
-	signature         string
+	signature         []byte
 	requestsPerSecond int
 	rateLimiter       chan requestQuota
-=======
-	httpClient *http.Client
-	apiKey     string
-	baseURL    string
-	clientID   string
-	signature  []byte
->>>>>>> upstream/master
 }
 
 //
