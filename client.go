@@ -27,6 +27,8 @@ import (
 	"google.golang.org/maps/internal"
 )
 
+type requestQuota struct{}
+
 // Client may be used to make requests to the Google Maps WebService APIs
 type Client struct {
 	httpClient        *http.Client
@@ -35,7 +37,7 @@ type Client struct {
 	clientID          string
 	signature         string
 	requestsPerSecond int
-	rateLimiter       chan time.Time
+	rateLimiter       chan requestQuota
 }
 
 type clientOption func(*Client) error
@@ -57,15 +59,15 @@ func NewClient(options ...clientOption) (*Client, error) {
 
 	// Implement a bursty rate limiter.
 	// Allow up to 1 second worth of requests to be made at once.
-	c.rateLimiter = make(chan time.Time, c.requestsPerSecond)
+	c.rateLimiter = make(chan requestQuota, c.requestsPerSecond)
 	// Prefill rateLimiter with 1 seconds worth of requests.
 	for i := 0; i < c.requestsPerSecond; i++ {
-		c.rateLimiter <- time.Now()
+		c.rateLimiter <- requestQuota{}
 	}
 	go func() {
 		// Refill rateLimiter continuously
-		for t := range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
-			c.rateLimiter <- t
+		for range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
+			c.rateLimiter <- requestQuota{}
 		}
 	}()
 
