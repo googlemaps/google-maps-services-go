@@ -22,14 +22,9 @@ import (
 	"net/url"
 )
 
-// generateSignature builds the digital signature for a key and a message.
-func generateSignature(key, message string) (string, error) {
-	k, err := base64.URLEncoding.DecodeString(key)
-	if err != nil {
-		return "", err
-	}
-
-	mac := hmac.New(sha1.New, k)
+// generateSignature generates the base64 URL-encoded HMAC-SHA1 signature for the key and plaintext message.
+func generateSignature(key []byte, message string) (string, error) {
+	mac := hmac.New(sha1.New, key)
 	mac.Write([]byte(message))
 	return base64.URLEncoding.EncodeToString(mac.Sum(nil)), nil
 }
@@ -38,7 +33,7 @@ func generateSignature(key, message string) (string, error) {
 // The signature is assumed to be in URL safe base64 encoding.
 // The returned signature string is URLEncoded.
 // See: https://developers.google.com/maps/documentation/business/webservices/auth#digital_signatures
-func SignURL(path, clientID, signature string, q url.Values) (string, error) {
+func SignURL(path, clientID string, signature []byte, q url.Values) (string, error) {
 	q.Set("client", clientID)
 	encodedQuery := q.Encode()
 	message := fmt.Sprintf("%s?%s", path, encodedQuery)
