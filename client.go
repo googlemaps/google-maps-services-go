@@ -35,12 +35,12 @@ type Client struct {
 	signature  []byte
 }
 
-// ClientOption is the type of the options for NewClient.
-type ClientOption func(*Client) error
+//
+type clientOption func(*Client) error
 
 // NewClient constructs a new Client which can make requests to the Google Maps WebService APIs.
 // The supplied http.Client is used for making requests to the Maps WebService APIs
-func NewClient(options ...ClientOption) (*Client, error) {
+func NewClient(options ...clientOption) (*Client, error) {
 	c := &Client{}
 	WithHTTPClient(&http.Client{})(c)
 	for _, option := range options {
@@ -50,14 +50,14 @@ func NewClient(options ...ClientOption) (*Client, error) {
 		}
 	}
 	if c.apiKey == "" && (c.clientID == "" || len(c.signature) == 0) {
-		return nil, fmt.Errorf("maps.Client with no API Key or credentials")
+		return nil, fmt.Errorf("maps.Client with no API Key or Maps for Work credentials")
 	}
 
 	return c, nil
 }
 
 // WithHTTPClient configures a Maps API client with a http.Client to make requests over.
-func WithHTTPClient(c *http.Client) ClientOption {
+func WithHTTPClient(c *http.Client) clientOption {
 	return func(client *Client) error {
 		if _, ok := c.Transport.(*transport); !ok {
 			t := c.Transport
@@ -73,7 +73,7 @@ func WithHTTPClient(c *http.Client) ClientOption {
 }
 
 // withBaseURL is for testing only.
-func withBaseURL(url string) ClientOption {
+func withBaseURL(url string) clientOption {
 	return func(client *Client) error {
 		client.baseURL = url
 		return nil
@@ -81,7 +81,7 @@ func withBaseURL(url string) ClientOption {
 }
 
 // WithAPIKey configures a Maps API client with an API Key
-func WithAPIKey(apiKey string) ClientOption {
+func WithAPIKey(apiKey string) clientOption {
 	return func(client *Client) error {
 		client.apiKey = apiKey
 		return nil
@@ -90,7 +90,7 @@ func WithAPIKey(apiKey string) ClientOption {
 
 // WithClientIDAndSignature configures a Maps API client for a Maps for Work application
 // The signature is assumed to be URL modified Base64 encoded
-func WithClientIDAndSignature(clientID, signature string) ClientOption {
+func WithClientIDAndSignature(clientID, signature string) clientOption {
 	return func(client *Client) error {
 		client.clientID = clientID
 		decoded, err := base64.URLEncoding.DecodeString(signature)
