@@ -32,9 +32,10 @@ type Client struct {
 	apiKey     string
 	baseURL    string
 	clientID   string
-	signature  string
+	signature  []byte
 }
 
+//
 type clientOption func(*Client) error
 
 // NewClient constructs a new Client which can make requests to the Google Maps WebService APIs.
@@ -48,15 +49,15 @@ func NewClient(options ...clientOption) (*Client, error) {
 			return nil, err
 		}
 	}
-	if c.apiKey == "" && (c.clientID == "" || c.signature == "") {
-		return nil, fmt.Errorf("maps.Client with no API Key or credentials")
+	if c.apiKey == "" && (c.clientID == "" || len(c.signature) == 0) {
+		return nil, fmt.Errorf("maps.Client with no API Key or Maps for Work credentials")
 	}
 
 	return c, nil
 }
 
 // WithHTTPClient configures a Maps API client with a http.Client to make requests over.
-func WithHTTPClient(c *http.Client) func(*Client) error {
+func WithHTTPClient(c *http.Client) clientOption {
 	return func(client *Client) error {
 		if _, ok := c.Transport.(*transport); !ok {
 			t := c.Transport
@@ -72,7 +73,7 @@ func WithHTTPClient(c *http.Client) func(*Client) error {
 }
 
 // withBaseURL is for testing only.
-func withBaseURL(url string) func(*Client) error {
+func withBaseURL(url string) clientOption {
 	return func(client *Client) error {
 		client.baseURL = url
 		return nil
@@ -80,7 +81,7 @@ func withBaseURL(url string) func(*Client) error {
 }
 
 // WithAPIKey configures a Maps API client with an API Key
-func WithAPIKey(apiKey string) func(*Client) error {
+func WithAPIKey(apiKey string) clientOption {
 	return func(client *Client) error {
 		client.apiKey = apiKey
 		return nil
@@ -89,14 +90,15 @@ func WithAPIKey(apiKey string) func(*Client) error {
 
 // WithClientIDAndSignature configures a Maps API client for a Maps for Work application
 // The signature is assumed to be URL modified Base64 encoded
-func WithClientIDAndSignature(clientID, signature string) func(*Client) error {
+func WithClientIDAndSignature(clientID, signature string) clientOption {
 	return func(client *Client) error {
 		client.clientID = clientID
-		client.signature = signature
-
-		// Enforce that signature is URL modified Base64 encoded
-		_, err := base64.URLEncoding.DecodeString(signature)
-		return err
+		decoded, err := base64.URLEncoding.DecodeString(signature)
+		if err != nil {
+			return err
+		}
+		client.signature = decoded
+		return nil
 	}
 }
 
