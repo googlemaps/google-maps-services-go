@@ -72,7 +72,7 @@ Your API key should be 40 characters long, and begin with `AIza`.
 
 ## Developer Documentation
 
-View the [reference documentation](https://godoc.org/google.golang.org/maps)
+View the [reference documentation](https://godoc.org/github.com/googlemaps/google-maps-services-go)
 
 Additional documentation for the included web services is available at
 https://developers.google.com/maps/.
