@@ -43,11 +43,11 @@ func (p *Polyline) Decode() []LatLng {
 	for {
 		dlat, _ := decodeInt(input)
 		dlng, err := decodeInt(input)
-		if err != nil {
-			if err != io.EOF {
-				log.Fatal("unexpected err decoding polyline", err)
-			}
+		if err == io.EOF {
 			return path
+		}
+		if err != nil {
+			log.Fatal("unexpected err decoding polyline", err)
 		}
 
 		lat, lng = lat+dlat, lng+dlng
