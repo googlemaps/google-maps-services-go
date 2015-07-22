@@ -72,8 +72,7 @@ Your API key should be 40 characters long, and begin with `AIza`.
 
 ## Developer Documentation
 
-View the [reference documentation](http://googlemaps.github.io/google-maps-services-go/docs)
-TODO(brettmorgan): make this documentation.
+View the [reference documentation](https://godoc.org/github.com/googlemaps/google-maps-services-go)
 
 Additional documentation for the included web services is available at
 https://developers.google.com/maps/.
@@ -123,7 +122,15 @@ func main() {
 ```
 
 ## Features
-TODO(brettmorgan): Implement features
+
+### Keys *and* Client IDs
+
+Maps API for Work customers can use their [client ID and secret][clientid] to authenticate. Free
+customers can use their [API key][apikey], too.
+
+### Native types
+
+Native objects for each of the API responses.
 
 [apikey]: https://developers.google.com/maps/faq#keysystem
 [clientid]: https://developers.google.com/maps/documentation/business/webservices/auth

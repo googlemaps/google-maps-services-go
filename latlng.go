@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package maps // import "google.golang.org/maps"
+package maps // import "github.com/googlemaps/google-maps-services-go"
 
 import (
 	"fmt"

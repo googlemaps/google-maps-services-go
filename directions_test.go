@@ -15,7 +15,7 @@
 // More information about Google Directions API is available on
 // https://developers.google.com/maps/documentation/directions/
 
-package maps // import "google.golang.org/maps"
+package maps // import "github.com/googlemaps/google-maps-services-go"
 
 import (
 	"fmt"
