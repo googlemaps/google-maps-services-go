@@ -23,10 +23,9 @@ import (
 	"os"
 	"strings"
 
-	"golang.org/x/net/context"
-
+	maps "github.com/googlemaps/google-maps-services-go"
 	"github.com/kr/pretty"
-	"google.golang.org/maps"
+	"golang.org/x/net/context"
 )
 
 var (

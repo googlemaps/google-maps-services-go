@@ -15,7 +15,7 @@
 // More information about Google Directions API is available on
 // https://developers.google.com/maps/documentation/directions/
 
-package maps // import "google.golang.org/maps"
+package maps // import "github.com/googlemaps/google-maps-services-go"
 
 import (
 	"encoding/base64"
@@ -23,7 +23,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"google.golang.org/maps/internal"
+	"github.com/googlemaps/google-maps-services-go/internal"
 )
 
 // Client may be used to make requests to the Google Maps WebService APIs

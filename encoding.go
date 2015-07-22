@@ -15,13 +15,13 @@
 // More information about Google Distance Matrix API is available on
 // https://developers.google.com/maps/documentation/distancematrix/
 
-package maps // import "google.golang.org/maps"
+package maps // import "github.com/googlemaps/google-maps-services-go"
 
 import (
 	"encoding/json"
 	"net/url"
 
-	"google.golang.org/maps/internal"
+	"github.com/googlemaps/google-maps-services-go/internal"
 )
 
 // safeLeg is a raw version of Leg that does not have custom encoding or
