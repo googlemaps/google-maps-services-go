@@ -31,7 +31,7 @@ type snapToRoadResponse struct {
 	err      error
 }
 
-// SnapToRoad makes a SnapToRoad API request
+// SnapToRoad makes a Snap to Road API request
 func (c *Client) SnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
 
 	if len(r.Path) == 0 {
@@ -118,7 +118,7 @@ type speedLimitsResponse struct {
 	err      error
 }
 
-// SpeedLimits makes a SpeedLimits API request
+// SpeedLimits makes a Speed Limits API request
 func (c *Client) SpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*SpeedLimitsResponse, error) {
 
 	if len(r.Path) == 0 && len(r.PlaceID) == 0 {
