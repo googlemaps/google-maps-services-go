@@ -54,9 +54,7 @@ type geocodingResultWithError struct {
 	err     error
 }
 
-func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) {
-	var response geocodingResponse
-
+func (r *GeocodingRequest) request(c *Client) (*http.Request, error) {
 	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/geocode/json", nil)
@@ -102,6 +100,16 @@ func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) 
 		return nil, err
 	}
 	req.URL.RawQuery = query
+	return req, nil
+}
+
+func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) {
+	var response geocodingResponse
+
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
+	}
 
 	resp, err := c.httpDo(req)
 	if err != nil {
