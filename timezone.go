@@ -28,8 +28,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// GetTimezone makes a Timezone API request
-func (c *Client) GetTimezone(ctx context.Context, r *TimezoneRequest) (*TimezoneResult, error) {
+// Timezone makes a Timezone API request
+func (c *Client) Timezone(ctx context.Context, r *TimezoneRequest) (*TimezoneResult, error) {
 	if r.Location == nil {
 		return nil, errors.New("timezone: You must specify Location")
 	}

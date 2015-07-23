@@ -31,8 +31,8 @@ type snapToRoadResponse struct {
 	err      error
 }
 
-// GetSnapToRoad makes a SnapToRoad API request
-func (c *Client) GetSnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
+// SnapToRoad makes a SnapToRoad API request
+func (c *Client) SnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
 
 	if len(r.Path) == 0 {
 		return nil, errors.New("snapToRoad: You must specify a Path")
@@ -121,8 +121,8 @@ type speedLimitsResponse struct {
 	err      error
 }
 
-// GetSpeedLimits makes a SpeedLimits API request
-func (c *Client) GetSpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*SpeedLimitsResponse, error) {
+// SpeedLimits makes a SpeedLimits API request
+func (c *Client) SpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*SpeedLimitsResponse, error) {
 
 	if len(r.Path) == 0 && len(r.PlaceID) == 0 {
 		return nil, errors.New("speedLimits: You must specify a Path or PlaceID")

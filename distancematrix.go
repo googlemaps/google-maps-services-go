@@ -33,8 +33,8 @@ type distanceMatrixResponse struct {
 	err    error
 }
 
-// GetDistanceMatrix makes a Distance Matrix API request
-func (c *Client) GetDistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
+// DistanceMatrix makes a Distance Matrix API request
+func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
 
 	if len(r.Origins) == 0 {
 		return nil, errors.New("distancematrix: Origins must contain at least one start address")

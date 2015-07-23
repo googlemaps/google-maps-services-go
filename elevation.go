@@ -27,8 +27,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// GetElevation makes an Elevation API request
-func (c *Client) GetElevation(ctx context.Context, r *ElevationRequest) ([]ElevationResult, error) {
+// Elevation makes an Elevation API request
+func (c *Client) Elevation(ctx context.Context, r *ElevationRequest) ([]ElevationResult, error) {
 
 	if len(r.Path) == 0 && len(r.Locations) == 0 {
 		return nil, errors.New("elevation: Provide either Path or Locations")

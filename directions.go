@@ -34,8 +34,8 @@ type directionsResponse struct {
 	err    error
 }
 
-// GetDirections issues the Directions request and retrieves the Response
-func (c *Client) GetDirections(ctx context.Context, r *DirectionsRequest) ([]Route, error) {
+// Directions issues the Directions request and retrieves the Response
+func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route, error) {
 	if r.Origin == "" {
 		return nil, errors.New("directions: Origin required")
 	}

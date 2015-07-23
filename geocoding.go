@@ -28,7 +28,7 @@ import (
 )
 
 // GetGeocoding makes a Geocoding API request
-func (c *Client) GetGeocoding(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
+func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
 
 	if r.Address == "" && len(r.components) == 0 && r.LatLng == nil {
 		return nil, errors.New("geocoding: You must specify at least one of Address or Components for a geocoding request, or LatLng for a reverse geocoding request")
