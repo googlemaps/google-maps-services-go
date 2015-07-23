@@ -94,7 +94,7 @@ func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) 
 	}
 
 	if response.Status != "OK" {
-		err = fmt.Errorf("distancematrix: %s - %s", response.Status, response.ErrorMessage)
+		err = errors.New("distancematrix: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 

@@ -20,7 +20,6 @@ package maps
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -79,7 +78,7 @@ func (c *Client) doGetTimezone(r *TimezoneRequest) (*TimezoneResult, error) {
 		return nil, err
 	}
 	if response.Status != "OK" {
-		err := fmt.Errorf("timezone: %s - %s", response.Status, response.ErrorMessage)
+		err := errors.New("timezone: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 

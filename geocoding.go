@@ -27,7 +27,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-// GetGeocoding makes a Geocoding API request
+// Geocode makes a Geocoding API request
 func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
 
 	if r.Address == "" && len(r.components) == 0 && r.LatLng == nil {
@@ -114,7 +114,7 @@ func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) 
 		return nil, err
 	}
 	if response.Status != "OK" {
-		err = fmt.Errorf("geocoding: %s - %s", response.Status, response.ErrorMessage)
+		err = errors.New("geocoding: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 

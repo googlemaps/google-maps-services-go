@@ -20,7 +20,6 @@ package maps
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -112,7 +111,7 @@ func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixR
 		return nil, err
 	}
 	if raw.Status != "OK" {
-		err = fmt.Errorf("distancematrix: %s - %s", raw.Status, raw.ErrorMessage)
+		err = errors.New("distancematrix: " + raw.Status + " - " + raw.ErrorMessage)
 		return nil, err
 	}
 

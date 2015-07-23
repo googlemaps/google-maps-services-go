@@ -130,7 +130,7 @@ func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
 	}
 
 	if response.Status != "OK" {
-		err = fmt.Errorf("directions: %s - %s", response.Status, response.ErrorMessage)
+		err = errors.New("directions: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 	return response.Routes, nil
