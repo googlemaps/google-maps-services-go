@@ -24,9 +24,9 @@ import (
 	"strings"
 	"time"
 
+	maps "github.com/googlemaps/google-maps-services-go"
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
-	"google.golang.org/maps"
 )
 
 var (
@@ -121,7 +121,7 @@ func main() {
 	}
 
 	if *iterations == 1 {
-		resp, err := client.GetDirections(context.Background(), r)
+		resp, err := client.Directions(context.Background(), r)
 		if err != nil {
 			log.Fatalf("fatal error: %s", err)
 		}
@@ -132,7 +132,7 @@ func main() {
 		for i := 0; i < *iterations; i++ {
 			go func(i int) {
 				startTime := time.Now()
-				_, err := client.GetDirections(context.Background(), r)
+				_, err := client.Directions(context.Background(), r)
 				done <- iterationResult{
 					fmt.Sprintf("Iteration %2d: round trip %.2f seconds", i, float64(time.Now().Sub(startTime))/1000000000),
 					err,

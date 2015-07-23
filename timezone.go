@@ -15,12 +15,11 @@
 // More information about Google Distance Matrix API is available on
 // https://developers.google.com/maps/documentation/distancematrix/
 
-package maps // import "google.golang.org/maps"
+package maps
 
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -28,8 +27,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// GetTimezone makes a Timezone API request
-func (c *Client) GetTimezone(ctx context.Context, r *TimezoneRequest) (*TimezoneResult, error) {
+// Timezone makes a Timezone API request
+func (c *Client) Timezone(ctx context.Context, r *TimezoneRequest) (*TimezoneResult, error) {
 	if r.Location == nil {
 		return nil, errors.New("timezone: You must specify Location")
 	}
@@ -50,10 +49,7 @@ func (c *Client) GetTimezone(ctx context.Context, r *TimezoneRequest) (*Timezone
 }
 
 func (c *Client) doGetTimezone(r *TimezoneRequest) (*TimezoneResult, error) {
-	baseURL := "https://maps.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
+	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/timezone/json", nil)
 	if err != nil {
@@ -82,7 +78,7 @@ func (c *Client) doGetTimezone(r *TimezoneRequest) (*TimezoneResult, error) {
 		return nil, err
 	}
 	if response.Status != "OK" {
-		err := fmt.Errorf("timezone: %s - %s", response.Status, response.ErrorMessage)
+		err := errors.New("timezone: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 

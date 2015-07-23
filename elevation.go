@@ -15,7 +15,7 @@
 // More information about Google Distance Matrix API is available on
 // https://developers.google.com/maps/documentation/distancematrix/
 
-package maps // import "google.golang.org/maps"
+package maps
 
 import (
 	"encoding/json"
@@ -27,8 +27,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// GetElevation makes an Elevation API request
-func (c *Client) GetElevation(ctx context.Context, r *ElevationRequest) ([]ElevationResult, error) {
+// Elevation makes an Elevation API request
+func (c *Client) Elevation(ctx context.Context, r *ElevationRequest) ([]ElevationResult, error) {
 
 	if len(r.Path) == 0 && len(r.Locations) == 0 {
 		return nil, errors.New("elevation: Provide either Path or Locations")
@@ -60,10 +60,7 @@ type elevationResultWithError struct {
 }
 
 func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) {
-	baseURL := "https://maps.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
+	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/elevation/json", nil)
 	if err != nil {
@@ -97,7 +94,7 @@ func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) 
 	}
 
 	if response.Status != "OK" {
-		err = fmt.Errorf("distancematrix: %s - %s", response.Status, response.ErrorMessage)
+		err = errors.New("distancematrix: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 

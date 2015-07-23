@@ -23,9 +23,9 @@ import (
 	"os"
 	"strings"
 
+	maps "github.com/googlemaps/google-maps-services-go"
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
-	"google.golang.org/maps"
 )
 
 var (
@@ -86,7 +86,7 @@ func main() {
 	lookupTransitMode(*transitMode, r)
 	lookupTransitRoutingPreference(*transitRoutingPreference, r)
 
-	resp, err := client.GetDistanceMatrix(context.Background(), r)
+	resp, err := client.DistanceMatrix(context.Background(), r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}

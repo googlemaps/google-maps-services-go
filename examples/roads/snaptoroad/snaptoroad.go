@@ -24,10 +24,9 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/net/context"
-
+	maps "github.com/googlemaps/google-maps-services-go"
 	"github.com/kr/pretty"
-	"google.golang.org/maps"
+	"golang.org/x/net/context"
 )
 
 var (
@@ -61,7 +60,7 @@ func main() {
 	}
 	parsePath(*path, r)
 
-	resp, err := client.GetSnapToRoad(context.Background(), r)
+	resp, err := client.SnapToRoad(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}

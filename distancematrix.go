@@ -15,12 +15,11 @@
 // More information about Google Distance Matrix API is available on
 // https://developers.google.com/maps/documentation/distancematrix/
 
-package maps // import "google.golang.org/maps"
+package maps
 
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -33,8 +32,8 @@ type distanceMatrixResponse struct {
 	err    error
 }
 
-// GetDistanceMatrix makes a Distance Matrix API request
-func (c *Client) GetDistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
+// DistanceMatrix makes a Distance Matrix API request
+func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
 
 	if len(r.Origins) == 0 {
 		return nil, errors.New("distancematrix: Origins must contain at least one start address")
@@ -62,10 +61,7 @@ func (c *Client) GetDistanceMatrix(ctx context.Context, r *DistanceMatrixRequest
 }
 
 func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
-	baseURL := "https://maps.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
+	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/distancematrix/json", nil)
 	if err != nil {
@@ -115,7 +111,7 @@ func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixR
 		return nil, err
 	}
 	if raw.Status != "OK" {
-		err = fmt.Errorf("distancematrix: %s - %s", raw.Status, raw.ErrorMessage)
+		err = errors.New("distancematrix: " + raw.Status + " - " + raw.ErrorMessage)
 		return nil, err
 	}
 

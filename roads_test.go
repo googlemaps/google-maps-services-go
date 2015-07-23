@@ -15,7 +15,7 @@
 // More information about Google Directions API is available on
 // https://developers.google.com/maps/documentation/directions/
 
-package maps // import "google.golang.org/maps"
+package maps
 
 import (
 	"reflect"
@@ -149,7 +149,7 @@ func TestSnapToRoad(t *testing.T) {
 		},
 	}
 
-	resp, err := c.GetSnapToRoad(context.Background(), r)
+	resp, err := c.SnapToRoad(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("r.Get returned non nil error: %v", err)
@@ -245,7 +245,7 @@ func TestSnapToRoadNoPath(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &SnapToRoadRequest{}
 
-	if _, err := c.GetSnapToRoad(context.Background(), r); err == nil {
+	if _, err := c.SnapToRoad(context.Background(), r); err == nil {
 		t.Errorf("Empty path should return error")
 	}
 }
@@ -267,7 +267,7 @@ func TestSnapToRoadWithCancelledContext(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	if _, err := c.GetSnapToRoad(ctx, r); err == nil {
+	if _, err := c.SnapToRoad(ctx, r); err == nil {
 		t.Errorf("Cancelled context should return non-nil err")
 	}
 }
@@ -363,7 +363,7 @@ func TestSpeedLimit(t *testing.T) {
 		},
 	}
 
-	resp, err := c.GetSpeedLimits(context.Background(), r)
+	resp, err := c.SpeedLimits(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("r.Get returned non nil error: %v", err)
@@ -397,7 +397,7 @@ func TestSpeedLimitsNoPlaceIDs(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &SpeedLimitsRequest{}
 
-	if _, err := c.GetSpeedLimits(context.Background(), r); err == nil {
+	if _, err := c.SpeedLimits(context.Background(), r); err == nil {
 		t.Errorf("Empty PlaceIDs should return error")
 	}
 }
@@ -424,7 +424,7 @@ func TestSpeedLimitsWithCancelledContext(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	if _, err := c.GetSpeedLimits(ctx, r); err == nil {
+	if _, err := c.SpeedLimits(ctx, r); err == nil {
 		t.Errorf("Cancelled context should return non-nil err")
 	}
 }

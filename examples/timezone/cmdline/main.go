@@ -25,9 +25,9 @@ import (
 	"strings"
 	"time"
 
+	maps "github.com/googlemaps/google-maps-services-go"
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
-	"google.golang.org/maps"
 )
 
 var (
@@ -77,7 +77,7 @@ func main() {
 
 	parseLocation(*location, r)
 
-	resp, err := client.GetTimezone(context.Background(), r)
+	resp, err := client.Timezone(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}

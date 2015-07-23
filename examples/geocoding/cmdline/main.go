@@ -24,9 +24,9 @@ import (
 	"strconv"
 	"strings"
 
+	maps "github.com/googlemaps/google-maps-services-go"
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
-	"google.golang.org/maps"
 )
 
 var (
@@ -78,7 +78,7 @@ func main() {
 	parseResultType(*resultType, r)
 	parseLocationType(*locationType, r)
 
-	resp, err := client.GetGeocoding(context.Background(), r)
+	resp, err := client.Geocode(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}

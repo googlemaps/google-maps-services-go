@@ -24,9 +24,9 @@ import (
 	"strconv"
 	"strings"
 
+	maps "github.com/googlemaps/google-maps-services-go"
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
-	"google.golang.org/maps"
 )
 
 var (
@@ -67,7 +67,7 @@ func main() {
 	parsePath(*path, r)
 	parsePlaceIds(*placeIds, r)
 
-	resp, err := client.GetSpeedLimits(context.Background(), r)
+	resp, err := client.SpeedLimits(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}

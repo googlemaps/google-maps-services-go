@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package maps // import "google.golang.org/maps"
+package maps
 
 import (
 	"bytes"
-	"log"
 	"io"
+	"log"
 )
 
 // Polyline represents a list of lat,lng points encoded as a byte array.
@@ -43,11 +43,11 @@ func (p *Polyline) Decode() []LatLng {
 	for {
 		dlat, _ := decodeInt(input)
 		dlng, err := decodeInt(input)
-		if err != nil {
-      if err != io.EOF {
-        log.Fatal("unexpected err decoding polyline", err)
-      }
+		if err == io.EOF {
 			return path
+		}
+		if err != nil {
+			log.Fatal("unexpected err decoding polyline", err)
 		}
 
 		lat, lng = lat+dlat, lng+dlng
@@ -66,8 +66,8 @@ func Encode(path []LatLng) string {
 	out.Grow(len(path) * 4)
 
 	for _, point := range path {
-		lat := int64(point.Lat*1e5)
-    lng := int64(point.Lng*1e5)
+		lat := int64(point.Lat * 1e5)
+		lng := int64(point.Lng * 1e5)
 
 		encodeInt(lat-prevLat, out)
 		encodeInt(lng-prevLng, out)
