@@ -57,10 +57,7 @@ type geocodingResultWithError struct {
 func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) {
 	var response geocodingResponse
 
-	baseURL := "https://maps.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
+	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/geocode/json", nil)
 	if err != nil {

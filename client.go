@@ -159,3 +159,10 @@ func (client *Client) generateAuthQuery(path string, q url.Values, acceptClientI
 	}
 	return "", fmt.Errorf("Must provide API key for this API. It does not accept enterprise credentials.")
 }
+
+func (client *Client) getBaseURL(baseURL string) string {
+	if client.baseURL != "" {
+		return client.baseURL
+	}
+	return baseURL
+}

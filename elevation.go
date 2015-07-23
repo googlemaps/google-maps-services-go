@@ -60,10 +60,7 @@ type elevationResultWithError struct {
 }
 
 func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) {
-	baseURL := "https://maps.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
+	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/elevation/json", nil)
 	if err != nil {

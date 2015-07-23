@@ -71,10 +71,7 @@ func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route,
 }
 
 func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
-	baseURL := "https://maps.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
+	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
 	if err != nil {
