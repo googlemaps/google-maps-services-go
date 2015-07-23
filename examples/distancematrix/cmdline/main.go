@@ -86,7 +86,7 @@ func main() {
 	lookupTransitMode(*transitMode, r)
 	lookupTransitRoutingPreference(*transitRoutingPreference, r)
 
-	resp, err := client.GetDistanceMatrix(context.Background(), r)
+	resp, err := client.DistanceMatrix(context.Background(), r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}

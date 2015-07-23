@@ -67,7 +67,7 @@ func main() {
 	parsePath(*path, r)
 	parsePlaceIds(*placeIds, r)
 
-	resp, err := client.GetSpeedLimits(context.Background(), r)
+	resp, err := client.SpeedLimits(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}

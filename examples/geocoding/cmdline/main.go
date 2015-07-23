@@ -78,7 +78,7 @@ func main() {
 	parseResultType(*resultType, r)
 	parseLocationType(*locationType, r)
 
-	resp, err := client.GetGeocoding(context.Background(), r)
+	resp, err := client.Geocode(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}

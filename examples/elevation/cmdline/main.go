@@ -83,7 +83,7 @@ func main() {
 		r.Path = p
 	}
 
-	resp, err := client.GetElevation(context.Background(), r)
+	resp, err := client.Elevation(context.Background(), r)
 	if err != nil {
 		log.Fatalf("Could not request elevations: %v", err)
 	}

@@ -118,7 +118,7 @@ func main() {
 		}
 	}
 
-	resp, err := client.GetDirections(context.Background(), r)
+	resp, err := client.Directions(context.Background(), r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
