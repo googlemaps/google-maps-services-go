@@ -15,7 +15,7 @@
 // More information about Google Distance Matrix API is available on
 // https://developers.google.com/maps/documentation/distancematrix/
 
-package maps // import "github.com/googlemaps/google-maps-services-go"
+package maps
 
 import (
 	"encoding/json"
@@ -27,8 +27,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// GetGeocoding makes a Geocoding API request
-func (c *Client) GetGeocoding(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
+// Geocode makes a Geocoding API request
+func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
 
 	if r.Address == "" && len(r.components) == 0 && r.LatLng == nil {
 		return nil, errors.New("geocoding: You must specify at least one of Address or Components for a geocoding request, or LatLng for a reverse geocoding request")
@@ -54,13 +54,8 @@ type geocodingResultWithError struct {
 	err     error
 }
 
-func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) {
-	var response geocodingResponse
-
-	baseURL := "https://maps.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
+func (r *GeocodingRequest) request(c *Client) (*http.Request, error) {
+	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/geocode/json", nil)
 	if err != nil {
@@ -105,6 +100,16 @@ func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) 
 		return nil, err
 	}
 	req.URL.RawQuery = query
+	return req, nil
+}
+
+func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) {
+	var response geocodingResponse
+
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
+	}
 
 	resp, err := c.httpDo(req)
 	if err != nil {
@@ -117,7 +122,7 @@ func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) 
 		return nil, err
 	}
 	if response.Status != "OK" {
-		err = fmt.Errorf("geocoding: %s - %s", response.Status, response.ErrorMessage)
+		err = errors.New("geocoding: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 

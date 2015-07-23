@@ -15,7 +15,7 @@
 // More information about Google Directions API is available on
 // https://developers.google.com/maps/documentation/directions/
 
-package maps // import "github.com/googlemaps/google-maps-services-go"
+package maps
 
 import (
 	"encoding/json"
@@ -34,8 +34,8 @@ type directionsResponse struct {
 	err    error
 }
 
-// GetDirections issues the Directions request and retrieves the Response
-func (c *Client) GetDirections(ctx context.Context, r *DirectionsRequest) ([]Route, error) {
+// Directions issues the Directions request and retrieves the Response
+func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route, error) {
 	if r.Origin == "" {
 		return nil, errors.New("directions: Origin required")
 	}
@@ -71,10 +71,7 @@ func (c *Client) GetDirections(ctx context.Context, r *DirectionsRequest) ([]Rou
 }
 
 func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
-	baseURL := "https://maps.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
+	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
 	if err != nil {
@@ -133,7 +130,7 @@ func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
 	}
 
 	if response.Status != "OK" {
-		err = fmt.Errorf("directions: %s - %s", response.Status, response.ErrorMessage)
+		err = errors.New("directions: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 	return response.Routes, nil

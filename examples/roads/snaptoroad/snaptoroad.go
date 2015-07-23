@@ -60,7 +60,7 @@ func main() {
 	}
 	parsePath(*path, r)
 
-	resp, err := client.GetSnapToRoad(context.Background(), r)
+	resp, err := client.SnapToRoad(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}

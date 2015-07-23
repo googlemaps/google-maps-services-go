@@ -15,7 +15,7 @@
 // More information about Google Distance Matrix API is available on
 // https://developers.google.com/maps/documentation/distancematrix/
 
-package maps // import "github.com/googlemaps/google-maps-services-go"
+package maps
 
 import (
 	"encoding/json"
@@ -31,8 +31,8 @@ type snapToRoadResponse struct {
 	err      error
 }
 
-// GetSnapToRoad makes a SnapToRoad API request
-func (c *Client) GetSnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
+// SnapToRoad makes a Snap to Road API request
+func (c *Client) SnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
 
 	if len(r.Path) == 0 {
 		return nil, errors.New("snapToRoad: You must specify a Path")
@@ -54,10 +54,7 @@ func (c *Client) GetSnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*Snap
 }
 
 func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
-	baseURL := "https://roads.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
+	baseURL := c.getBaseURL("https://roads.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/v1/snapToRoads", nil)
 	if err != nil {
@@ -121,8 +118,8 @@ type speedLimitsResponse struct {
 	err      error
 }
 
-// GetSpeedLimits makes a SpeedLimits API request
-func (c *Client) GetSpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*SpeedLimitsResponse, error) {
+// SpeedLimits makes a Speed Limits API request
+func (c *Client) SpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*SpeedLimitsResponse, error) {
 
 	if len(r.Path) == 0 && len(r.PlaceID) == 0 {
 		return nil, errors.New("speedLimits: You must specify a Path or PlaceID")
@@ -144,11 +141,7 @@ func (c *Client) GetSpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*Sp
 }
 
 func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (*SpeedLimitsResponse, error) {
-
-	baseURL := "https://roads.googleapis.com/"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
+	baseURL := c.getBaseURL("https://roads.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/v1/speedLimits", nil)
 	if err != nil {

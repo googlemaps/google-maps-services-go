@@ -15,10 +15,11 @@
 // More information about Google Directions API is available on
 // https://developers.google.com/maps/documentation/directions/
 
-package maps // import "github.com/googlemaps/google-maps-services-go"
+package maps
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -50,7 +51,7 @@ func NewClient(options ...clientOption) (*Client, error) {
 		}
 	}
 	if c.apiKey == "" && (c.clientID == "" || len(c.signature) == 0) {
-		return nil, fmt.Errorf("maps.Client with no API Key or Maps for Work credentials")
+		return nil, errors.New("maps.Client with no API Key or Maps for Work credentials")
 	}
 
 	return c, nil
@@ -157,5 +158,12 @@ func (client *Client) generateAuthQuery(path string, q url.Values, acceptClientI
 		}
 		return query, nil
 	}
-	return "", fmt.Errorf("Must provide API key for this API. It does not accept enterprise credentials.")
+	return "", errors.New("Must provide API key for this API. It does not accept enterprise credentials.")
+}
+
+func (client *Client) getBaseURL(baseURL string) string {
+	if client.baseURL != "" {
+		return client.baseURL
+	}
+	return baseURL
 }

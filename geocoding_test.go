@@ -15,7 +15,7 @@
 // More information about Google Directions API is available on
 // https://developers.google.com/maps/documentation/directions/
 
-package maps // import "github.com/googlemaps/google-maps-services-go"
+package maps
 
 import (
 	"reflect"
@@ -117,7 +117,7 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 		Address: "1600 Amphitheatre Parkway, Mountain View, CA",
 	}
 
-	resp, err := c.GetGeocoding(context.Background(), r)
+	resp, err := c.Geocode(context.Background(), r)
 
 	if len(resp) != 1 {
 		t.Errorf("Expected length of response is 1, was %+v", len(resp))
@@ -285,7 +285,7 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 		LatLng: &LatLng{Lat: 40.714224, Lng: -73.961452},
 	}
 
-	resp, err := c.GetGeocoding(context.Background(), r)
+	resp, err := c.Geocode(context.Background(), r)
 
 	if len(resp) != 1 {
 		t.Errorf("expected %+v, was %+v", 1, len(resp))
@@ -360,7 +360,7 @@ func TestGeocodingEmptyRequest(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &GeocodingRequest{}
 
-	if _, err := c.GetGeocoding(context.Background(), r); err == nil {
+	if _, err := c.Geocode(context.Background(), r); err == nil {
 		t.Errorf("Missing Address, Address Components, and LatLng should return error")
 	}
 }
@@ -373,7 +373,7 @@ func TestGeocodingWithCancelledContext(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	if _, err := c.GetGeocoding(ctx, r); err == nil {
+	if _, err := c.Geocode(ctx, r); err == nil {
 		t.Errorf("Cancelled context should return non-nil err")
 	}
 }
@@ -386,7 +386,29 @@ func TestGeocodingFailingServer(t *testing.T) {
 		Address: "Sydney Town Hall",
 	}
 
-	if _, err := c.GetGeocoding(context.Background(), r); err == nil {
+	if _, err := c.Geocode(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
+	}
+}
+
+func TestGeocodingRequestURL(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &GeocodingRequest{
+		Address:      "Santa Cruz",
+		Bounds:       &LatLngBounds{LatLng{34.172684, -118.604794}, LatLng{34.236144, -118.500938}},
+		Region:       "es",
+		ResultType:   []string{"country"},
+		LocationType: []locationType{LocationTypeApproximate},
+		Language:     "es",
+	}
+	expectedQuery := "address=Santa+Cruz&bounds=34.236144%2C-118.500938%7C34.172684%2C-118.604794&components=country%3AES&key=AIzaNotReallyAnAPIKey&language=es&location_type=APPROXIMATE&region=es&result_type=country"
+
+	r.AddComponentFilter(ComponentCounty, "ES")
+	req, err := r.request(c)
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+	if req.URL.RawQuery != expectedQuery {
+		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
 	}
 }

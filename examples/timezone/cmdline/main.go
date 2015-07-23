@@ -77,7 +77,7 @@ func main() {
 
 	parseLocation(*location, r)
 
-	resp, err := client.GetTimezone(context.Background(), r)
+	resp, err := client.Timezone(context.Background(), r)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
