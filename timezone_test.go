@@ -47,7 +47,7 @@ func TestTimezoneNevada(t *testing.T) {
 		Timestamp: time.Unix(1331161200, 0),
 	}
 
-	resp, err := c.GetTimezone(context.Background(), r)
+	resp, err := c.Timezone(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("r.Get returned non nil error: %v", err)
@@ -73,7 +73,7 @@ func TestTimezoneLocationMissing(t *testing.T) {
 		Timestamp: time.Unix(1331161200, 0),
 	}
 
-	if _, err := c.GetTimezone(context.Background(), r); err == nil {
+	if _, err := c.Timezone(context.Background(), r); err == nil {
 		t.Errorf("Missing Location should return error")
 	}
 }
@@ -89,7 +89,7 @@ func TestTimezoneWithCancelledContext(t *testing.T) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	if _, err := c.GetTimezone(ctx, r); err == nil {
+	if _, err := c.Timezone(ctx, r); err == nil {
 		t.Errorf("Cancelled context should return error")
 	}
 }
@@ -102,7 +102,7 @@ func TestTimezoneFailingServer(t *testing.T) {
 		Location: &LatLng{Lat: 36.578581, Lng: -118.291994},
 	}
 
-	if _, err := c.GetTimezone(context.Background(), r); err == nil {
+	if _, err := c.Timezone(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
 	}
 }

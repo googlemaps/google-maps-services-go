@@ -73,7 +73,7 @@ func TestDistanceMatrixSydPyrToPar(t *testing.T) {
 		Destinations: []string{"Parramatta"},
 	}
 
-	resp, err := c.GetDistanceMatrix(context.Background(), r)
+	resp, err := c.DistanceMatrix(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("r.Get returned non nil error, was %+v", err)
@@ -116,7 +116,7 @@ func TestDistanceMatrixMissingOrigins(t *testing.T) {
 		Destinations: []string{"Parramatta"},
 	}
 
-	if _, err := c.GetDistanceMatrix(context.Background(), r); err == nil {
+	if _, err := c.DistanceMatrix(context.Background(), r); err == nil {
 		t.Errorf("Missing Origins should return error")
 	}
 }
@@ -128,7 +128,7 @@ func TestDistanceMatrixMissingDestinations(t *testing.T) {
 		Destinations: []string{},
 	}
 
-	if _, err := c.GetDistanceMatrix(context.Background(), r); err == nil {
+	if _, err := c.DistanceMatrix(context.Background(), r); err == nil {
 		t.Errorf("Missing Destinations should return error")
 	}
 }
@@ -142,7 +142,7 @@ func TestDistanceMatrixDepartureAndArrivalTime(t *testing.T) {
 		ArrivalTime:   "4pm",
 	}
 
-	if _, err := c.GetDistanceMatrix(context.Background(), r); err == nil {
+	if _, err := c.DistanceMatrix(context.Background(), r); err == nil {
 		t.Errorf("Having both Departure time and Arrival time should return error")
 	}
 }
@@ -156,7 +156,7 @@ func TestDistanceMatrixWithCancelledContext(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	if _, err := c.GetDistanceMatrix(ctx, r); err == nil {
+	if _, err := c.DistanceMatrix(ctx, r); err == nil {
 		t.Errorf("Cancelled context should return non-nil err")
 	}
 }
@@ -170,7 +170,7 @@ func TestDistanceMatrixFailingServer(t *testing.T) {
 		Destinations: []string{},
 	}
 
-	if _, err := c.GetDistanceMatrix(context.Background(), r); err == nil {
+	if _, err := c.DistanceMatrix(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
 	}
 }

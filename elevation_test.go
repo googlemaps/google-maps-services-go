@@ -53,7 +53,7 @@ func TestElevationDenver(t *testing.T) {
 		},
 	}
 
-	resp, err := c.GetElevation(context.Background(), r)
+	resp, err := c.Elevation(context.Background(), r)
 
 	if len(resp) != 1 {
 		t.Errorf("Expected length of response is 1, was %+v", len(resp))
@@ -119,7 +119,7 @@ func TestElevationSampledPath(t *testing.T) {
 		Samples: 3,
 	}
 
-	resp, err := c.GetElevation(context.Background(), r)
+	resp, err := c.Elevation(context.Background(), r)
 
 	if len(resp) != 3 {
 		t.Errorf("Expected length of response is 3, was %+v", len(resp))
@@ -146,7 +146,7 @@ func TestElevationNoPathOrLocations(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &ElevationRequest{}
 
-	if _, err := c.GetElevation(context.Background(), r); err == nil {
+	if _, err := c.Elevation(context.Background(), r); err == nil {
 		t.Errorf("Missing both Path and Locations should return error")
 	}
 }
@@ -160,7 +160,7 @@ func TestElevationPathWithNoSamples(t *testing.T) {
 		},
 	}
 
-	if _, err := c.GetElevation(context.Background(), r); err == nil {
+	if _, err := c.Elevation(context.Background(), r); err == nil {
 		t.Errorf("Missing both Path and Locations should return error")
 	}
 }
@@ -177,7 +177,7 @@ func TestElevationFailingServer(t *testing.T) {
 		Samples: 3,
 	}
 
-	if _, err := c.GetElevation(context.Background(), r); err == nil {
+	if _, err := c.Elevation(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
 	}
 }
@@ -193,7 +193,7 @@ func TestElevationCancelledContext(t *testing.T) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	if _, err := c.GetElevation(ctx, r); err == nil {
+	if _, err := c.Elevation(ctx, r); err == nil {
 		t.Errorf("Cancelled context should return non-nil err")
 	}
 }

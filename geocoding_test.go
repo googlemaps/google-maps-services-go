@@ -117,7 +117,7 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 		Address: "1600 Amphitheatre Parkway, Mountain View, CA",
 	}
 
-	resp, err := c.GetGeocoding(context.Background(), r)
+	resp, err := c.Geocode(context.Background(), r)
 
 	if len(resp) != 1 {
 		t.Errorf("Expected length of response is 1, was %+v", len(resp))
@@ -285,7 +285,7 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 		LatLng: &LatLng{Lat: 40.714224, Lng: -73.961452},
 	}
 
-	resp, err := c.GetGeocoding(context.Background(), r)
+	resp, err := c.Geocode(context.Background(), r)
 
 	if len(resp) != 1 {
 		t.Errorf("expected %+v, was %+v", 1, len(resp))
@@ -360,7 +360,7 @@ func TestGeocodingEmptyRequest(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &GeocodingRequest{}
 
-	if _, err := c.GetGeocoding(context.Background(), r); err == nil {
+	if _, err := c.Geocode(context.Background(), r); err == nil {
 		t.Errorf("Missing Address, Address Components, and LatLng should return error")
 	}
 }
@@ -373,7 +373,7 @@ func TestGeocodingWithCancelledContext(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	if _, err := c.GetGeocoding(ctx, r); err == nil {
+	if _, err := c.Geocode(ctx, r); err == nil {
 		t.Errorf("Cancelled context should return non-nil err")
 	}
 }
@@ -386,7 +386,7 @@ func TestGeocodingFailingServer(t *testing.T) {
 		Address: "Sydney Town Hall",
 	}
 
-	if _, err := c.GetGeocoding(context.Background(), r); err == nil {
+	if _, err := c.Geocode(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
 	}
 }
