@@ -70,7 +70,7 @@ func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route,
 	}
 }
 
-func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
+func (r *DirectionsRequest) request(c *Client) (*http.Request, error) {
 	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
@@ -118,6 +118,14 @@ func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
 	}
 	req.URL.RawQuery = query
 
+	return req, nil
+}
+
+func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err

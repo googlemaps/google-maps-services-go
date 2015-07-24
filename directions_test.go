@@ -273,3 +273,27 @@ func TestDirectionsFailingServer(t *testing.T) {
 		t.Errorf("Failing server should return error")
 	}
 }
+
+func TestDirectionsRequestURL(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &DirectionsRequest{
+		Origin:       "Sydney",
+		Destination:  "Parramatta",
+		Mode:         TravelModeTransit,
+		TransitMode:  []transitMode{TransitModeRail},
+		Waypoints:    []string{"Charlestown,MA", "via:Lexington"},
+		Alternatives: true,
+		Avoid:        []avoid{AvoidTolls, AvoidFerries},
+		Language:     "es",
+		Region:       "es",
+		Units:        UnitsImperial,
+	}
+	expectedQuery := "alternatives=true&avoid=tolls%7Cferries&destination=Parramatta&key=AIzaNotReallyAnAPIKey&language=es&mode=transit&origin=Sydney&region=es&transit_mode=rail&units=imperial&waypoints=Charlestown%2CMA%7Cvia%3ALexington"
+	req, err := r.request(c)
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+	if req.URL.RawQuery != expectedQuery {
+		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
+	}
+}
