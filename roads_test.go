@@ -428,3 +428,42 @@ func TestSpeedLimitsWithCancelledContext(t *testing.T) {
 		t.Errorf("Cancelled context should return non-nil err")
 	}
 }
+
+func TestSnapToRoadRequestURL(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &SnapToRoadRequest{
+		Path:        []LatLng{LatLng{1, 2}, LatLng{3, 4}},
+		Interpolate: true,
+	}
+	req, err := r.request(c)
+	expectedQuery := "interpolate=true&key=AIzaNotReallyAnAPIKey&path=1%2C2%7C3%2C4"
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+	if req.URL.RawQuery != expectedQuery {
+		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
+	}
+}
+
+func TestSpeedLimitsRequestURL(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &SpeedLimitsRequest{
+		Path: []LatLng{
+			LatLng{Lat: -35.27801, Lng: 149.12958},
+			LatLng{Lat: -35.28032, Lng: 149.12907},
+		},
+		PlaceID: []string{
+			"ChIJ1Wi6I2pNFmsRQL9GbW7qABM",
+			"ChIJ58xCoGlNFmsRUEZUbW7qABM",
+		},
+		Units: SpeedLimitMPH,
+	}
+	req, err := r.request(c)
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&path=-35.27801%2C149.12958%7C-35.28032%2C149.12907&placeId=ChIJ1Wi6I2pNFmsRQL9GbW7qABM&placeId=ChIJ58xCoGlNFmsRUEZUbW7qABM&units=MPH"
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+	if req.URL.RawQuery != expectedQuery {
+		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
+	}
+}

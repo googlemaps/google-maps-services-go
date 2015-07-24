@@ -53,7 +53,7 @@ func (c *Client) SnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToR
 	}
 }
 
-func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
+func (r *SnapToRoadRequest) request(c *Client) (*http.Request, error) {
 	baseURL := c.getBaseURL("https://roads.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/v1/snapToRoads", nil)
@@ -75,7 +75,14 @@ func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (*SnapToRoadResponse, err
 		return nil, err
 	}
 	req.URL.RawQuery = query
+	return req, nil
+}
 
+func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err
@@ -140,7 +147,7 @@ func (c *Client) SpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*Speed
 	}
 }
 
-func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (*SpeedLimitsResponse, error) {
+func (r *SpeedLimitsRequest) request(c *Client) (*http.Request, error) {
 	baseURL := c.getBaseURL("https://roads.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/v1/speedLimits", nil)
@@ -167,7 +174,14 @@ func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (*SpeedLimitsResponse, 
 		return nil, err
 	}
 	req.URL.RawQuery = query
+	return req, nil
+}
 
+func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (*SpeedLimitsResponse, error) {
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err
