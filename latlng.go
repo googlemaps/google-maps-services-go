@@ -42,5 +42,5 @@ type LatLngBounds struct {
 }
 
 func (b *LatLngBounds) String() string {
-	return fmt.Sprintf("%s|%s", b.SouthWest.String(), b.NorthEast.String())
+	return b.SouthWest.String() + "|" + b.NorthEast.String()
 }
