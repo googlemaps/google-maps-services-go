@@ -398,12 +398,12 @@ func TestGeocodingRequestURL(t *testing.T) {
 		Bounds:       &LatLngBounds{LatLng{34.172684, -118.604794}, LatLng{34.236144, -118.500938}},
 		Region:       "es",
 		ResultType:   []string{"country"},
-		LocationType: []locationType{LocationTypeApproximate},
+		LocationType: []LocationType{LocationTypeApproximate},
+		Components:   map[ComponentFilter]string{ComponentCounty: "ES"},
 		Language:     "es",
 	}
 	expectedQuery := "address=Santa+Cruz&bounds=34.236144%2C-118.500938%7C34.172684%2C-118.604794&components=country%3AES&key=AIzaNotReallyAnAPIKey&language=es&location_type=APPROXIMATE&region=es&result_type=country"
 
-	r.AddComponentFilter(ComponentCounty, "ES")
 	req, err := r.request(c)
 	if err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)

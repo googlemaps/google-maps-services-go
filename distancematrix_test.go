@@ -149,7 +149,7 @@ func TestDistanceMatrixDepartureAndArrivalTime(t *testing.T) {
 
 func TestDistanceMatrixTravelModeTransit(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
-	var transitModes []transitMode
+	var transitModes []TransitMode
 	transitModes = append(transitModes, TransitModeBus)
 	r := &DistanceMatrixRequest{
 		Origins:      []string{"Sydney"},
@@ -214,7 +214,7 @@ func TestDistanceMatrixRequestURL(t *testing.T) {
 		Units:                    UnitsImperial,
 		DepartureTime:            "now",
 		ArrivalTime:              "3pm",
-		TransitMode:              []transitMode{TransitModeRail},
+		TransitMode:              []TransitMode{TransitModeRail},
 		TransitRoutingPreference: TransitRoutingPreferenceLessWalking,
 	}
 	req, err := r.request(c)

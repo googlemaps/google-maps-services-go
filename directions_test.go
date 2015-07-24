@@ -220,7 +220,7 @@ func TestDirectionsDeclaringBothDepartureAndArrivalTime(t *testing.T) {
 
 func TestDirectionsTravelModeTransit(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
-	var transitModes []transitMode
+	var transitModes []TransitMode
 	transitModes = append(transitModes, TransitModeBus)
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
@@ -280,10 +280,10 @@ func TestDirectionsRequestURL(t *testing.T) {
 		Origin:       "Sydney",
 		Destination:  "Parramatta",
 		Mode:         TravelModeTransit,
-		TransitMode:  []transitMode{TransitModeRail},
+		TransitMode:  []TransitMode{TransitModeRail},
 		Waypoints:    []string{"Charlestown,MA", "via:Lexington"},
 		Alternatives: true,
-		Avoid:        []avoid{AvoidTolls, AvoidFerries},
+		Avoid:        []Avoid{AvoidTolls, AvoidFerries},
 		Language:     "es",
 		Region:       "es",
 		Units:        UnitsImperial,

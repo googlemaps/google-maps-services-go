@@ -153,13 +153,13 @@ type DistanceMatrixRequest struct {
 	Destinations []string
 	// Mode specifies the mode of transport to use when calculating distance. Valid values are `ModeDriving`, `ModeWalking`, `ModeBicycling`
 	// and `ModeTransit`. Optional.
-	Mode mode
+	Mode Mode
 	// Language in which to return results. Optional.
 	Language string
 	// Avoid introduces restrictions to the route. Valid values are `AvoidTolls`, `AvoidHighways` and `AvoidFerries`. Optional.
-	Avoid avoid
+	Avoid Avoid
 	// Units Specifies the unit system to use when expressing distance as text. Valid values are `UnitsMetric` and `UnitsImperial`. Optional.
-	Units units
+	Units Units
 	// DepartureTime is the desired time of departure. You can specify the time as an integer in seconds since midnight, January 1, 1970 UTC.
 	// Alternatively, you can specify a value of `"now"``. Optional.
 	DepartureTime string
@@ -169,10 +169,10 @@ type DistanceMatrixRequest struct {
 	// TransitMode specifies one or more preferred modes of transit. This parameter may only be specified for requests where the mode is
 	// `transit`. Valid values are `TransitModeBus`, `TransitModeSubway`, `TransitModeTrain`, `TransitModeTram`, and `TransitModeRail`.
 	// Optional.
-	TransitMode []transitMode
+	TransitMode []TransitMode
 	// TransitRoutingPreference Specifies preferences for transit requests. Valid values are `TransitRoutingPreferenceLessWalking` and
 	// `TransitRoutingPreferenceFewerTransfers`. Optional.
-	TransitRoutingPreference transitRoutingPreference
+	TransitRoutingPreference TransitRoutingPreference
 }
 
 type rawDistanceMatrixResponse struct {
