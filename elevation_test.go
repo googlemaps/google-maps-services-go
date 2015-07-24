@@ -197,3 +197,20 @@ func TestElevationCancelledContext(t *testing.T) {
 		t.Errorf("Cancelled context should return non-nil err")
 	}
 }
+
+func TestElevationRequestURL(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &ElevationRequest{
+		Locations: []LatLng{LatLng{1, 2}, LatLng{3, 4}},
+		Path:      []LatLng{LatLng{5, 6}, LatLng{7, 8}},
+		Samples:   10,
+	}
+	req, err := r.request(c)
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&locations=enc%3A_ibE_seK_seK_seK&path=enc%3A_qo%5D_%7Brc%40_seK_seK&samples=10"
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+	if req.URL.RawQuery != expectedQuery {
+		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
+	}
+}

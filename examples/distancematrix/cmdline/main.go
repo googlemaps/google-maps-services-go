@@ -120,7 +120,7 @@ func lookupAvoid(avoid string, r *maps.DistanceMatrixRequest) {
 	case "ferries":
 		r.Avoid = maps.AvoidFerries
 	case "":
-		//ignore
+		// ignore
 	default:
 		log.Fatalf("Unknown avoid restriction %s", avoid)
 	}
@@ -140,21 +140,23 @@ func lookupUnits(units string, r *maps.DistanceMatrixRequest) {
 }
 
 func lookupTransitMode(transitMode string, r *maps.DistanceMatrixRequest) {
-	switch transitMode {
-	case "bus":
-		r.TransitMode = maps.TransitModeBus
-	case "subway":
-		r.TransitMode = maps.TransitModeSubway
-	case "train":
-		r.TransitMode = maps.TransitModeTrain
-	case "tram":
-		r.TransitMode = maps.TransitModeTram
-	case "rail":
-		r.TransitMode = maps.TransitModeRail
-	case "":
-		// ignore
-	default:
-		log.Fatalf("Unknown transit_mode %s", transitMode)
+	if transitMode != "" {
+		for _, m := range strings.Split(transitMode, "|") {
+			switch m {
+			case "bus":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeBus)
+			case "subway":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeSubway)
+			case "train":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeTrain)
+			case "tram":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeTram)
+			case "rail":
+				r.TransitMode = append(r.TransitMode, maps.TransitModeRail)
+			default:
+				log.Fatalf("Unknown transit_mode %s", m)
+			}
+		}
 	}
 }
 
@@ -167,6 +169,6 @@ func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.Dis
 	case "":
 		// ignore
 	default:
-		log.Fatalf("Unknown transit_routing_preference %s", transitRoutingPreference)
+		log.Fatalf("Unknown transit routing preference %s", transitRoutingPreference)
 	}
 }

@@ -17,49 +17,58 @@
 
 package maps
 
-type mode string
-type avoid string
-type units string
-type transitMode string
-type transitRoutingPreference string
+// Mode is for specifying travel mode.
+type Mode string
+
+// Avoid is for specifying routes that avoid certain features.
+type Avoid string
+
+// Units specifies which units system to return human readable results in.
+type Units string
+
+// TransitMode is for specifying a transit mode for a request
+type TransitMode string
+
+// TransitRoutingPreference biases which routes are returned
+type TransitRoutingPreference string
 
 const (
 	// TravelModeDriving is for specifying driving as travel mode
-	TravelModeDriving = mode("driving")
+	TravelModeDriving = Mode("driving")
 	// TravelModeWalking is for specifying walking as travel mode
-	TravelModeWalking = mode("walking")
+	TravelModeWalking = Mode("walking")
 	// TravelModeBicycling is for specifying bicycling as travel mode
-	TravelModeBicycling = mode("bicycling")
+	TravelModeBicycling = Mode("bicycling")
 	// TravelModeTransit is for specifying transit as travel mode
-	TravelModeTransit = mode("transit")
+	TravelModeTransit = Mode("transit")
 
 	// AvoidTolls is for specifying routes that avoid tolls
-	AvoidTolls = avoid("tolls")
+	AvoidTolls = Avoid("tolls")
 	// AvoidHighways is for specifying routes that avoid highways
-	AvoidHighways = avoid("highways")
+	AvoidHighways = Avoid("highways")
 	// AvoidFerries is for specifying routes that avoid ferries
-	AvoidFerries = avoid("ferries")
+	AvoidFerries = Avoid("ferries")
 
 	// UnitsMetric specifies usage of the metric units system
-	UnitsMetric = units("metric")
+	UnitsMetric = Units("metric")
 	// UnitsImperial specifies usage of the Imperial (English) units system
-	UnitsImperial = units("imperial")
+	UnitsImperial = Units("imperial")
 
 	// TransitModeBus is for specifying a transit mode of bus
-	TransitModeBus = transitMode("bus")
+	TransitModeBus = TransitMode("bus")
 	// TransitModeSubway is for specifying a transit mode of subway
-	TransitModeSubway = transitMode("subway")
+	TransitModeSubway = TransitMode("subway")
 	// TransitModeTrain is for specifying a transit mode of train
-	TransitModeTrain = transitMode("train")
+	TransitModeTrain = TransitMode("train")
 	// TransitModeTram is for specifying a transit mode of tram
-	TransitModeTram = transitMode("tram")
+	TransitModeTram = TransitMode("tram")
 	// TransitModeRail is for specifying a transit mode of rail
-	TransitModeRail = transitMode("rail")
+	TransitModeRail = TransitMode("rail")
 
 	// TransitRoutingPreferenceLessWalking indicates that the calculated route should prefer limited amounts of walking
-	TransitRoutingPreferenceLessWalking = transitRoutingPreference("less_walking")
+	TransitRoutingPreferenceLessWalking = TransitRoutingPreference("less_walking")
 	// TransitRoutingPreferenceFewerTransfers indicates that the calculated route should prefer a limited number of transfers
-	TransitRoutingPreferenceFewerTransfers = transitRoutingPreference("fewer_transfers")
+	TransitRoutingPreferenceFewerTransfers = TransitRoutingPreference("fewer_transfers")
 )
 
 // Distance is the API representation for a distance between two points.

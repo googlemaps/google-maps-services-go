@@ -48,7 +48,7 @@ func (c *Client) Timezone(ctx context.Context, r *TimezoneRequest) (*TimezoneRes
 	}
 }
 
-func (c *Client) doGetTimezone(r *TimezoneRequest) (*TimezoneResult, error) {
+func (r *TimezoneRequest) request(c *Client) (*http.Request, error) {
 	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/timezone/json", nil)
@@ -67,7 +67,14 @@ func (c *Client) doGetTimezone(r *TimezoneRequest) (*TimezoneResult, error) {
 		return nil, err
 	}
 	req.URL.RawQuery = query
+	return req, nil
+}
 
+func (c *Client) doGetTimezone(r *TimezoneRequest) (*TimezoneResult, error) {
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err

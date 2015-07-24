@@ -20,7 +20,6 @@ package maps
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -59,7 +58,7 @@ type elevationResultWithError struct {
 	err        error
 }
 
-func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) {
+func (r *ElevationRequest) request(c *Client) (*http.Request, error) {
 	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/elevation/json", nil)
@@ -69,19 +68,26 @@ func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) 
 	q := req.URL.Query()
 
 	if len(r.Path) > 0 {
-		q.Set("path", fmt.Sprintf("enc:%s", Encode(r.Path)))
+		q.Set("path", "enc:"+Encode(r.Path))
 		q.Set("samples", strconv.Itoa(r.Samples))
 	}
 
 	if len(r.Locations) > 0 {
-		q.Set("locations", fmt.Sprintf("enc:%s", Encode(r.Locations)))
+		q.Set("locations", "enc:"+Encode(r.Locations))
 	}
 	query, err := c.generateAuthQuery(req.URL.Path, q, true)
 	if err != nil {
 		return nil, err
 	}
 	req.URL.RawQuery = query
+	return req, nil
+}
 
+func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) {
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err

@@ -220,7 +220,7 @@ func TestDirectionsDeclaringBothDepartureAndArrivalTime(t *testing.T) {
 
 func TestDirectionsTravelModeTransit(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
-	var transitModes []transitMode
+	var transitModes []TransitMode
 	transitModes = append(transitModes, TransitModeBus)
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
@@ -271,5 +271,30 @@ func TestDirectionsFailingServer(t *testing.T) {
 
 	if _, err := c.Directions(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
+	}
+}
+
+func TestDirectionsRequestURL(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &DirectionsRequest{
+		Origin:       "Sydney",
+		Destination:  "Parramatta",
+		Mode:         TravelModeTransit,
+		TransitMode:  []TransitMode{TransitModeRail},
+		Waypoints:    []string{"Charlestown,MA", "via:Lexington"},
+		Alternatives: true,
+		Avoid:        []Avoid{AvoidTolls, AvoidFerries},
+		Language:     "es",
+		Region:       "es",
+		Units:        UnitsImperial,
+		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
+	}
+	expectedQuery := "alternatives=true&avoid=tolls%7Cferries&destination=Parramatta&key=AIzaNotReallyAnAPIKey&language=es&mode=transit&origin=Sydney&region=es&transit_mode=rail&transit_routing_preference=fewer_transfers&units=imperial&waypoints=Charlestown%2CMA%7Cvia%3ALexington"
+	req, err := r.request(c)
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+	if req.URL.RawQuery != expectedQuery {
+		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
 	}
 }
