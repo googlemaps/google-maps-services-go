@@ -97,9 +97,10 @@ func main() {
 				r.Avoid = append(r.Avoid, maps.AvoidHighways)
 			case "ferries":
 				r.Avoid = append(r.Avoid, maps.AvoidFerries)
+			default:
+				log.Fatalf("Unknown avoid restriction %s", a)
 			}
 		}
-
 	}
 	if *transitMode != "" {
 		for _, t := range strings.Split(*transitMode, "|") {
@@ -165,6 +166,6 @@ func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.Dir
 	case "":
 		// ignore
 	default:
-		log.Fatalf("Unknown transit_routing_preference '%s'", transitRoutingPreference)
+		log.Fatalf("Unknown transit routing preference %s", transitRoutingPreference)
 	}
 }

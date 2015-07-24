@@ -93,15 +93,15 @@ func parseComponents(components string, r *maps.GeocodingRequest) {
 			i := strings.Split(cf, ":")
 			switch i[0] {
 			case "route":
-				r.AddComponentFilter(maps.ComponentRoute, i[1])
+				r.Components[maps.ComponentRoute] = i[1]
 			case "locality":
-				r.AddComponentFilter(maps.ComponentLocality, i[1])
+				r.Components[maps.ComponentLocality] = i[1]
 			case "administrative_area":
-				r.AddComponentFilter(maps.ComponentAdministrativeArea, i[1])
+				r.Components[maps.ComponentAdministrativeArea] = i[1]
 			case "postal_code":
-				r.AddComponentFilter(maps.ComponentPostalCode, i[1])
+				r.Components[maps.ComponentPostalCode] = i[1]
 			case "country":
-				r.AddComponentFilter(maps.ComponentCounty, i[1])
+				r.Components[maps.ComponentCounty] = i[1]
 			}
 		}
 	}

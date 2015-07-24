@@ -147,6 +147,34 @@ func TestDistanceMatrixDepartureAndArrivalTime(t *testing.T) {
 	}
 }
 
+func TestDistanceMatrixTravelModeTransit(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	var transitModes []TransitMode
+	transitModes = append(transitModes, TransitModeBus)
+	r := &DistanceMatrixRequest{
+		Origins:      []string{"Sydney"},
+		Destinations: []string{"Parramatta"},
+		TransitMode:  transitModes,
+	}
+
+	if _, err := c.DistanceMatrix(context.Background(), r); err == nil {
+		t.Errorf("Declaring TransitMode without Mode=Transit should return error")
+	}
+}
+
+func TestDistanceMatrixTransitRoutingPreference(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &DistanceMatrixRequest{
+		Origins:                  []string{"Sydney"},
+		Destinations:             []string{"Parramatta"},
+		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
+	}
+
+	if _, err := c.DistanceMatrix(context.Background(), r); err == nil {
+		t.Errorf("Declaring TransitRoutingPreference without Mode=TravelModeTransit should return error")
+	}
+}
+
 func TestDistanceMatrixWithCancelledContext(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &DistanceMatrixRequest{
@@ -172,5 +200,29 @@ func TestDistanceMatrixFailingServer(t *testing.T) {
 
 	if _, err := c.DistanceMatrix(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
+	}
+}
+
+func TestDistanceMatrixRequestURL(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &DistanceMatrixRequest{
+		Origins:                  []string{"Sydney", "Pyrmont"},
+		Destinations:             []string{"Perth", "Parramatta"},
+		Mode:                     TravelModeDriving,
+		Language:                 "en",
+		Avoid:                    AvoidTolls,
+		Units:                    UnitsImperial,
+		DepartureTime:            "now",
+		ArrivalTime:              "3pm",
+		TransitMode:              []TransitMode{TransitModeRail},
+		TransitRoutingPreference: TransitRoutingPreferenceLessWalking,
+	}
+	req, err := r.request(c)
+	expectedQuery := "arrival_time=3pm&avoid=t%7Co%7Cl%7Cl%7Cs&departure_time=now&destinations=Perth%7CParramatta&key=AIzaNotReallyAnAPIKey&language=en&mode=driving&origins=Sydney%7CPyrmont&transit_mode=rail&transit_routing_preference=less_walking&units=imperial"
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+	if req.URL.RawQuery != expectedQuery {
+		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
 	}
 }

@@ -92,27 +92,22 @@ package main
 
 import (
 	"log"
-	"net/http"
 
+	maps "github.com/googlemaps/google-maps-services-go"
 	"github.com/kr/pretty"
-
-	"google.golang.org/maps"
-
 	"golang.org/x/net/context"
 )
 
 func main() {
-
-	apiKey := "Insert-API-Key-Here"
-	client := maps.NewClient(&http.Client{}, apiKey)
-
+	c, err := maps.NewClient(maps.WithAPIKey("Insert-API-Key-Here"))
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
 	r := &maps.DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Perth",
 	}
-
-	ctx := context.Background()
-	resp, err := client.GetDirections(ctx, r)
+	resp, err := c.Directions(context.Background(), r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}

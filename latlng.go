@@ -21,8 +21,8 @@ import (
 
 // LatLng represents a location on the Earth.
 type LatLng struct {
-	Lat float64 `json:"lat"` // latitude
-	Lng float64 `json:"lng"` // longitude
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
 }
 
 func (l *LatLng) String() string {
@@ -37,10 +37,10 @@ func (l *LatLng) AlmostEqual(other *LatLng, epsilon float64) bool {
 
 // LatLngBounds represents a bounded square area on the Earth.
 type LatLngBounds struct {
-	NorthEast LatLng `json:"northeast"` // ne corner
-	SouthWest LatLng `json:"southwest"` // sw corner
+	NorthEast LatLng `json:"northeast"`
+	SouthWest LatLng `json:"southwest"`
 }
 
 func (b *LatLngBounds) String() string {
-	return fmt.Sprintf("%s|%s", b.SouthWest.String(), b.NorthEast.String())
+	return b.SouthWest.String() + "|" + b.NorthEast.String()
 }

@@ -70,7 +70,7 @@ func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route,
 	}
 }
 
-func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
+func (r *DirectionsRequest) request(c *Client) (*http.Request, error) {
 	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
@@ -112,12 +112,23 @@ func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
 		}
 		q.Set("transit_mode", strings.Join(transitMode, "|"))
 	}
+	if r.TransitRoutingPreference != "" {
+		q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
+	}
 	query, err := c.generateAuthQuery(req.URL.Path, q, true)
 	if err != nil {
 		return nil, err
 	}
 	req.URL.RawQuery = query
 
+	return req, nil
+}
+
+func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err
@@ -143,7 +154,7 @@ type DirectionsRequest struct {
 	// Destination is the address or textual latitude/longitude value from which you wish to calculate directions. Required.
 	Destination string
 	// Mode specifies the mode of transport to use when calculating directions. Optional.
-	Mode mode
+	Mode Mode
 	// DepartureTime specifies the desired time of departure. You can specify the time as an integer in seconds since midnight, January 1, 1970 UTC. Alternatively, you can specify a value of `"now"`. Optional.
 	DepartureTime string
 	// ArrivalTime specifies the desired time of arrival for transit directions, in seconds since midnight, January 1, 1970 UTC. Optional. You cannot specify both `DepartureTime` and `ArrivalTime`.
@@ -153,17 +164,17 @@ type DirectionsRequest struct {
 	// Alternatives specifies if Directions service may provide more than one route alternative in the response. Optional.
 	Alternatives bool
 	// Avoid indicates that the calculated route(s) should avoid the indicated features. Optional.
-	Avoid []avoid
+	Avoid []Avoid
 	// Language specifies the language in which to return results. Optional.
 	Language string
 	// Units specifies the unit system to use when displaying results. Optional.
-	Units units
+	Units Units
 	// Region specifies the region code, specified as a ccTLD two-character value. Optional.
 	Region string
 	// TransitMode specifies one or more preferred modes of transit. This parameter may only be specified for transit directions. Optional.
-	TransitMode []transitMode
+	TransitMode []TransitMode
 	// TransitRoutingPreference specifies preferences for transit routes. Optional.
-	TransitRoutingPreference transitRoutingPreference
+	TransitRoutingPreference TransitRoutingPreference
 }
 
 // DirectionsResponse represents a Directions API response.
