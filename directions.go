@@ -112,6 +112,9 @@ func (r *DirectionsRequest) request(c *Client) (*http.Request, error) {
 		}
 		q.Set("transit_mode", strings.Join(transitMode, "|"))
 	}
+	if r.TransitRoutingPreference != "" {
+		q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
+	}
 	query, err := c.generateAuthQuery(req.URL.Path, q, true)
 	if err != nil {
 		return nil, err

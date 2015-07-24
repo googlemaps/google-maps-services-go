@@ -44,6 +44,12 @@ func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (
 	if r.DepartureTime != "" && r.ArrivalTime != "" {
 		return nil, errors.New("distancematrix: must not specify both DepartureTime and ArrivalTime")
 	}
+	if len(r.TransitMode) != 0 && r.Mode != TravelModeTransit {
+		return nil, errors.New("distancematrix: must specify mode of transit when specifying transitMode")
+	}
+	if r.TransitRoutingPreference != "" && r.Mode != TravelModeTransit {
+		return nil, errors.New("distancematrix: must specify mode of transit when specifying transitRoutingPreference")
+	}
 
 	chResult := make(chan distanceMatrixResponse)
 
@@ -60,7 +66,7 @@ func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (
 	}
 }
 
-func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
+func (r *DistanceMatrixRequest) request(c *Client) (*http.Request, error) {
 	baseURL := c.getBaseURL("https://maps.googleapis.com/")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/distancematrix/json", nil)
@@ -76,8 +82,12 @@ func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixR
 	if r.Language != "" {
 		q.Set("language", r.Language)
 	}
-	if r.Avoid != "" {
-		q.Set("avoid", string(r.Avoid))
+	if len(r.Avoid) > 0 {
+		var avoid []string
+		for _, a := range r.Avoid {
+			avoid = append(avoid, string(a))
+		}
+		q.Set("avoid", strings.Join(avoid, "|"))
 	}
 	if r.Units != "" {
 		q.Set("units", string(r.Units))
@@ -88,8 +98,12 @@ func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixR
 	if r.ArrivalTime != "" {
 		q.Set("arrival_time", r.ArrivalTime)
 	}
-	if r.TransitMode != "" {
-		q.Set("transit_mode", string(r.TransitMode))
+	if len(r.TransitMode) != 0 {
+		var transitMode []string
+		for _, t := range r.TransitMode {
+			transitMode = append(transitMode, string(t))
+		}
+		q.Set("transit_mode", strings.Join(transitMode, "|"))
 	}
 	if r.TransitRoutingPreference != "" {
 		q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
@@ -99,7 +113,14 @@ func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixR
 		return nil, err
 	}
 	req.URL.RawQuery = query
+	return req, nil
+}
 
+func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := c.httpDo(req)
 	if err != nil {
 		return nil, err
@@ -148,7 +169,7 @@ type DistanceMatrixRequest struct {
 	// TransitMode specifies one or more preferred modes of transit. This parameter may only be specified for requests where the mode is
 	// `transit`. Valid values are `TransitModeBus`, `TransitModeSubway`, `TransitModeTrain`, `TransitModeTram`, and `TransitModeRail`.
 	// Optional.
-	TransitMode transitMode
+	TransitMode []transitMode
 	// TransitRoutingPreference Specifies preferences for transit requests. Valid values are `TransitRoutingPreferenceLessWalking` and
 	// `TransitRoutingPreferenceFewerTransfers`. Optional.
 	TransitRoutingPreference transitRoutingPreference

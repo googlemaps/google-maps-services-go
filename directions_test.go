@@ -287,8 +287,9 @@ func TestDirectionsRequestURL(t *testing.T) {
 		Language:     "es",
 		Region:       "es",
 		Units:        UnitsImperial,
+		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
 	}
-	expectedQuery := "alternatives=true&avoid=tolls%7Cferries&destination=Parramatta&key=AIzaNotReallyAnAPIKey&language=es&mode=transit&origin=Sydney&region=es&transit_mode=rail&units=imperial&waypoints=Charlestown%2CMA%7Cvia%3ALexington"
+	expectedQuery := "alternatives=true&avoid=tolls%7Cferries&destination=Parramatta&key=AIzaNotReallyAnAPIKey&language=es&mode=transit&origin=Sydney&region=es&transit_mode=rail&transit_routing_preference=fewer_transfers&units=imperial&waypoints=Charlestown%2CMA%7Cvia%3ALexington"
 	req, err := r.request(c)
 	if err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
