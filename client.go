@@ -41,13 +41,15 @@ type Client struct {
 	rateLimiter       chan requestQuota
 }
 
-//
-type clientOption func(*Client) error
+// ClientOption is the type of constructor options for NewClient(...).
+type ClientOption func(*Client) error
+
+var defaultRequestsPerSecond = 10
 
 // NewClient constructs a new Client which can make requests to the Google Maps WebService APIs.
 // The supplied http.Client is used for making requests to the Maps WebService APIs
-func NewClient(options ...clientOption) (*Client, error) {
-	c := &Client{requestsPerSecond: 10}
+func NewClient(options ...ClientOption) (*Client, error) {
+	c := &Client{requestsPerSecond: defaultRequestsPerSecond}
 	WithHTTPClient(&http.Client{})(c)
 	for _, option := range options {
 		err := option(c)
@@ -77,7 +79,7 @@ func NewClient(options ...clientOption) (*Client, error) {
 }
 
 // WithHTTPClient configures a Maps API client with a http.Client to make requests over.
-func WithHTTPClient(c *http.Client) clientOption {
+func WithHTTPClient(c *http.Client) ClientOption {
 	return func(client *Client) error {
 		if _, ok := c.Transport.(*transport); !ok {
 			t := c.Transport
@@ -93,7 +95,7 @@ func WithHTTPClient(c *http.Client) clientOption {
 }
 
 // withBaseURL is for testing only.
-func withBaseURL(url string) clientOption {
+func withBaseURL(url string) ClientOption {
 	return func(client *Client) error {
 		client.baseURL = url
 		return nil
@@ -101,7 +103,7 @@ func withBaseURL(url string) clientOption {
 }
 
 // WithAPIKey configures a Maps API client with an API Key
-func WithAPIKey(apiKey string) clientOption {
+func WithAPIKey(apiKey string) ClientOption {
 	return func(client *Client) error {
 		client.apiKey = apiKey
 		return nil
@@ -110,7 +112,7 @@ func WithAPIKey(apiKey string) clientOption {
 
 // WithClientIDAndSignature configures a Maps API client for a Maps for Work application
 // The signature is assumed to be URL modified Base64 encoded
-func WithClientIDAndSignature(clientID, signature string) clientOption {
+func WithClientIDAndSignature(clientID, signature string) ClientOption {
 	return func(client *Client) error {
 		client.clientID = clientID
 		decoded, err := base64.URLEncoding.DecodeString(signature)
