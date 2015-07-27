@@ -22,6 +22,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	maps "github.com/googlemaps/google-maps-services-go"
 	"github.com/kr/pretty"
@@ -45,6 +46,7 @@ var (
 	region                   = flag.String("region", "", "Specifies the region code, specified as a ccTLD (\"top-level domain\") two-character value.")
 	transitMode              = flag.String("transit_mode", "", "Specifies one or more preferred modes of transit, | separated. This parameter may only be specified for transit directions.")
 	transitRoutingPreference = flag.String("transit_routing_preference", "", "Specifies preferences for transit routes.")
+	iterations               = flag.Int("iterations", 1, "Number of times to make API request.")
 )
 
 func usageAndExit(msg string) {
@@ -60,7 +62,7 @@ func main() {
 	var client *maps.Client
 	var err error
 	if *apiKey != "" {
-		client, err = maps.NewClient(maps.WithAPIKey(*apiKey))
+		client, err = maps.NewClient(maps.WithAPIKey(*apiKey), maps.WithRateLimit(2))
 	} else if *clientID != "" || *signature != "" {
 		client, err = maps.NewClient(maps.WithClientIDAndSignature(*clientID, *signature))
 	} else {
@@ -119,12 +121,40 @@ func main() {
 		}
 	}
 
-	resp, err := client.Directions(context.Background(), r)
-	if err != nil {
-		log.Fatalf("fatal error: %s", err)
-	}
+	if *iterations == 1 {
+		resp, err := client.Directions(context.Background(), r)
+		if err != nil {
+			log.Fatalf("fatal error: %s", err)
+		}
 
-	pretty.Println(resp)
+		pretty.Println(resp)
+	} else {
+		done := make(chan iterationResult)
+		for i := 0; i < *iterations; i++ {
+			go func(i int) {
+				startTime := time.Now()
+				_, err := client.Directions(context.Background(), r)
+				done <- iterationResult{
+					fmt.Sprintf("Iteration %2d: round trip %.2f seconds", i, float64(time.Now().Sub(startTime))/1000000000),
+					err,
+				}
+			}(i)
+		}
+
+		for i := 0; i < *iterations; i++ {
+			result := <-done
+			if err != nil {
+				fmt.Printf("error: %+v\n", result.err)
+			} else {
+				fmt.Println(result.result)
+			}
+		}
+	}
+}
+
+type iterationResult struct {
+	result string
+	err    error
 }
 
 func lookupMode(mode string, r *maps.DirectionsRequest) {
