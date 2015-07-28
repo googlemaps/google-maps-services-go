@@ -38,24 +38,27 @@ func (c *Client) Elevation(ctx context.Context, r *ElevationRequest) ([]Elevatio
 		return nil, errors.New("elevation: Sampled Path Request requires Samples to be specifed")
 	}
 
-	chResult := make(chan elevationResultWithError)
-
-	go func() {
-		elevations, err := c.doGetElevation(r)
-		chResult <- elevationResultWithError{elevations, err}
-	}()
-
-	select {
-	case resp := <-chResult:
-		return resp.elevations, resp.err
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
 	}
-}
+	resp, err := c.httpDo(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var response elevationResponse
 
-type elevationResultWithError struct {
-	elevations []ElevationResult
-	err        error
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	if response.Status != "OK" {
+		err = errors.New("distancematrix: " + response.Status + " - " + response.ErrorMessage)
+		return nil, err
+	}
+
+	return response.Results, nil
 }
 
 func (r *ElevationRequest) request(c *Client) (*http.Request, error) {
@@ -81,30 +84,6 @@ func (r *ElevationRequest) request(c *Client) (*http.Request, error) {
 	}
 	req.URL.RawQuery = query
 	return req, nil
-}
-
-func (c *Client) doGetElevation(r *ElevationRequest) ([]ElevationResult, error) {
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var response elevationResponse
-
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, err
-	}
-
-	if response.Status != "OK" {
-		err = errors.New("distancematrix: " + response.Status + " - " + response.ErrorMessage)
-		return nil, err
-	}
-
-	return response.Results, nil
 }
 
 type elevationResponse struct {

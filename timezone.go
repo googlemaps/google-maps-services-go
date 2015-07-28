@@ -33,19 +33,32 @@ func (c *Client) Timezone(ctx context.Context, r *TimezoneRequest) (*TimezoneRes
 		return nil, errors.New("timezone: You must specify Location")
 	}
 
-	chResult := make(chan timezoneResultWithError)
-
-	go func() {
-		result, err := c.doGetTimezone(r)
-		chResult <- timezoneResultWithError{result, err}
-	}()
-
-	select {
-	case result := <-chResult:
-		return result.timezone, result.err
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
 	}
+	resp, err := c.httpDo(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &timezoneResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(response); err != nil {
+		return nil, err
+	}
+	if response.Status != "OK" {
+		err := errors.New("timezone: " + response.Status + " - " + response.ErrorMessage)
+		return nil, err
+	}
+
+	var result = &TimezoneResult{
+		DstOffset:    response.DstOffset,
+		RawOffset:    response.RawOffset,
+		TimeZoneID:   response.TimeZoneID,
+		TimeZoneName: response.TimeZoneName,
+	}
+
+	return result, nil
 }
 
 func (r *TimezoneRequest) request(c *Client) (*http.Request, error) {
@@ -68,35 +81,6 @@ func (r *TimezoneRequest) request(c *Client) (*http.Request, error) {
 	}
 	req.URL.RawQuery = query
 	return req, nil
-}
-
-func (c *Client) doGetTimezone(r *TimezoneRequest) (*TimezoneResult, error) {
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(req)
-	if err != nil {
-		return nil, err
-	}
-
-	response := &timezoneResponse{}
-	if err := json.NewDecoder(resp.Body).Decode(response); err != nil {
-		return nil, err
-	}
-	if response.Status != "OK" {
-		err := errors.New("timezone: " + response.Status + " - " + response.ErrorMessage)
-		return nil, err
-	}
-
-	var result = &TimezoneResult{
-		DstOffset:    response.DstOffset,
-		RawOffset:    response.RawOffset,
-		TimeZoneID:   response.TimeZoneID,
-		TimeZoneName: response.TimeZoneName,
-	}
-
-	return result, nil
 }
 
 type timezoneResultWithError struct {

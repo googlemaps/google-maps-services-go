@@ -25,6 +25,8 @@ import (
 	"net/url"
 	"time"
 
+	"golang.org/x/net/context"
+
 	"github.com/googlemaps/google-maps-services-go/internal"
 )
 
@@ -33,6 +35,7 @@ type requestQuota struct{}
 // Client may be used to make requests to the Google Maps WebService APIs
 type Client struct {
 	httpClient        *http.Client
+	transport         *http.Transport
 	apiKey            string
 	baseURL           string
 	clientID          string
@@ -49,7 +52,10 @@ var defaultRequestsPerSecond = 10
 // NewClient constructs a new Client which can make requests to the Google Maps WebService APIs.
 // The supplied http.Client is used for making requests to the Maps WebService APIs
 func NewClient(options ...ClientOption) (*Client, error) {
-	c := &Client{requestsPerSecond: defaultRequestsPerSecond}
+	c := &Client{
+		requestsPerSecond: defaultRequestsPerSecond,
+		transport:         http.DefaultTransport.(*http.Transport),
+	}
 	WithHTTPClient(&http.Client{})(c)
 	for _, option := range options {
 		err := option(c)
@@ -85,8 +91,10 @@ func WithHTTPClient(c *http.Client) ClientOption {
 			t := c.Transport
 			if t != nil {
 				c.Transport = &transport{Base: t}
+				client.transport = t.(*http.Transport)
 			} else {
 				c.Transport = &transport{Base: http.DefaultTransport}
+				client.transport = http.DefaultTransport.(*http.Transport)
 			}
 		}
 		client.httpClient = c
@@ -133,9 +141,27 @@ func WithRateLimit(requestsPerSecond int) func(*Client) error {
 	}
 }
 
-func (client *Client) httpDo(req *http.Request) (*http.Response, error) {
+type httpResponse struct {
+	response *http.Response
+	err      error
+}
+
+func (client *Client) httpDo(ctx context.Context, req *http.Request) (*http.Response, error) {
 	<-client.rateLimiter
-	return client.httpClient.Do(req)
+	c := make(chan httpResponse)
+
+	go func() {
+		resp, err := client.httpClient.Do(req)
+		c <- httpResponse{resp, err}
+	}()
+
+	select {
+	case resp := <-c:
+		return resp.response, resp.err
+	case <-ctx.Done():
+		client.transport.CancelRequest(req)
+		return nil, ctx.Err()
+	}
 }
 
 const userAgent = "GoogleGeoApiClientGo/0.1"

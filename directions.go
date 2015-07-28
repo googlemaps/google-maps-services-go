@@ -29,11 +29,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-type directionsResponse struct {
-	routes []Route
-	err    error
-}
-
 // Directions issues the Directions request and retrieves the Response
 func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route, error) {
 	if r.Origin == "" {
@@ -55,19 +50,26 @@ func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route,
 		return nil, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
 	}
 
-	chResult := make(chan directionsResponse)
-
-	go func() {
-		routes, err := c.doGetDirections(r)
-		chResult <- directionsResponse{routes, err}
-	}()
-
-	select {
-	case resp := <-chResult:
-		return resp.routes, resp.err
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
 	}
+	resp, err := c.httpDo(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var response DirectionsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	if response.Status != "OK" {
+		err = errors.New("directions: " + response.Status + " - " + response.ErrorMessage)
+		return nil, err
+	}
+	return response.Routes, nil
 }
 
 func (r *DirectionsRequest) request(c *Client) (*http.Request, error) {
@@ -122,29 +124,6 @@ func (r *DirectionsRequest) request(c *Client) (*http.Request, error) {
 	req.URL.RawQuery = query
 
 	return req, nil
-}
-
-func (c *Client) doGetDirections(r *DirectionsRequest) ([]Route, error) {
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var response DirectionsResponse
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, err
-	}
-
-	if response.Status != "OK" {
-		err = errors.New("directions: " + response.Status + " - " + response.ErrorMessage)
-		return nil, err
-	}
-	return response.Routes, nil
 }
 
 // DirectionsRequest is the functional options struct for directions.Get

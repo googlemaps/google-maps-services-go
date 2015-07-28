@@ -33,19 +33,29 @@ func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingR
 		return nil, errors.New("geocoding: You must specify at least one of Address or Components for a geocoding request, or LatLng for a reverse geocoding request")
 	}
 
-	chResult := make(chan geocodingResultWithError)
+	var response geocodingResponse
 
-	go func() {
-		results, err := c.doGetGeocoding(r)
-		chResult <- geocodingResultWithError{results, err}
-	}()
-
-	select {
-	case resp := <-chResult:
-		return resp.Results, resp.err
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
 	}
+
+	resp, err := c.httpDo(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return nil, err
+	}
+	if response.Status != "OK" {
+		err = errors.New("geocoding: " + response.Status + " - " + response.ErrorMessage)
+		return nil, err
+	}
+
+	return response.Results, nil
 }
 
 type geocodingResultWithError struct {
@@ -100,32 +110,6 @@ func (r *GeocodingRequest) request(c *Client) (*http.Request, error) {
 	}
 	req.URL.RawQuery = query
 	return req, nil
-}
-
-func (c *Client) doGetGeocoding(r *GeocodingRequest) ([]GeocodingResult, error) {
-	var response geocodingResponse
-
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := c.httpDo(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	err = json.NewDecoder(resp.Body).Decode(&response)
-	if err != nil {
-		return nil, err
-	}
-	if response.Status != "OK" {
-		err = errors.New("geocoding: " + response.Status + " - " + response.ErrorMessage)
-		return nil, err
-	}
-
-	return response.Results, nil
 }
 
 // ComponentFilter enables filtering of returned results
