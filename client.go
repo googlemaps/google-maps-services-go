@@ -134,12 +134,12 @@ func WithRateLimit(requestsPerSecond int) func(*Client) error {
 	}
 }
 
-type httpResponse struct {
-	response *http.Response
-	err      error
-}
-
 func (client *Client) httpDo(ctx context.Context, req *http.Request) (*http.Response, error) {
+	type httpResponse struct {
+		response *http.Response
+		err      error
+	}
+
 	<-client.rateLimiter
 	c := make(chan httpResponse)
 
