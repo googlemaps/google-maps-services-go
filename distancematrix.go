@@ -27,11 +27,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-type distanceMatrixResponse struct {
-	matrix *DistanceMatrixResponse
-	err    error
-}
-
 // DistanceMatrix makes a Distance Matrix API request
 func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
 
@@ -51,19 +46,32 @@ func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (
 		return nil, errors.New("distancematrix: must specify mode of transit when specifying transitRoutingPreference")
 	}
 
-	chResult := make(chan distanceMatrixResponse)
-
-	go func() {
-		matrix, err := c.doGetDistanceMatrix(r)
-		chResult <- distanceMatrixResponse{matrix, err}
-	}()
-
-	select {
-	case resp := <-chResult:
-		return resp.matrix, resp.err
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
 	}
+	resp, err := c.httpDo(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var raw rawDistanceMatrixResponse
+	err = json.NewDecoder(resp.Body).Decode(&raw)
+	if err != nil {
+		return nil, err
+	}
+	if raw.Status != "OK" {
+		err = errors.New("distancematrix: " + raw.Status + " - " + raw.ErrorMessage)
+		return nil, err
+	}
+
+	response := &DistanceMatrixResponse{
+		DestinationAddresses: raw.DestinationAddresses,
+		OriginAddresses:      raw.OriginAddresses,
+		Rows:                 raw.Rows,
+	}
+
+	return response, nil
 }
 
 func (r *DistanceMatrixRequest) request(c *Client) (*http.Request, error) {
@@ -114,35 +122,6 @@ func (r *DistanceMatrixRequest) request(c *Client) (*http.Request, error) {
 	}
 	req.URL.RawQuery = query
 	return req, nil
-}
-
-func (c *Client) doGetDistanceMatrix(r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var raw rawDistanceMatrixResponse
-	err = json.NewDecoder(resp.Body).Decode(&raw)
-	if err != nil {
-		return nil, err
-	}
-	if raw.Status != "OK" {
-		err = errors.New("distancematrix: " + raw.Status + " - " + raw.ErrorMessage)
-		return nil, err
-	}
-
-	response := &DistanceMatrixResponse{
-		DestinationAddresses: raw.DestinationAddresses,
-		OriginAddresses:      raw.OriginAddresses,
-		Rows:                 raw.Rows,
-	}
-
-	return response, nil
 }
 
 // DistanceMatrixRequest is the request struct for Distance Matrix APi

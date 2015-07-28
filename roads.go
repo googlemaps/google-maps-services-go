@@ -26,11 +26,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-type snapToRoadResponse struct {
-	response *SnapToRoadResponse
-	err      error
-}
-
 // SnapToRoad makes a Snap to Road API request
 func (c *Client) SnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
 
@@ -38,19 +33,19 @@ func (c *Client) SnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToR
 		return nil, errors.New("snapToRoad: You must specify a Path")
 	}
 
-	chResult := make(chan snapToRoadResponse)
-
-	go func() {
-		resp, err := c.doGetSnapToRoad(r)
-		chResult <- snapToRoadResponse{resp, err}
-	}()
-
-	select {
-	case resp := <-chResult:
-		return resp.response, resp.err
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
 	}
+	resp, err := c.httpDo(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	response := &SnapToRoadResponse{}
+	err = json.NewDecoder(resp.Body).Decode(response)
+	return response, err
 }
 
 func (r *SnapToRoadRequest) request(c *Client) (*http.Request, error) {
@@ -76,22 +71,6 @@ func (r *SnapToRoadRequest) request(c *Client) (*http.Request, error) {
 	}
 	req.URL.RawQuery = query
 	return req, nil
-}
-
-func (c *Client) doGetSnapToRoad(r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	response := &SnapToRoadResponse{}
-	err = json.NewDecoder(resp.Body).Decode(response)
-	return response, err
 }
 
 // SnapToRoadRequest is the request structure for the Roads Snap to Road API.
@@ -120,11 +99,6 @@ type SnappedPoint struct {
 	PlaceID string `json:"placeId"`
 }
 
-type speedLimitsResponse struct {
-	response *SpeedLimitsResponse
-	err      error
-}
-
 // SpeedLimits makes a Speed Limits API request
 func (c *Client) SpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*SpeedLimitsResponse, error) {
 
@@ -132,19 +106,19 @@ func (c *Client) SpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*Speed
 		return nil, errors.New("speedLimits: You must specify a Path or PlaceID")
 	}
 
-	chResult := make(chan speedLimitsResponse)
-
-	go func() {
-		resp, err := c.doGetSpeedLimits(r)
-		chResult <- speedLimitsResponse{resp, err}
-	}()
-
-	select {
-	case resp := <-chResult:
-		return resp.response, resp.err
-	case <-ctx.Done():
-		return nil, ctx.Err()
+	req, err := r.request(c)
+	if err != nil {
+		return nil, err
 	}
+	resp, err := c.httpDo(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	response := &SpeedLimitsResponse{}
+	err = json.NewDecoder(resp.Body).Decode(response)
+	return response, err
 }
 
 func (r *SpeedLimitsRequest) request(c *Client) (*http.Request, error) {
@@ -175,22 +149,6 @@ func (r *SpeedLimitsRequest) request(c *Client) (*http.Request, error) {
 	}
 	req.URL.RawQuery = query
 	return req, nil
-}
-
-func (c *Client) doGetSpeedLimits(r *SpeedLimitsRequest) (*SpeedLimitsResponse, error) {
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	response := &SpeedLimitsResponse{}
-	err = json.NewDecoder(resp.Body).Decode(response)
-	return response, err
 }
 
 type speedLimitUnit string

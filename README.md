@@ -144,5 +144,5 @@ Native objects for each of the API responses.
 [Roads API]: https://developers.google.com/maps/documentation/roads/
 [Time Zone API]: https://developers.google.com/maps/documentation/timezone/
 
-[issues]: https://github.com/googlemaps/google-maps-services-python/issues
-[contrib]: https://github.com/googlemaps/google-maps-services-python/blob/master/CONTRIB.md
+[issues]: https://github.com/googlemaps/google-maps-services-go/issues
+[contrib]: https://github.com/googlemaps/google-maps-services-go/blob/master/CONTRIB.md

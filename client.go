@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/googlemaps/google-maps-services-go/internal"
+	"golang.org/x/net/context"
 )
 
 type requestQuota struct{}
@@ -133,9 +134,27 @@ func WithRateLimit(requestsPerSecond int) func(*Client) error {
 	}
 }
 
-func (client *Client) httpDo(req *http.Request) (*http.Response, error) {
+func (client *Client) httpDo(ctx context.Context, req *http.Request) (*http.Response, error) {
+	type httpResponse struct {
+		response *http.Response
+		err      error
+	}
+
 	<-client.rateLimiter
-	return client.httpClient.Do(req)
+	c := make(chan httpResponse)
+
+	go func() {
+		resp, err := client.httpClient.Do(req)
+		c <- httpResponse{resp, err}
+	}()
+
+	select {
+	case resp := <-c:
+		return resp.response, resp.err
+	case <-ctx.Done():
+		client.httpClient.Transport.(*transport).Base.(*http.Transport).CancelRequest(req)
+		return nil, ctx.Err()
+	}
 }
 
 const userAgent = "GoogleGeoApiClientGo/0.1"
