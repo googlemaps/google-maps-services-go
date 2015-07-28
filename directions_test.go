@@ -132,7 +132,7 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 	var steps []*Step
 	steps = append(steps, &Step{
 		HTMLInstructions: "Head <b>south</b> on <b>George St</b> toward <b>Barrack St</b>",
-		Distance:         Distance{Text: "0.4 km", Value: 366},
+		Distance:         Distance{HumanReadable: "0.4 km", Meters: 366},
 		Duration:         103000000000,
 		StartLocation:    LatLng{Lat: -33.8674944, Lng: 151.2070825},
 		EndLocation:      LatLng{Lat: -33.8707786, Lng: 151.206934},
@@ -145,7 +145,7 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 	var legs []*Leg
 	legs = append(legs, &Leg{
 		Steps:         steps,
-		Distance:      Distance{Text: "23.8 km", Value: 23846},
+		Distance:      Distance{HumanReadable: "23.8 km", Meters: 23846},
 		Duration:      2214000000000,
 		StartLocation: LatLng{Lat: -33.8674944, Lng: 151.2070825},
 		EndLocation:   LatLng{Lat: -33.8150985, Lng: 151.0031658},
