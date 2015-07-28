@@ -88,7 +88,7 @@ func TestDistanceMatrixSydPyrToPar(t *testing.T) {
 					&DistanceMatrixElement{
 						Status:   "OK",
 						Duration: 2215000000000,
-						Distance: Distance{Text: "23.8 km", Value: 23846},
+						Distance: Distance{HumanReadable: "23.8 km", Meters: 23846},
 					},
 				},
 			},
@@ -97,7 +97,7 @@ func TestDistanceMatrixSydPyrToPar(t *testing.T) {
 					&DistanceMatrixElement{
 						Status:   "OK",
 						Duration: 2058000000000,
-						Distance: Distance{Text: "22.2 km", Value: 22242},
+						Distance: Distance{HumanReadable: "22.2 km", Meters: 22242},
 					},
 				},
 			},

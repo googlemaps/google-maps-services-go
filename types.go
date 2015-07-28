@@ -73,8 +73,10 @@ const (
 
 // Distance is the API representation for a distance between two points.
 type Distance struct {
-	// Text is the distance in a human displayable form. The style of display can be changed by setting `units`.
-	Text string `json:"text"`
-	// Value is the distance in meters.
-	Value int `json:"value"`
+	// HumanReadable is the human friendly distance. This is rounded and in an appropriate unit for the
+	// request. The units can be overriden with a request parameter.
+	HumanReadable string `json:"text"`
+	// Meters is the numeric distance, always in meters. This is intended to be used only in
+	// algorithmic situations, e.g. sorting results by some user specified metric.
+	Meters int `json:"value"`
 }
