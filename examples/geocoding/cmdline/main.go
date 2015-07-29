@@ -101,7 +101,7 @@ func parseComponents(components string, r *maps.GeocodingRequest) {
 			case "postal_code":
 				r.Components[maps.ComponentPostalCode] = i[1]
 			case "country":
-				r.Components[maps.ComponentCounty] = i[1]
+				r.Components[maps.ComponentCountry] = i[1]
 			}
 		}
 	}
@@ -166,13 +166,13 @@ func parseLocationType(locationType string, r *maps.GeocodingRequest) {
 		for _, l := range strings.Split(locationType, "|") {
 			switch l {
 			case "ROOFTOP":
-				r.LocationType = append(r.LocationType, maps.LocationTypeRooftop)
+				r.LocationType = append(r.LocationType, maps.GeocodeAccuracyRooftop)
 			case "RANGE_INTERPOLATED":
-				r.LocationType = append(r.LocationType, maps.LocationTypeRangeInterpolated)
+				r.LocationType = append(r.LocationType, maps.GeocodeAccuracyRangeInterpolated)
 			case "GEOMETRIC_CENTER":
-				r.LocationType = append(r.LocationType, maps.LocationTypeGeometricCenter)
+				r.LocationType = append(r.LocationType, maps.GeocodeAccuracyGeometricCenter)
 			case "APPROXIMATE":
-				r.LocationType = append(r.LocationType, maps.LocationTypeApproximate)
+				r.LocationType = append(r.LocationType, maps.GeocodeAccuracyApproximate)
 			}
 		}
 
