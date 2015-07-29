@@ -129,18 +129,18 @@ const (
 	ComponentCountry = Component("country")
 )
 
-// LocationType is the type of a location result from the Geocoding API.
-type LocationType string
+// GeocodeAccuracy is the type of a location result from the Geocoding API.
+type GeocodeAccuracy string
 
 const (
-	// LocationTypeRooftop restricts the results to addresses for which Google has location information accurate down to street address precision
-	LocationTypeRooftop = LocationType("ROOFTOP")
-	// LocationTypeRangeInterpolated restricts the results to those that reflect an approximation interpolated between two precise points.
-	LocationTypeRangeInterpolated = LocationType("RANGE_INTERPOLATED")
-	// LocationTypeGeometricCenter restricts the results to geometric centers of a location such as a polyline or polygon.
-	LocationTypeGeometricCenter = LocationType("GEOMETRIC_CENTER")
-	// LocationTypeApproximate restricts the results to those that are characterized as approximate.
-	LocationTypeApproximate = LocationType("APPROXIMATE")
+	// GeocodeAccuracyRooftop restricts the results to addresses for which Google has location information accurate down to street address precision
+	GeocodeAccuracyRooftop = GeocodeAccuracy("ROOFTOP")
+	// GeocodeAccuracyRangeInterpolated restricts the results to those that reflect an approximation interpolated between two precise points.
+	GeocodeAccuracyRangeInterpolated = GeocodeAccuracy("RANGE_INTERPOLATED")
+	// GeocodeAccuracyGeometricCenter restricts the results to geometric centers of a location such as a polyline or polygon.
+	GeocodeAccuracyGeometricCenter = GeocodeAccuracy("GEOMETRIC_CENTER")
+	// GeocodeAccuracyApproximate restricts the results to those that are characterized as approximate.
+	GeocodeAccuracyApproximate = GeocodeAccuracy("APPROXIMATE")
 )
 
 // GeocodingRequest is the request structure for Geocoding API
@@ -163,8 +163,8 @@ type GeocodingRequest struct {
 	LatLng *LatLng
 	// ResultType is an array of one or more address types. Optional.
 	ResultType []string
-	// LocationType is an array of One or more location types. Optional.
-	LocationType []LocationType
+	// LocationType is an array of one or more geocoding accuracy types. Optional.
+	LocationType []GeocodeAccuracy
 
 	// Language is the language in which to return results. Optional.
 	Language string

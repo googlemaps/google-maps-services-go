@@ -398,7 +398,7 @@ func TestGeocodingRequestURL(t *testing.T) {
 		Bounds:       &LatLngBounds{LatLng{34.172684, -118.604794}, LatLng{34.236144, -118.500938}},
 		Region:       "es",
 		ResultType:   []string{"country"},
-		LocationType: []LocationType{LocationTypeApproximate},
+		LocationType: []GeocodeAccuracy{GeocodeAccuracyApproximate},
 		Components:   map[Component]string{ComponentCountry: "ES"},
 		Language:     "es",
 	}
