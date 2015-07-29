@@ -399,7 +399,7 @@ func TestGeocodingRequestURL(t *testing.T) {
 		Region:       "es",
 		ResultType:   []string{"country"},
 		LocationType: []LocationType{LocationTypeApproximate},
-		Components:   map[ComponentFilter]string{ComponentCounty: "ES"},
+		Components:   map[Component]string{ComponentCountry: "ES"},
 		Language:     "es",
 	}
 	expectedQuery := "address=Santa+Cruz&bounds=34.236144%2C-118.500938%7C34.172684%2C-118.604794&components=country%3AES&key=AIzaNotReallyAnAPIKey&language=es&location_type=APPROXIMATE&region=es&result_type=country"

@@ -32,42 +32,39 @@ type TransitMode string
 // TransitRoutingPreference biases which routes are returned
 type TransitRoutingPreference string
 
+// Travel mode preferences.
 const (
-	// TravelModeDriving is for specifying driving as travel mode
-	TravelModeDriving = Mode("driving")
-	// TravelModeWalking is for specifying walking as travel mode
-	TravelModeWalking = Mode("walking")
-	// TravelModeBicycling is for specifying bicycling as travel mode
+	TravelModeDriving   = Mode("driving")
+	TravelModeWalking   = Mode("walking")
 	TravelModeBicycling = Mode("bicycling")
-	// TravelModeTransit is for specifying transit as travel mode
-	TravelModeTransit = Mode("transit")
+	TravelModeTransit   = Mode("transit")
+)
 
-	// AvoidTolls is for specifying routes that avoid tolls
-	AvoidTolls = Avoid("tolls")
-	// AvoidHighways is for specifying routes that avoid highways
+// Features to avoid.
+const (
+	AvoidTolls    = Avoid("tolls")
 	AvoidHighways = Avoid("highways")
-	// AvoidFerries is for specifying routes that avoid ferries
-	AvoidFerries = Avoid("ferries")
+	AvoidFerries  = Avoid("ferries")
+)
 
-	// UnitsMetric specifies usage of the metric units system
-	UnitsMetric = Units("metric")
-	// UnitsImperial specifies usage of the Imperial (English) units system
+// Units to use on human readable distances.
+const (
+	UnitsMetric   = Units("metric")
 	UnitsImperial = Units("imperial")
+)
 
-	// TransitModeBus is for specifying a transit mode of bus
-	TransitModeBus = TransitMode("bus")
-	// TransitModeSubway is for specifying a transit mode of subway
+// Transit mode of directions or distance matrix request.
+const (
+	TransitModeBus    = TransitMode("bus")
 	TransitModeSubway = TransitMode("subway")
-	// TransitModeTrain is for specifying a transit mode of train
-	TransitModeTrain = TransitMode("train")
-	// TransitModeTram is for specifying a transit mode of tram
-	TransitModeTram = TransitMode("tram")
-	// TransitModeRail is for specifying a transit mode of rail
-	TransitModeRail = TransitMode("rail")
+	TransitModeTrain  = TransitMode("train")
+	TransitModeTram   = TransitMode("tram")
+	TransitModeRail   = TransitMode("rail")
+)
 
-	// TransitRoutingPreferenceLessWalking indicates that the calculated route should prefer limited amounts of walking
-	TransitRoutingPreferenceLessWalking = TransitRoutingPreference("less_walking")
-	// TransitRoutingPreferenceFewerTransfers indicates that the calculated route should prefer a limited number of transfers
+// Transit Routing preferences for transit mode requests
+const (
+	TransitRoutingPreferenceLessWalking    = TransitRoutingPreference("less_walking")
 	TransitRoutingPreferenceFewerTransfers = TransitRoutingPreference("fewer_transfers")
 )
 

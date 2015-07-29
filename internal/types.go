@@ -22,17 +22,12 @@ type DateTime struct {
 	// the corresponding TimeZone.
 	Text string `json:"text"`
 
-	// TimeZone contains the time zone as per the IANA Time Zone Database. For
+	// TimeZone is the name of the time zone in the IANA Time Zone Database. For
 	// example, "America/New_York" or "Australia/Sydney".
 	TimeZone string `json:"time_zone"`
 
 	// Value is the number of milliseconds since midnight 01 January, 1970 UTC.
 	Value int64 `json:"value"`
-}
-
-// Location returns the *time.Location corresponding to this DateTime.
-func (dt *DateTime) Location() (*time.Location, error) {
-	return time.LoadLocation(dt.TimeZone)
 }
 
 // Time returns the time.Time for this DateTime.
@@ -41,8 +36,8 @@ func (dt *DateTime) Time() time.Time {
 		return time.Time{}
 	}
 
-	loc, err := dt.Location()
-	t := time.Unix(0, dt.Value*int64(time.Millisecond))
+	loc, err := time.LoadLocation(dt.TimeZone)
+	t := time.Unix(0, dt.Value*1e6)
 	if err == nil && loc != nil {
 		t = t.In(loc)
 	}
@@ -83,8 +78,8 @@ func (d *Duration) Duration() time.Duration {
 
 // NewDuration builds an internal Duration from the passed time.Duration.
 func NewDuration(d time.Duration) *Duration {
-	if d == time.Duration(0) {
-		return nil
+	if d == 0 {
+		return &Duration{}
 	}
 	return &Duration{
 		Value: int64(d / time.Second),

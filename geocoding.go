@@ -112,23 +112,24 @@ func (r *GeocodingRequest) request(c *Client) (*http.Request, error) {
 	return req, nil
 }
 
-// ComponentFilter enables filtering of returned results
-type ComponentFilter string
+// Component specifies a key for the parts of a structured address.
+// See https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering for more detail.
+type Component string
 
 const (
 	// ComponentRoute matches long or short name of a route
-	ComponentRoute = ComponentFilter("route")
+	ComponentRoute = Component("route")
 	// ComponentLocality matches against both locality and sublocality types
-	ComponentLocality = ComponentFilter("locality")
+	ComponentLocality = Component("locality")
 	// ComponentAdministrativeArea matches all the administrative_area levels
-	ComponentAdministrativeArea = ComponentFilter("administrative_area")
+	ComponentAdministrativeArea = Component("administrative_area")
 	// ComponentPostalCode matches postal_code and postal_code_prefix
-	ComponentPostalCode = ComponentFilter("postal_code")
-	// ComponentCounty matches a country name or a two letter ISO 3166-1 country code
-	ComponentCounty = ComponentFilter("country")
+	ComponentPostalCode = Component("postal_code")
+	// ComponentCountry matches a country name or a two letter ISO 3166-1 country code
+	ComponentCountry = Component("country")
 )
 
-// LocationType restricts the results to this type
+// LocationType is the type of a location result from the Geocoding API.
 type LocationType string
 
 const (
@@ -150,7 +151,7 @@ type GeocodingRequest struct {
 	Address string
 	// Components is a component filter for which you wish to obtain a geocode. Either Address or Components is required in a geocoding request.
 	// For more detail on Component Filtering please see https://developers.google.com/maps/documentation/geocoding/#ComponentFiltering
-	Components map[ComponentFilter]string
+	Components map[Component]string
 	// Bounds is the bounding box of the viewport within which to bias geocode results more prominently. Optional.
 	Bounds *LatLngBounds
 	// Region is the region code, specified as a ccTLD two-character value. Optional.
