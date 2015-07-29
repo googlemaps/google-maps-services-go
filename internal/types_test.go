@@ -42,8 +42,8 @@ func TestDateTime(t *testing.T) {
 }
 
 func TestDuration(t *testing.T) {
-	if empty := NewDuration(time.Duration(0)); empty != nil {
-		t.Errorf("expected nil empty duration, was %v", empty)
+	if empty := NewDuration(time.Duration(0)); empty.Text != "" || empty.Value != 0 {
+		t.Errorf("expected empty duration, was %v", empty)
 	}
 
 	orig := time.Second * time.Duration(133)
