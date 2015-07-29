@@ -30,7 +30,7 @@ import (
 func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
 
 	if r.Address == "" && len(r.Components) == 0 && r.LatLng == nil {
-		return nil, errors.New("geocoding: You must specify at least one of Address or Components for a geocoding request, or LatLng for a reverse geocoding request")
+		return nil, errors.New("maps: address, components and LatLng are all missing")
 	}
 
 	var response geocodingResponse
@@ -51,7 +51,7 @@ func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingR
 		return nil, err
 	}
 	if response.Status != "OK" {
-		err = errors.New("geocoding: " + response.Status + " - " + response.ErrorMessage)
+		err = errors.New("maps: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 
@@ -112,34 +112,35 @@ func (r *GeocodingRequest) request(c *Client) (*http.Request, error) {
 	return req, nil
 }
 
-// ComponentFilter enables filtering of returned results
-type ComponentFilter string
+// Component specifies a key for the parts of a structured address.
+// See https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering for more detail.
+type Component string
 
 const (
 	// ComponentRoute matches long or short name of a route
-	ComponentRoute = ComponentFilter("route")
+	ComponentRoute = Component("route")
 	// ComponentLocality matches against both locality and sublocality types
-	ComponentLocality = ComponentFilter("locality")
+	ComponentLocality = Component("locality")
 	// ComponentAdministrativeArea matches all the administrative_area levels
-	ComponentAdministrativeArea = ComponentFilter("administrative_area")
+	ComponentAdministrativeArea = Component("administrative_area")
 	// ComponentPostalCode matches postal_code and postal_code_prefix
-	ComponentPostalCode = ComponentFilter("postal_code")
-	// ComponentCounty matches a country name or a two letter ISO 3166-1 country code
-	ComponentCounty = ComponentFilter("country")
+	ComponentPostalCode = Component("postal_code")
+	// ComponentCountry matches a country name or a two letter ISO 3166-1 country code
+	ComponentCountry = Component("country")
 )
 
-// LocationType restricts the results to this type
-type LocationType string
+// GeocodeAccuracy is the type of a location result from the Geocoding API.
+type GeocodeAccuracy string
 
 const (
-	// LocationTypeRooftop restricts the results to addresses for which Google has location information accurate down to street address precision
-	LocationTypeRooftop = LocationType("ROOFTOP")
-	// LocationTypeRangeInterpolated restricts the results to those that reflect an approximation interpolated between two precise points.
-	LocationTypeRangeInterpolated = LocationType("RANGE_INTERPOLATED")
-	// LocationTypeGeometricCenter restricts the results to geometric centers of a location such as a polyline or polygon.
-	LocationTypeGeometricCenter = LocationType("GEOMETRIC_CENTER")
-	// LocationTypeApproximate restricts the results to those that are characterized as approximate.
-	LocationTypeApproximate = LocationType("APPROXIMATE")
+	// GeocodeAccuracyRooftop restricts the results to addresses for which Google has location information accurate down to street address precision
+	GeocodeAccuracyRooftop = GeocodeAccuracy("ROOFTOP")
+	// GeocodeAccuracyRangeInterpolated restricts the results to those that reflect an approximation interpolated between two precise points.
+	GeocodeAccuracyRangeInterpolated = GeocodeAccuracy("RANGE_INTERPOLATED")
+	// GeocodeAccuracyGeometricCenter restricts the results to geometric centers of a location such as a polyline or polygon.
+	GeocodeAccuracyGeometricCenter = GeocodeAccuracy("GEOMETRIC_CENTER")
+	// GeocodeAccuracyApproximate restricts the results to those that are characterized as approximate.
+	GeocodeAccuracyApproximate = GeocodeAccuracy("APPROXIMATE")
 )
 
 // GeocodingRequest is the request structure for Geocoding API
@@ -150,7 +151,7 @@ type GeocodingRequest struct {
 	Address string
 	// Components is a component filter for which you wish to obtain a geocode. Either Address or Components is required in a geocoding request.
 	// For more detail on Component Filtering please see https://developers.google.com/maps/documentation/geocoding/#ComponentFiltering
-	Components map[ComponentFilter]string
+	Components map[Component]string
 	// Bounds is the bounding box of the viewport within which to bias geocode results more prominently. Optional.
 	Bounds *LatLngBounds
 	// Region is the region code, specified as a ccTLD two-character value. Optional.
@@ -162,8 +163,8 @@ type GeocodingRequest struct {
 	LatLng *LatLng
 	// ResultType is an array of one or more address types. Optional.
 	ResultType []string
-	// LocationType is an array of One or more location types. Optional.
-	LocationType []LocationType
+	// LocationType is an array of one or more geocoding accuracy types. Optional.
+	LocationType []GeocodeAccuracy
 
 	// Language is the language in which to return results. Optional.
 	Language string

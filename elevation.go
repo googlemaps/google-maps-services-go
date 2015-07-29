@@ -30,12 +30,12 @@ import (
 func (c *Client) Elevation(ctx context.Context, r *ElevationRequest) ([]ElevationResult, error) {
 
 	if len(r.Path) == 0 && len(r.Locations) == 0 {
-		return nil, errors.New("elevation: Provide either Path or Locations")
+		return nil, errors.New("maps: Path and Locations empty")
 	}
 
 	// Sampled path request
 	if len(r.Path) > 0 && r.Samples == 0 {
-		return nil, errors.New("elevation: Sampled Path Request requires Samples to be specifed")
+		return nil, errors.New("maps: Samples empty")
 	}
 
 	req, err := r.request(c)
@@ -54,7 +54,7 @@ func (c *Client) Elevation(ctx context.Context, r *ElevationRequest) ([]Elevatio
 	}
 
 	if response.Status != "OK" {
-		err = errors.New("distancematrix: " + response.Status + " - " + response.ErrorMessage)
+		err = errors.New("maps: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 

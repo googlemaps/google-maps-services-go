@@ -30,7 +30,7 @@ import (
 func (c *Client) SnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
 
 	if len(r.Path) == 0 {
-		return nil, errors.New("snapToRoad: You must specify a Path")
+		return nil, errors.New("maps: Path empty")
 	}
 
 	req, err := r.request(c)
@@ -103,7 +103,7 @@ type SnappedPoint struct {
 func (c *Client) SpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*SpeedLimitsResponse, error) {
 
 	if len(r.Path) == 0 && len(r.PlaceID) == 0 {
-		return nil, errors.New("speedLimits: You must specify a Path or PlaceID")
+		return nil, errors.New("maps: Path and PlaceID both empty")
 	}
 
 	req, err := r.request(c)

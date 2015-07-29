@@ -59,7 +59,7 @@ func NewClient(options ...ClientOption) (*Client, error) {
 		}
 	}
 	if c.apiKey == "" && (c.clientID == "" || len(c.signature) == 0) {
-		return nil, errors.New("maps.Client with no API Key or Maps for Work credentials")
+		return nil, errors.New("maps: API Key or Maps for Work credentials missing")
 	}
 
 	// Implement a bursty rate limiter.
@@ -208,7 +208,7 @@ func (client *Client) generateAuthQuery(path string, q url.Values, acceptClientI
 		}
 		return query, nil
 	}
-	return "", errors.New("Must provide API key for this API. It does not accept enterprise credentials.")
+	return "", errors.New("maps: API Key missing")
 }
 
 func (client *Client) getBaseURL(baseURL string) string {
