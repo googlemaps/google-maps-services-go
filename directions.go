@@ -32,22 +32,22 @@ import (
 // Directions issues the Directions request and retrieves the Response
 func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route, error) {
 	if r.Origin == "" {
-		return nil, errors.New("directions: Origin required")
+		return nil, errors.New("maps: origin missing")
 	}
 	if r.Destination == "" {
-		return nil, errors.New("directions: Destination required")
+		return nil, errors.New("maps: destination missing")
 	}
 	if r.Mode != "" && TravelModeDriving != r.Mode && TravelModeWalking != r.Mode && TravelModeBicycling != r.Mode && TravelModeTransit != r.Mode {
-		return nil, fmt.Errorf("directions: unknown Mode: '%s'", r.Mode)
+		return nil, fmt.Errorf("maps: unknown Mode: '%s'", r.Mode)
 	}
 	if r.DepartureTime != "" && r.ArrivalTime != "" {
-		return nil, errors.New("directions: must not specify both DepartureTime and ArrivalTime")
+		return nil, errors.New("maps: DepartureTime and ArrivalTime both specified")
 	}
 	if len(r.TransitMode) != 0 && r.Mode != TravelModeTransit {
-		return nil, errors.New("directions: must specify mode of transit when specifying transitMode")
+		return nil, errors.New("maps: TransitMode specified while Mode != TravelModeTransit")
 	}
 	if r.TransitRoutingPreference != "" && r.Mode != TravelModeTransit {
-		return nil, errors.New("directions: must specify mode of transit when specifying transitRoutingPreference")
+		return nil, errors.New("maps: mode of transit '" + string(r.Mode) + "' invalid for TransitRoutingPreference")
 	}
 
 	req, err := r.request(c)
@@ -66,7 +66,7 @@ func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route,
 	}
 
 	if response.Status != "OK" {
-		err = errors.New("directions: " + response.Status + " - " + response.ErrorMessage)
+		err = errors.New("maps: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 	return response.Routes, nil

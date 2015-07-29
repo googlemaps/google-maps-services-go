@@ -30,7 +30,7 @@ import (
 // Timezone makes a Timezone API request
 func (c *Client) Timezone(ctx context.Context, r *TimezoneRequest) (*TimezoneResult, error) {
 	if r.Location == nil {
-		return nil, errors.New("timezone: You must specify Location")
+		return nil, errors.New("maps: Location missing")
 	}
 
 	req, err := r.request(c)
@@ -47,7 +47,7 @@ func (c *Client) Timezone(ctx context.Context, r *TimezoneRequest) (*TimezoneRes
 		return nil, err
 	}
 	if response.Status != "OK" {
-		err := errors.New("timezone: " + response.Status + " - " + response.ErrorMessage)
+		err := errors.New("maps: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 

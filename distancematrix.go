@@ -31,19 +31,19 @@ import (
 func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
 
 	if len(r.Origins) == 0 {
-		return nil, errors.New("distancematrix: Origins must contain at least one start address")
+		return nil, errors.New("maps: origins empty")
 	}
 	if len(r.Destinations) == 0 {
-		return nil, errors.New("distancematrix: Destinations must contain at least one end address")
+		return nil, errors.New("maps: destinations empty")
 	}
 	if r.DepartureTime != "" && r.ArrivalTime != "" {
-		return nil, errors.New("distancematrix: must not specify both DepartureTime and ArrivalTime")
+		return nil, errors.New("maps: DepartureTime and ArrivalTime both specified")
 	}
 	if len(r.TransitMode) != 0 && r.Mode != TravelModeTransit {
-		return nil, errors.New("distancematrix: must specify mode of transit when specifying transitMode")
+		return nil, errors.New("maps: TransitMode specified while Mode != TravelModeTransit")
 	}
 	if r.TransitRoutingPreference != "" && r.Mode != TravelModeTransit {
-		return nil, errors.New("distancematrix: must specify mode of transit when specifying transitRoutingPreference")
+		return nil, errors.New("maps: mode of transit '" + string(r.Mode) + "' invalid for TransitRoutingPreference")
 	}
 
 	req, err := r.request(c)
@@ -61,7 +61,7 @@ func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (
 		return nil, err
 	}
 	if raw.Status != "OK" {
-		err = errors.New("distancematrix: " + raw.Status + " - " + raw.ErrorMessage)
+		err = errors.New("maps: " + raw.Status + " - " + raw.ErrorMessage)
 		return nil, err
 	}
 

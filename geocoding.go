@@ -30,7 +30,7 @@ import (
 func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
 
 	if r.Address == "" && len(r.Components) == 0 && r.LatLng == nil {
-		return nil, errors.New("geocoding: You must specify at least one of Address or Components for a geocoding request, or LatLng for a reverse geocoding request")
+		return nil, errors.New("maps: address, components and LatLng are all missing")
 	}
 
 	var response geocodingResponse
@@ -51,7 +51,7 @@ func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingR
 		return nil, err
 	}
 	if response.Status != "OK" {
-		err = errors.New("geocoding: " + response.Status + " - " + response.ErrorMessage)
+		err = errors.New("maps: " + response.Status + " - " + response.ErrorMessage)
 		return nil, err
 	}
 
