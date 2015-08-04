@@ -62,7 +62,7 @@ func (c *Client) Elevation(ctx context.Context, r *ElevationRequest) ([]Elevatio
 }
 
 func (r *ElevationRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://maps.googleapis.com/")
+	baseURL := c.getBaseURL("https://maps.googleapis.com")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/elevation/json", nil)
 	if err != nil {

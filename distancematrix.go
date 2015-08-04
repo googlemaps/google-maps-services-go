@@ -75,7 +75,7 @@ func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (
 }
 
 func (r *DistanceMatrixRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://maps.googleapis.com/")
+	baseURL := c.getBaseURL("https://maps.googleapis.com")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/distancematrix/json", nil)
 	if err != nil {

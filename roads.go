@@ -49,7 +49,7 @@ func (c *Client) SnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToR
 }
 
 func (r *SnapToRoadRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://roads.googleapis.com/")
+	baseURL := c.getBaseURL("https://roads.googleapis.com")
 
 	req, err := http.NewRequest("GET", baseURL+"/v1/snapToRoads", nil)
 	if err != nil {
@@ -122,7 +122,7 @@ func (c *Client) SpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*Speed
 }
 
 func (r *SpeedLimitsRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://roads.googleapis.com/")
+	baseURL := c.getBaseURL("https://roads.googleapis.com")
 
 	req, err := http.NewRequest("GET", baseURL+"/v1/speedLimits", nil)
 	if err != nil {

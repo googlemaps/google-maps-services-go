@@ -62,7 +62,7 @@ func (c *Client) Timezone(ctx context.Context, r *TimezoneRequest) (*TimezoneRes
 }
 
 func (r *TimezoneRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://maps.googleapis.com/")
+	baseURL := c.getBaseURL("https://maps.googleapis.com")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/timezone/json", nil)
 	if err != nil {
