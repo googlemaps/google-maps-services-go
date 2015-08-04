@@ -67,7 +67,8 @@ func TestDistanceMatrixSydPyrToPar(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
 	r := &DistanceMatrixRequest{
 		Origins:      []string{"Sydney", "Pyrmont"},
 		Destinations: []string{"Parramatta"},
@@ -192,7 +193,8 @@ func TestDistanceMatrixWithCancelledContext(t *testing.T) {
 func TestDistanceMatrixFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
 	r := &DistanceMatrixRequest{
 		Origins:      []string{"Sydney", "Pyrmont"},
 		Destinations: []string{},

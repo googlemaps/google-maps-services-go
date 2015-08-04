@@ -38,7 +38,8 @@ func TestTimezoneNevada(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
 	r := &TimezoneRequest{
 		Location: &LatLng{
 			Lat: 39.6034810,
@@ -97,7 +98,8 @@ func TestTimezoneWithCancelledContext(t *testing.T) {
 func TestTimezoneFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
 	r := &TimezoneRequest{
 		Location: &LatLng{Lat: 36.578581, Lng: -118.291994},
 	}

@@ -114,7 +114,8 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
@@ -263,7 +264,8 @@ func TestDirectionsWithCancelledContext(t *testing.T) {
 func TestDirectionsFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
