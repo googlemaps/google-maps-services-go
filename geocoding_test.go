@@ -112,7 +112,8 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
 	r := &GeocodingRequest{
 		Address: "1600 Amphitheatre Parkway, Mountain View, CA",
 	}
@@ -280,7 +281,8 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
 	r := &GeocodingRequest{
 		LatLng: &LatLng{Lat: 40.714224, Lng: -73.961452},
 	}
@@ -381,7 +383,8 @@ func TestGeocodingWithCancelledContext(t *testing.T) {
 func TestGeocodingFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey), withBaseURL(server.URL))
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
 	r := &GeocodingRequest{
 		Address: "Sydney Town Hall",
 	}

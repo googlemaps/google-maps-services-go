@@ -29,8 +29,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-type requestQuota struct{}
-
 // Client may be used to make requests to the Google Maps WebService APIs
 type Client struct {
 	httpClient        *http.Client
@@ -39,7 +37,7 @@ type Client struct {
 	clientID          string
 	signature         []byte
 	requestsPerSecond int
-	rateLimiter       chan requestQuota
+	rateLimiter       chan int
 }
 
 // ClientOption is the type of constructor options for NewClient(...).
@@ -48,7 +46,6 @@ type ClientOption func(*Client) error
 var defaultRequestsPerSecond = 10
 
 // NewClient constructs a new Client which can make requests to the Google Maps WebService APIs.
-// The supplied http.Client is used for making requests to the Maps WebService APIs
 func NewClient(options ...ClientOption) (*Client, error) {
 	c := &Client{requestsPerSecond: defaultRequestsPerSecond}
 	WithHTTPClient(&http.Client{})(c)
@@ -64,15 +61,15 @@ func NewClient(options ...ClientOption) (*Client, error) {
 
 	// Implement a bursty rate limiter.
 	// Allow up to 1 second worth of requests to be made at once.
-	c.rateLimiter = make(chan requestQuota, c.requestsPerSecond)
+	c.rateLimiter = make(chan int, c.requestsPerSecond)
 	// Prefill rateLimiter with 1 seconds worth of requests.
 	for i := 0; i < c.requestsPerSecond; i++ {
-		c.rateLimiter <- requestQuota{}
+		c.rateLimiter <- 1
 	}
 	go func() {
 		// Refill rateLimiter continuously
 		for range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
-			c.rateLimiter <- requestQuota{}
+			c.rateLimiter <- 1
 		}
 	}()
 
@@ -91,14 +88,6 @@ func WithHTTPClient(c *http.Client) ClientOption {
 			}
 		}
 		client.httpClient = c
-		return nil
-	}
-}
-
-// withBaseURL is for testing only.
-func withBaseURL(url string) ClientOption {
-	return func(client *Client) error {
-		client.baseURL = url
 		return nil
 	}
 }
@@ -135,6 +124,8 @@ func WithRateLimit(requestsPerSecond int) func(*Client) error {
 }
 
 func (client *Client) httpDo(ctx context.Context, req *http.Request) (*http.Response, error) {
+	// TODO: change this code to use ctxhttp when it is released.
+	// https://go-review.googlesource.com/#/c/12755/
 	type httpResponse struct {
 		response *http.Response
 		err      error
