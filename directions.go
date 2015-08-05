@@ -73,7 +73,7 @@ func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route,
 }
 
 func (r *DirectionsRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://maps.googleapis.com/")
+	baseURL := c.getBaseURL("https://maps.googleapis.com")
 
 	req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
 	if err != nil {
@@ -122,7 +122,6 @@ func (r *DirectionsRequest) request(c *Client) (*http.Request, error) {
 		return nil, err
 	}
 	req.URL.RawQuery = query
-
 	return req, nil
 }
 
