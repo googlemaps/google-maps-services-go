@@ -18,14 +18,20 @@
 package maps
 
 import (
-	"encoding/json"
 	"errors"
-	"net/http"
+	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
 	"golang.org/x/net/context"
 )
+
+var distanceMatrixAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/distancematrix/json",
+	acceptsClientID: true,
+}
 
 // DistanceMatrix makes a Distance Matrix API request
 func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (*DistanceMatrixResponse, error) {
@@ -46,42 +52,22 @@ func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (
 		return nil, errors.New("maps: mode of transit '" + string(r.Mode) + "' invalid for TransitRoutingPreference")
 	}
 
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var raw rawDistanceMatrixResponse
-	err = json.NewDecoder(resp.Body).Decode(&raw)
-	if err != nil {
-		return nil, err
-	}
-	if raw.Status != "OK" {
-		err = errors.New("maps: " + raw.Status + " - " + raw.ErrorMessage)
-		return nil, err
+	var response rawDistanceMatrixResponse
+	c.getJSON(ctx, distanceMatrixAPI, r, &response)
+
+	if response.Status != "OK" {
+		return nil, fmt.Errorf("maps: %s - %s", response.Status, response.ErrorMessage)
 	}
 
-	response := &DistanceMatrixResponse{
-		DestinationAddresses: raw.DestinationAddresses,
-		OriginAddresses:      raw.OriginAddresses,
-		Rows:                 raw.Rows,
-	}
-
-	return response, nil
+	return &DistanceMatrixResponse{
+		DestinationAddresses: response.DestinationAddresses,
+		OriginAddresses:      response.OriginAddresses,
+		Rows:                 response.Rows,
+	}, nil
 }
 
-func (r *DistanceMatrixRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://maps.googleapis.com")
-
-	req, err := http.NewRequest("GET", baseURL+"/maps/api/distancematrix/json", nil)
-	if err != nil {
-		return nil, err
-	}
-	q := req.URL.Query()
+func (r *DistanceMatrixRequest) params() url.Values {
+	q := make(url.Values)
 	q.Set("origins", strings.Join(r.Origins, "|"))
 	q.Set("destinations", strings.Join(r.Destinations, "|"))
 	if r.Mode != "" {
@@ -116,12 +102,7 @@ func (r *DistanceMatrixRequest) request(c *Client) (*http.Request, error) {
 	if r.TransitRoutingPreference != "" {
 		q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
 	}
-	query, err := c.generateAuthQuery(req.URL.Path, q, true)
-	if err != nil {
-		return nil, err
-	}
-	req.URL.RawQuery = query
-	return req, nil
+	return q
 }
 
 // DistanceMatrixRequest is the request struct for Distance Matrix APi

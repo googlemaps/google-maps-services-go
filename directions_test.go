@@ -29,16 +29,36 @@ import (
 
 const apiKey = "AIzaNotReallyAnAPIKey"
 
-// Create a mock HTTP Server that will return a response with HTTP code and body.
-func mockServer(code int, body string) *httptest.Server {
+type countingServer struct {
+	s          *httptest.Server
+	successful int
+	failed     []string
+}
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// mockServerForQuery returns a mock server that only responds to a particular query string.
+func mockServerForQuery(query string, code int, body string) *countingServer {
+	server := &countingServer{}
+
+	server.s = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if query != "" && r.URL.RawQuery != query {
+			server.failed = append(server.failed, r.URL.RawQuery)
+			http.Error(w, "fail", 999)
+			return
+		}
+		server.successful++
+
 		w.WriteHeader(code)
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		fmt.Fprintln(w, body)
 	}))
 
 	return server
+}
+
+// Create a mock HTTP Server that will return a response with HTTP code and body.
+func mockServer(code int, body string) *httptest.Server {
+	serv := mockServerForQuery("", code, body)
+	return serv.s
 }
 
 func TestDirectionsSydneyToParramatta(t *testing.T) {
@@ -277,7 +297,14 @@ func TestDirectionsFailingServer(t *testing.T) {
 }
 
 func TestDirectionsRequestURL(t *testing.T) {
+	expectedQuery := "alternatives=true&avoid=tolls%7Cferries&destination=Parramatta&key=AIzaNotReallyAnAPIKey&language=es&mode=transit&origin=Sydney&region=es&transit_mode=rail&transit_routing_preference=fewer_transfers&units=imperial&waypoints=Charlestown%2CMA%7Cvia%3ALexington"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
 	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
 	r := &DirectionsRequest{
 		Origin:       "Sydney",
 		Destination:  "Parramatta",
@@ -291,12 +318,12 @@ func TestDirectionsRequestURL(t *testing.T) {
 		Units:        UnitsImperial,
 		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
 	}
-	expectedQuery := "alternatives=true&avoid=tolls%7Cferries&destination=Parramatta&key=AIzaNotReallyAnAPIKey&language=es&mode=transit&origin=Sydney&region=es&transit_mode=rail&transit_routing_preference=fewer_transfers&units=imperial&waypoints=Charlestown%2CMA%7Cvia%3ALexington"
-	req, err := r.request(c)
+
+	_, err := c.Directions(context.Background(), r)
 	if err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
 	}
-	if req.URL.RawQuery != expectedQuery {
-		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }

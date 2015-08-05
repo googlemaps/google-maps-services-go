@@ -19,14 +19,17 @@ package maps
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/googlemaps/google-maps-services-go/internal"
 	"golang.org/x/net/context"
+	"golang.org/x/net/context/ctxhttp"
+
+	"github.com/googlemaps/google-maps-services-go/internal"
 )
 
 // Client may be used to make requests to the Google Maps WebService APIs
@@ -94,8 +97,8 @@ func WithHTTPClient(c *http.Client) ClientOption {
 
 // WithAPIKey configures a Maps API client with an API Key
 func WithAPIKey(apiKey string) ClientOption {
-	return func(client *Client) error {
-		client.apiKey = apiKey
+	return func(c *Client) error {
+		c.apiKey = apiKey
 		return nil
 	}
 }
@@ -103,49 +106,75 @@ func WithAPIKey(apiKey string) ClientOption {
 // WithClientIDAndSignature configures a Maps API client for a Maps for Work application
 // The signature is assumed to be URL modified Base64 encoded
 func WithClientIDAndSignature(clientID, signature string) ClientOption {
-	return func(client *Client) error {
-		client.clientID = clientID
+	return func(c *Client) error {
+		c.clientID = clientID
 		decoded, err := base64.URLEncoding.DecodeString(signature)
 		if err != nil {
 			return err
 		}
-		client.signature = decoded
+		c.signature = decoded
 		return nil
 	}
 }
 
 // WithRateLimit configures the rate limit for back end requests.
 // Default is to limit to 10 requests per second.
-func WithRateLimit(requestsPerSecond int) func(*Client) error {
-	return func(client *Client) error {
-		client.requestsPerSecond = requestsPerSecond
+func WithRateLimit(requestsPerSecond int) ClientOption {
+	return func(c *Client) error {
+		c.requestsPerSecond = requestsPerSecond
 		return nil
 	}
 }
 
-func (client *Client) httpDo(ctx context.Context, req *http.Request) (*http.Response, error) {
-	// TODO: change this code to use ctxhttp when it is released.
-	// https://go-review.googlesource.com/#/c/12755/
-	type httpResponse struct {
-		response *http.Response
-		err      error
-	}
+type apiConfig struct {
+	host            string
+	path            string
+	acceptsClientID bool
+}
 
-	<-client.rateLimiter
-	c := make(chan httpResponse)
+type apiRequest interface {
+	params() url.Values
+}
 
-	go func() {
-		resp, err := client.httpClient.Do(req)
-		c <- httpResponse{resp, err}
-	}()
-
+func (c *Client) getJSON(ctx context.Context, config *apiConfig, apiReq apiRequest, resp interface{}) error {
 	select {
-	case resp := <-c:
-		return resp.response, resp.err
 	case <-ctx.Done():
-		client.httpClient.Transport.(*transport).Base.(*http.Transport).CancelRequest(req)
-		return nil, ctx.Err()
+		return ctx.Err()
+	case <-c.rateLimiter:
+		// Execute request.
 	}
+
+	host := config.host
+	if c.baseURL != "" {
+		host = c.baseURL
+	}
+	req, err := http.NewRequest("GET", host+config.path, nil)
+	if err != nil {
+		return err
+	}
+	q, err := c.generateAuthQuery(config.path, apiReq.params(), config.acceptsClientID)
+	if err != nil {
+		return err
+	}
+	req.URL.RawQuery = q
+	httpResp, err := ctxhttp.Do(ctx, c.httpClient, req)
+	if err != nil {
+		return err
+	}
+	defer httpResp.Body.Close()
+
+	return json.NewDecoder(httpResp.Body).Decode(resp)
+}
+
+func (c *Client) generateAuthQuery(path string, q url.Values, acceptClientID bool) (string, error) {
+	if c.apiKey != "" {
+		q.Set("key", c.apiKey)
+		return q.Encode(), nil
+	}
+	if acceptClientID {
+		return internal.SignURL(path, c.clientID, c.signature, q)
+	}
+	return "", errors.New("maps: API Key missing")
 }
 
 const userAgent = "GoogleGeoApiClientGo/0.1"
@@ -185,26 +214,4 @@ func cloneRequest(r *http.Request) *http.Request {
 		r2.Header[k] = s
 	}
 	return r2
-}
-
-func (client *Client) generateAuthQuery(path string, q url.Values, acceptClientID bool) (string, error) {
-	if client.apiKey != "" {
-		q.Set("key", client.apiKey)
-		return q.Encode(), nil
-	}
-	if acceptClientID {
-		query, err := internal.SignURL(path, client.clientID, client.signature, q)
-		if err != nil {
-			return "", err
-		}
-		return query, nil
-	}
-	return "", errors.New("maps: API Key missing")
-}
-
-func (client *Client) getBaseURL(baseURL string) string {
-	if client.baseURL != "" {
-		return client.baseURL
-	}
-	return baseURL
 }

@@ -18,13 +18,19 @@
 package maps
 
 import (
-	"encoding/json"
 	"errors"
-	"net/http"
+	"fmt"
+	"net/url"
 	"strings"
 
 	"golang.org/x/net/context"
 )
+
+var geocodingAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/geocode/json",
+	acceptsClientID: true,
+}
 
 // Geocode makes a Geocoding API request
 func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
@@ -35,42 +41,19 @@ func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingR
 
 	var response geocodingResponse
 
-	req, err := r.request(c)
-	if err != nil {
+	if err := c.getJSON(ctx, directionsAPI, r, &response); err != nil {
 		return nil, err
 	}
 
-	resp, err := c.httpDo(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	err = json.NewDecoder(resp.Body).Decode(&response)
-	if err != nil {
-		return nil, err
-	}
 	if response.Status != "OK" {
-		err = errors.New("maps: " + response.Status + " - " + response.ErrorMessage)
-		return nil, err
+		return nil, fmt.Errorf("maps: %s - %s", response.Status, response.ErrorMessage)
 	}
 
 	return response.Results, nil
 }
 
-type geocodingResultWithError struct {
-	Results []GeocodingResult
-	err     error
-}
-
-func (r *GeocodingRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://maps.googleapis.com")
-
-	req, err := http.NewRequest("GET", baseURL+"/maps/api/geocode/json", nil)
-	if err != nil {
-		return nil, err
-	}
-	q := req.URL.Query()
+func (r *GeocodingRequest) params() url.Values {
+	q := make(url.Values)
 
 	if r.Address != "" {
 		q.Set("address", r.Address)
@@ -104,12 +87,8 @@ func (r *GeocodingRequest) request(c *Client) (*http.Request, error) {
 	if r.Language != "" {
 		q.Set("language", r.Language)
 	}
-	query, err := c.generateAuthQuery(req.URL.Path, q, true)
-	if err != nil {
-		return nil, err
-	}
-	req.URL.RawQuery = query
-	return req, nil
+
+	return q
 }
 
 // Component specifies a key for the parts of a structured address.

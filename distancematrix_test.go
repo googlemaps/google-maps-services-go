@@ -206,25 +206,31 @@ func TestDistanceMatrixFailingServer(t *testing.T) {
 }
 
 func TestDistanceMatrixRequestURL(t *testing.T) {
+	expectedQuery := "avoid=t%7Co%7Cl%7Cl%7Cs&departure_time=now&destinations=Perth%7CParramatta&key=AIzaNotReallyAnAPIKey&language=en&mode=transit&origins=Sydney%7CPyrmont&transit_mode=rail&transit_routing_preference=less_walking&units=imperial"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
 	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
 	r := &DistanceMatrixRequest{
 		Origins:                  []string{"Sydney", "Pyrmont"},
 		Destinations:             []string{"Perth", "Parramatta"},
-		Mode:                     TravelModeDriving,
+		Mode:                     TravelModeTransit,
 		Language:                 "en",
 		Avoid:                    AvoidTolls,
 		Units:                    UnitsImperial,
 		DepartureTime:            "now",
-		ArrivalTime:              "3pm",
 		TransitMode:              []TransitMode{TransitModeRail},
 		TransitRoutingPreference: TransitRoutingPreferenceLessWalking,
 	}
-	req, err := r.request(c)
-	expectedQuery := "arrival_time=3pm&avoid=t%7Co%7Cl%7Cl%7Cs&departure_time=now&destinations=Perth%7CParramatta&key=AIzaNotReallyAnAPIKey&language=en&mode=driving&origins=Sydney%7CPyrmont&transit_mode=rail&transit_routing_preference=less_walking&units=imperial"
+
+	_, err := c.DistanceMatrix(context.Background(), r)
 	if err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
 	}
-	if req.URL.RawQuery != expectedQuery {
-		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }

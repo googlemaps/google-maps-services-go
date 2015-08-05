@@ -18,13 +18,24 @@
 package maps
 
 import (
-	"encoding/json"
 	"errors"
-	"net/http"
+	"net/url"
 	"strings"
 
 	"golang.org/x/net/context"
 )
+
+var snapToRoadsAPI = &apiConfig{
+	host:            "https://roads.googleapis.com",
+	path:            "/v1/snapToRoads",
+	acceptsClientID: false,
+}
+
+var speedLimitsAPI = &apiConfig{
+	host:            "https://roads.googleapis.com",
+	path:            "/v1/speedLimits",
+	acceptsClientID: false,
+}
 
 // SnapToRoad makes a Snap to Road API request
 func (c *Client) SnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToRoadResponse, error) {
@@ -33,29 +44,17 @@ func (c *Client) SnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToR
 		return nil, errors.New("maps: Path empty")
 	}
 
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
 	response := &SnapToRoadResponse{}
-	err = json.NewDecoder(resp.Body).Decode(response)
-	return response, err
+
+	if err := c.getJSON(ctx, directionsAPI, r, response); err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
-func (r *SnapToRoadRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://roads.googleapis.com")
-
-	req, err := http.NewRequest("GET", baseURL+"/v1/snapToRoads", nil)
-	if err != nil {
-		return nil, err
-	}
-	q := req.URL.Query()
+func (r *SnapToRoadRequest) params() url.Values {
+	q := make(url.Values)
 	var p []string
 	for _, e := range r.Path {
 		p = append(p, e.String())
@@ -65,12 +64,8 @@ func (r *SnapToRoadRequest) request(c *Client) (*http.Request, error) {
 	if r.Interpolate {
 		q.Set("interpolate", "true")
 	}
-	query, err := c.generateAuthQuery(req.URL.Path, q, false)
-	if err != nil {
-		return nil, err
-	}
-	req.URL.RawQuery = query
-	return req, nil
+
+	return q
 }
 
 // SnapToRoadRequest is the request structure for the Roads Snap to Road API.
@@ -106,29 +101,18 @@ func (c *Client) SpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*Speed
 		return nil, errors.New("maps: Path and PlaceID both empty")
 	}
 
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
 	response := &SpeedLimitsResponse{}
-	err = json.NewDecoder(resp.Body).Decode(response)
-	return response, err
+
+	if err := c.getJSON(ctx, directionsAPI, r, response); err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
-func (r *SpeedLimitsRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://roads.googleapis.com")
+func (r *SpeedLimitsRequest) params() url.Values {
+	q := make(url.Values)
 
-	req, err := http.NewRequest("GET", baseURL+"/v1/speedLimits", nil)
-	if err != nil {
-		return nil, err
-	}
-	q := req.URL.Query()
 	var p []string
 	for _, e := range r.Path {
 		p = append(p, e.String())
@@ -143,12 +127,8 @@ func (r *SpeedLimitsRequest) request(c *Client) (*http.Request, error) {
 	if r.Units != "" {
 		q.Set("units", string(r.Units))
 	}
-	query, err := c.generateAuthQuery(req.URL.Path, q, false)
-	if err != nil {
-		return nil, err
-	}
-	req.URL.RawQuery = query
-	return req, nil
+
+	return q
 }
 
 type speedLimitUnit string

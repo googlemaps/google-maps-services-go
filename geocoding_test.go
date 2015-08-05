@@ -395,7 +395,14 @@ func TestGeocodingFailingServer(t *testing.T) {
 }
 
 func TestGeocodingRequestURL(t *testing.T) {
+	expectedQuery := "address=Santa+Cruz&bounds=34.236144%2C-118.500938%7C34.172684%2C-118.604794&components=country%3AES&key=AIzaNotReallyAnAPIKey&language=es&location_type=APPROXIMATE&region=es&result_type=country"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
 	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
 	r := &GeocodingRequest{
 		Address:      "Santa Cruz",
 		Bounds:       &LatLngBounds{LatLng{34.172684, -118.604794}, LatLng{34.236144, -118.500938}},
@@ -405,13 +412,12 @@ func TestGeocodingRequestURL(t *testing.T) {
 		Components:   map[Component]string{ComponentCountry: "ES"},
 		Language:     "es",
 	}
-	expectedQuery := "address=Santa+Cruz&bounds=34.236144%2C-118.500938%7C34.172684%2C-118.604794&components=country%3AES&key=AIzaNotReallyAnAPIKey&language=es&location_type=APPROXIMATE&region=es&result_type=country"
 
-	req, err := r.request(c)
+	_, err := c.Geocode(context.Background(), r)
 	if err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
 	}
-	if req.URL.RawQuery != expectedQuery {
-		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }

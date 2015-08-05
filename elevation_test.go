@@ -202,18 +202,25 @@ func TestElevationCancelledContext(t *testing.T) {
 }
 
 func TestElevationRequestURL(t *testing.T) {
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&locations=enc%3A_ibE_seK_seK_seK&path=enc%3A_qo%5D_%7Brc%40_seK_seK&samples=10"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
 	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
 	r := &ElevationRequest{
 		Locations: []LatLng{LatLng{1, 2}, LatLng{3, 4}},
 		Path:      []LatLng{LatLng{5, 6}, LatLng{7, 8}},
 		Samples:   10,
 	}
-	req, err := r.request(c)
-	expectedQuery := "key=AIzaNotReallyAnAPIKey&locations=enc%3A_ibE_seK_seK_seK&path=enc%3A_qo%5D_%7Brc%40_seK_seK&samples=10"
+
+	_, err := c.Elevation(context.Background(), r)
 	if err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
 	}
-	if req.URL.RawQuery != expectedQuery {
-		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }

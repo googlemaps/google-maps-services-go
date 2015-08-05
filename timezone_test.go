@@ -110,18 +110,25 @@ func TestTimezoneFailingServer(t *testing.T) {
 }
 
 func TestTimezoneRequestURL(t *testing.T) {
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&timestamp=-62135596800"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
 	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
 	r := &TimezoneRequest{
 		Location:  &LatLng{1, 2},
 		Timestamp: time.Time{},
 		Language:  "es",
 	}
-	req, err := r.request(c)
-	expectedQuery := "key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&timestamp=-62135596800"
+
+	_, err := c.Timezone(context.Background(), r)
 	if err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
 	}
-	if req.URL.RawQuery != expectedQuery {
-		t.Errorf("Expected query %s, actual query %s", expectedQuery, req.URL.RawQuery)
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }
