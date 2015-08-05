@@ -12,16 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// More information about Google Directions API is available on
-// https://developers.google.com/maps/documentation/directions/
-
 package maps
 
 import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -175,43 +171,4 @@ func (c *Client) generateAuthQuery(path string, q url.Values, acceptClientID boo
 		return internal.SignURL(path, c.clientID, c.signature, q)
 	}
 	return "", errors.New("maps: API Key missing")
-}
-
-const userAgent = "GoogleGeoApiClientGo/0.1"
-
-// Transport is an http.RoundTripper that appends
-// Google Cloud client's user-agent to the original
-// request's user-agent header.
-type transport struct {
-	// Base represents the actual http.RoundTripper
-	// the requests will be delegated to.
-	Base http.RoundTripper
-}
-
-// RoundTrip appends a user-agent to the existing user-agent
-// header and delegates the request to the base http.RoundTripper.
-func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	req = cloneRequest(req)
-	ua := req.Header.Get("User-Agent")
-	if ua == "" {
-		ua = userAgent
-	} else {
-		ua = fmt.Sprintf("%s;%s", ua, userAgent)
-	}
-	req.Header.Set("User-Agent", ua)
-	return t.Base.RoundTrip(req)
-}
-
-// cloneRequest returns a clone of the provided *http.Request.
-// The clone is a shallow copy of the struct and its Header map.
-func cloneRequest(r *http.Request) *http.Request {
-	// shallow copy of the struct
-	r2 := new(http.Request)
-	*r2 = *r
-	// deep copy of the Header
-	r2.Header = make(http.Header)
-	for k, s := range r.Header {
-		r2.Header[k] = s
-	}
-	return r2
 }
