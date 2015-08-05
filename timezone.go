@@ -18,14 +18,20 @@
 package maps
 
 import (
-	"encoding/json"
 	"errors"
-	"net/http"
+	"fmt"
+	"net/url"
 	"strconv"
 	"time"
 
 	"golang.org/x/net/context"
 )
+
+var timezoneAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/timezone/json",
+	acceptsClientID: true,
+}
 
 // Timezone makes a Timezone API request
 func (c *Client) Timezone(ctx context.Context, r *TimezoneRequest) (*TimezoneResult, error) {
@@ -33,54 +39,32 @@ func (c *Client) Timezone(ctx context.Context, r *TimezoneRequest) (*TimezoneRes
 		return nil, errors.New("maps: Location missing")
 	}
 
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(ctx, req)
-	if err != nil {
+	var response timezoneResponse
+
+	if err := c.getJSON(ctx, directionsAPI, r, &response); err != nil {
 		return nil, err
 	}
 
-	response := &timezoneResponse{}
-	if err := json.NewDecoder(resp.Body).Decode(response); err != nil {
-		return nil, err
-	}
 	if response.Status != "OK" {
-		err := errors.New("maps: " + response.Status + " - " + response.ErrorMessage)
-		return nil, err
+		return nil, fmt.Errorf("maps: %s - %s", response.Status, response.ErrorMessage)
 	}
 
-	var result = &TimezoneResult{
+	return &TimezoneResult{
 		DstOffset:    response.DstOffset,
 		RawOffset:    response.RawOffset,
 		TimeZoneID:   response.TimeZoneID,
 		TimeZoneName: response.TimeZoneName,
-	}
-
-	return result, nil
+	}, nil
 }
 
-func (r *TimezoneRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://maps.googleapis.com")
-
-	req, err := http.NewRequest("GET", baseURL+"/maps/api/timezone/json", nil)
-	if err != nil {
-		return nil, err
-	}
-	q := req.URL.Query()
-
+func (r *TimezoneRequest) params() url.Values {
+	q := make(url.Values)
 	q.Set("location", r.Location.String())
 	q.Set("timestamp", strconv.FormatInt(r.Timestamp.Unix(), 10))
 	if r.Language != "" {
 		q.Set("language", r.Language)
 	}
-	query, err := c.generateAuthQuery(req.URL.Path, q, true)
-	if err != nil {
-		return nil, err
-	}
-	req.URL.RawQuery = query
-	return req, nil
+	return q
 }
 
 type timezoneResultWithError struct {

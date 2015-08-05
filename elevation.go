@@ -18,13 +18,19 @@
 package maps
 
 import (
-	"encoding/json"
 	"errors"
-	"net/http"
+	"fmt"
+	"net/url"
 	"strconv"
 
 	"golang.org/x/net/context"
 )
+
+var elevationAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/elevation/json",
+	acceptsClientID: true,
+}
 
 // Elevation makes an Elevation API request
 func (c *Client) Elevation(ctx context.Context, r *ElevationRequest) ([]ElevationResult, error) {
@@ -38,37 +44,21 @@ func (c *Client) Elevation(ctx context.Context, r *ElevationRequest) ([]Elevatio
 		return nil, errors.New("maps: Samples empty")
 	}
 
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
 	var response elevationResponse
 
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+	if err := c.getJSON(ctx, directionsAPI, r, &response); err != nil {
 		return nil, err
 	}
 
 	if response.Status != "OK" {
-		err = errors.New("maps: " + response.Status + " - " + response.ErrorMessage)
-		return nil, err
+		return nil, fmt.Errorf("maps: %s - %s", response.Status, response.ErrorMessage)
 	}
 
 	return response.Results, nil
 }
 
-func (r *ElevationRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://maps.googleapis.com")
-
-	req, err := http.NewRequest("GET", baseURL+"/maps/api/elevation/json", nil)
-	if err != nil {
-		return nil, err
-	}
-	q := req.URL.Query()
+func (r *ElevationRequest) params() url.Values {
+	q := make(url.Values)
 
 	if len(r.Path) > 0 {
 		q.Set("path", "enc:"+Encode(r.Path))
@@ -78,12 +68,8 @@ func (r *ElevationRequest) request(c *Client) (*http.Request, error) {
 	if len(r.Locations) > 0 {
 		q.Set("locations", "enc:"+Encode(r.Locations))
 	}
-	query, err := c.generateAuthQuery(req.URL.Path, q, true)
-	if err != nil {
-		return nil, err
-	}
-	req.URL.RawQuery = query
-	return req, nil
+
+	return q
 }
 
 type elevationResponse struct {

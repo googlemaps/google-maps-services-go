@@ -18,16 +18,20 @@
 package maps
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
 	"golang.org/x/net/context"
 )
+
+var directionsAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/directions/json",
+	acceptsClientID: true,
+}
 
 // Directions issues the Directions request and retrieves the Response
 func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route, error) {
@@ -50,36 +54,21 @@ func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route,
 		return nil, errors.New("maps: mode of transit '" + string(r.Mode) + "' invalid for TransitRoutingPreference")
 	}
 
-	req, err := r.request(c)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := c.httpDo(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
 	var response DirectionsResponse
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+
+	if err := c.getJSON(ctx, directionsAPI, r, &response); err != nil {
 		return nil, err
 	}
 
 	if response.Status != "OK" {
-		err = errors.New("maps: " + response.Status + " - " + response.ErrorMessage)
-		return nil, err
+		return nil, fmt.Errorf("maps: %s - %s", response.Status, response.ErrorMessage)
 	}
+
 	return response.Routes, nil
 }
 
-func (r *DirectionsRequest) request(c *Client) (*http.Request, error) {
-	baseURL := c.getBaseURL("https://maps.googleapis.com")
-
-	req, err := http.NewRequest("GET", baseURL+"/maps/api/directions/json", nil)
-	if err != nil {
-		return nil, err
-	}
-	q := req.URL.Query()
+func (r *DirectionsRequest) params() url.Values {
+	q := make(url.Values)
 	q.Set("origin", r.Origin)
 	q.Set("destination", r.Destination)
 	if r.Mode != "" {
@@ -117,12 +106,7 @@ func (r *DirectionsRequest) request(c *Client) (*http.Request, error) {
 	if r.TransitRoutingPreference != "" {
 		q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
 	}
-	query, err := c.generateAuthQuery(req.URL.Path, q, true)
-	if err != nil {
-		return nil, err
-	}
-	req.URL.RawQuery = query
-	return req, nil
+	return q
 }
 
 // DirectionsRequest is the functional options struct for directions.Get
