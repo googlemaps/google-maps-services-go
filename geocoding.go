@@ -19,7 +19,6 @@ package maps
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"strings"
 
@@ -34,19 +33,21 @@ var geocodingAPI = &apiConfig{
 
 // Geocode makes a Geocoding API request
 func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
-
 	if r.Address == "" && len(r.Components) == 0 && r.LatLng == nil {
 		return nil, errors.New("maps: address, components and LatLng are all missing")
 	}
 
-	var response geocodingResponse
+	var response struct {
+		Results []GeocodingResult `json:"results"`
+		commonResponse
+	}
 
 	if err := c.getJSON(ctx, directionsAPI, r, &response); err != nil {
 		return nil, err
 	}
 
-	if response.Status != "OK" {
-		return nil, fmt.Errorf("maps: %s - %s", response.Status, response.ErrorMessage)
+	if err := response.StatusError(); err != nil {
+		return nil, err
 	}
 
 	return response.Results, nil
@@ -147,17 +148,6 @@ type GeocodingRequest struct {
 
 	// Language is the language in which to return results. Optional.
 	Language string
-}
-
-type geocodingResponse struct {
-	Results []GeocodingResult `json:"results"`
-
-	// Status indicating if this request was successful
-	Status string `json:"status"`
-	// ErrorMessage is the explanatory field added when Status is an error.
-	ErrorMessage string `json:"error_message"`
-
-	err error
 }
 
 // GeocodingResult is a single geocoded address

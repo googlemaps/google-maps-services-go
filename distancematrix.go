@@ -19,7 +19,6 @@ package maps
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -52,18 +51,20 @@ func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (
 		return nil, errors.New("maps: mode of transit '" + string(r.Mode) + "' invalid for TransitRoutingPreference")
 	}
 
-	var response rawDistanceMatrixResponse
-	c.getJSON(ctx, distanceMatrixAPI, r, &response)
-
-	if response.Status != "OK" {
-		return nil, fmt.Errorf("maps: %s - %s", response.Status, response.ErrorMessage)
+	var response struct {
+		commonResponse
+		DistanceMatrixResponse
 	}
 
-	return &DistanceMatrixResponse{
-		DestinationAddresses: response.DestinationAddresses,
-		OriginAddresses:      response.OriginAddresses,
-		Rows:                 response.Rows,
-	}, nil
+	if err := c.getJSON(ctx, distanceMatrixAPI, r, &response); err != nil {
+		return nil, err
+	}
+
+	if err := response.StatusError(); err != nil {
+		return nil, err
+	}
+
+	return &response.DistanceMatrixResponse, nil
 }
 
 func (r *DistanceMatrixRequest) params() url.Values {
@@ -135,33 +136,15 @@ type DistanceMatrixRequest struct {
 	TransitRoutingPreference TransitRoutingPreference
 }
 
-type rawDistanceMatrixResponse struct {
+// DistanceMatrixResponse represents a Distance Matrix API response.
+type DistanceMatrixResponse struct {
+
 	// OriginAddresses contains an array of addresses as returned by the API from your original request.
 	OriginAddresses []string `json:"origin_addresses"`
 	// DestinationAddresses contains an array of addresses as returned by the API from your original request.
 	DestinationAddresses []string `json:"destination_addresses"`
 	// Rows contains an array of elements.
 	Rows []DistanceMatrixElementsRow `json:"rows"`
-
-	// Status contains the status of the request, and may contain
-	// debugging information to help you track down why the Directions
-	// service failed.
-	// See https://developers.google.com/maps/documentation/distancematrix/#StatusCodes
-	Status string `json:"status"`
-
-	// ErrorMessage is the explanatory field added when Status is an error.
-	ErrorMessage string `json:"error_message"`
-}
-
-// DistanceMatrixResponse represents a Distance Matrix API response.
-type DistanceMatrixResponse struct {
-
-	// OriginAddresses contains an array of addresses as returned by the API from your original request.
-	OriginAddresses []string
-	// DestinationAddresses contains an array of addresses as returned by the API from your original request.
-	DestinationAddresses []string
-	// Rows contains an array of elements.
-	Rows []DistanceMatrixElementsRow
 }
 
 // DistanceMatrixElementsRow is a row of distance elements.

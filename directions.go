@@ -51,14 +51,17 @@ func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route,
 		return nil, errors.New("maps: mode of transit '" + string(r.Mode) + "' invalid for TransitRoutingPreference")
 	}
 
-	var response DirectionsResponse
+	var response struct {
+		Routes []Route `json:"routes"`
+		commonResponse
+	}
 
 	if err := c.getJSON(ctx, directionsAPI, r, &response); err != nil {
 		return nil, err
 	}
 
-	if response.Status != "OK" {
-		return nil, fmt.Errorf("maps: %s - %s", response.Status, response.ErrorMessage)
+	if err := response.StatusError(); err != nil {
+		return nil, err
 	}
 
 	return response.Routes, nil
@@ -134,21 +137,6 @@ type DirectionsRequest struct {
 	TransitMode []TransitMode
 	// TransitRoutingPreference specifies preferences for transit routes. Optional.
 	TransitRoutingPreference TransitRoutingPreference
-}
-
-// DirectionsResponse represents a Directions API response.
-type DirectionsResponse struct {
-	// Routes lists the found routes between origin and destination.
-	Routes []Route `json:"routes"`
-
-	// Status contains the status of the request, and may contain
-	// debugging information to help you track down why the Directions
-	// service failed.
-	// See https://developers.google.com/maps/documentation/directions/#StatusCodes
-	Status string `json:"status"`
-
-	// ErrorMessage is the explanatory field added when Status is an error.
-	ErrorMessage string `json:"error_message"`
 }
 
 // Route represents a single route between an origin and a destination.
