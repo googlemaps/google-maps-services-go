@@ -74,7 +74,7 @@ type TimezoneRequest struct {
 	Language string
 }
 
-// TimezoneResult is a single geocoded address
+// TimezoneResult is a single timezone result.
 type TimezoneResult struct {
 	// DstOffset is the offset for daylight-savings time in seconds.
 	DstOffset int `json:"dstOffset"`
