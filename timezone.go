@@ -19,7 +19,6 @@ package maps
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"strconv"
 	"time"
@@ -39,22 +38,20 @@ func (c *Client) Timezone(ctx context.Context, r *TimezoneRequest) (*TimezoneRes
 		return nil, errors.New("maps: Location missing")
 	}
 
-	var response timezoneResponse
+	var response struct {
+		TimezoneResult
+		commonResponse
+	}
 
 	if err := c.getJSON(ctx, directionsAPI, r, &response); err != nil {
 		return nil, err
 	}
 
-	if response.Status != "OK" {
-		return nil, fmt.Errorf("maps: %s - %s", response.Status, response.ErrorMessage)
+	if err := response.StatusError(); err != nil {
+		return nil, err
 	}
 
-	return &TimezoneResult{
-		DstOffset:    response.DstOffset,
-		RawOffset:    response.RawOffset,
-		TimeZoneID:   response.TimeZoneID,
-		TimeZoneName: response.TimeZoneName,
-	}, nil
+	return &response.TimezoneResult, nil
 }
 
 func (r *TimezoneRequest) params() url.Values {
@@ -67,11 +64,6 @@ func (r *TimezoneRequest) params() url.Values {
 	return q
 }
 
-type timezoneResultWithError struct {
-	timezone *TimezoneResult
-	err      error
-}
-
 // TimezoneRequest is the request structure for Timezone API.
 type TimezoneRequest struct {
 	// Location represents the location to look up.
@@ -82,7 +74,8 @@ type TimezoneRequest struct {
 	Language string
 }
 
-type timezoneResponse struct {
+// TimezoneResult is a single timezone result.
+type TimezoneResult struct {
 	// DstOffset is the offset for daylight-savings time in seconds.
 	DstOffset int `json:"dstOffset"`
 	// RawOffset is the offset from UTC for the given location.
@@ -91,21 +84,4 @@ type timezoneResponse struct {
 	TimeZoneID string `json:"timeZoneId"`
 	// TimeZoneName is a string containing the long form name of the time zone.
 	TimeZoneName string `json:"timeZoneName"`
-
-	// Status indicating if this request was successful
-	Status string `json:"status"`
-	// ErrorMessage is the explanatory field added when Status is an error.
-	ErrorMessage string `json:"error_message"`
-}
-
-// TimezoneResult is a single geocoded address
-type TimezoneResult struct {
-	// DstOffset is the offset for daylight-savings time in seconds.
-	DstOffset int
-	// RawOffset is the offset from UTC for the given location.
-	RawOffset int
-	// TimeZoneID is a string containing the "tz" ID of the time zone.
-	TimeZoneID string
-	// TimeZoneName is a string containing the long form name of the time zone.
-	TimeZoneName string
 }

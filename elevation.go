@@ -19,7 +19,6 @@ package maps
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"strconv"
 
@@ -44,14 +43,17 @@ func (c *Client) Elevation(ctx context.Context, r *ElevationRequest) ([]Elevatio
 		return nil, errors.New("maps: Samples empty")
 	}
 
-	var response elevationResponse
+	var response struct {
+		Results []ElevationResult `json:"results"`
+		commonResponse
+	}
 
 	if err := c.getJSON(ctx, directionsAPI, r, &response); err != nil {
 		return nil, err
 	}
 
-	if response.Status != "OK" {
-		return nil, fmt.Errorf("maps: %s - %s", response.Status, response.ErrorMessage)
+	if err := response.StatusError(); err != nil {
+		return nil, err
 	}
 
 	return response.Results, nil
@@ -70,15 +72,6 @@ func (r *ElevationRequest) params() url.Values {
 	}
 
 	return q
-}
-
-type elevationResponse struct {
-	// Results is the Elevation results array
-	Results []ElevationResult `json:"results"`
-	// Status indicating if this request was successful
-	Status string `json:"status"`
-	// ErrorMessage is the explanatory field added when Status is an error.
-	ErrorMessage string `json:"error_message"`
 }
 
 // ElevationRequest is the request structure for Elevation API. Either Locations or Path must be set.
