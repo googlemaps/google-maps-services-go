@@ -69,7 +69,7 @@ func main() {
 		Query:    *query,
 		Language: *language,
 		Radius:   *radius,
-		OpenNow:  opennow,
+		OpenNow:  *opennow,
 	}
 
 	parseLocation(*location, r)

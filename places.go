@@ -48,6 +48,11 @@ var placesTextSearchAPI = &apiConfig{
 
 // TextSearch issues the Places API Text Search request and retrieves the Response
 func (c *Client) TextSearch(ctx context.Context, r *TextSearchRequest) (PlacesSearchResponse, error) {
+
+	if r.Query == "" && r.PageToken == "" {
+		return PlacesSearchResponse{}, errors.New("maps: Query and PageToken both missing")
+	}
+
 	if r.Location != nil && r.Radius == 0 {
 		return PlacesSearchResponse{}, errors.New("maps: Radius missing, required with Location")
 	}
@@ -95,7 +100,7 @@ func (r *TextSearchRequest) params() url.Values {
 		q.Set("maxprice", string(r.MaxPrice))
 	}
 
-	if r.OpenNow != nil && *r.OpenNow {
+	if r.OpenNow {
 		q.Set("opennow", "true")
 	}
 
@@ -117,7 +122,7 @@ type TextSearchRequest struct {
 	// maxprice restricts results to only those places within the specified price level. Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
 	MaxPrice PriceLevel
 	// OpenNow returns only those places that are open for business at the time the query is sent. Places that do not specify opening hours in the Google Places database will not be returned if you include this parameter in your query.
-	OpenNow *bool
+	OpenNow bool
 	// PageToken returns the next 20 results from a previously run search. Setting a PageToken parameter will execute a search with the same parameters used previously — all parameters other than PageToken will be ignored.
 	PageToken string
 }

@@ -142,5 +142,59 @@ func TestTextSearchPizzaInNewYork(t *testing.T) {
 	if priceLevel != result.PriceLevel {
 		t.Errorf("expected %+v, was %+v", priceLevel, result.PriceLevel)
 	}
+}
 
+func TestTextSearchMinimalRequestURL(t *testing.T) {
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&query=Pizza+in+New+York"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &TextSearchRequest{
+		Query: "Pizza in New York",
+	}
+
+	_, err := c.TextSearch(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestTextSearchAllTheThingsRequestURL(t *testing.T) {
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&maxprice=2&minprice=0&opennow=true&query=Pizza+in+New+York&radius=1000"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &TextSearchRequest{
+		Query:     "Pizza in New York",
+		Location:  &LatLng{1.0, 2.0},
+		Radius:    1000,
+		Language:  "es",
+		MinPrice:  PriceLevelFree,
+		MaxPrice:  PriceLevelModerate,
+		OpenNow:   true,
+		PageToken: "NextPageToken",
+	}
+
+	_, err := c.TextSearch(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
 }
