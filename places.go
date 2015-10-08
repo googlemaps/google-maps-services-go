@@ -154,6 +154,13 @@ type PlacesSearchResult struct {
 	OpeningHours *OpeningHours `json:"opening_hours"`
 	// Photos is an array of photo objects, each containing a reference to an image.
 	Photos []Photo `json:"photos"`
+	// AltIDs — An array of zero, one or more alternative place IDs for the place, with a scope related to each alternative ID.
+	AltIDs []AltID `json:"alt_ids"`
+	// price_level is the price level of the place, on a scale of 0 to 4.
+	PriceLevel int `json:"price_level"`
 	// Vicinity contains a feature name of a nearby location.
 	Vicinity string `json:"vicinity"`
 }
+
+// AltID is the alternative place IDs for a place.
+type AltID struct{}

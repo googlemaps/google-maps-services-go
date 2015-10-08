@@ -137,4 +137,10 @@ func TestTextSearchPizzaInNewYork(t *testing.T) {
 		t.Errorf("expected %+v, was %+v", openNow, *result.OpeningHours.OpenNow)
 	}
 
+	// Find a way of mapping int -> PriceLevel
+	priceLevel := 2
+	if priceLevel != result.PriceLevel {
+		t.Errorf("expected %+v, was %+v", priceLevel, result.PriceLevel)
+	}
+
 }
