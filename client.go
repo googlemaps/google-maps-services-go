@@ -23,9 +23,10 @@ import (
 	"net/url"
 	"time"
 
-	"developers.google.com/maps/internal"
+	"github.com/kr/pretty"
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
+	"googlemaps.github.io/maps/internal"
 )
 
 // Client may be used to make requests to the Google Maps WebService APIs
@@ -153,6 +154,7 @@ func (c *Client) getJSON(ctx context.Context, config *apiConfig, apiReq apiReque
 		return err
 	}
 	req.URL.RawQuery = q
+	pretty.Print(req.URL)
 	httpResp, err := ctxhttp.Do(ctx, c.httpClient, req)
 	if err != nil {
 		return err

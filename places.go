@@ -48,7 +48,7 @@ var placesTextSearchAPI = &apiConfig{
 
 // TextSearch issues the Places API Text Search request and retrieves the Response
 func (c *Client) TextSearch(ctx context.Context, r *TextSearchRequest) (PlacesSearchResponse, error) {
-	if r.Location != nil && r.Radius == nil {
+	if r.Location != nil && r.Radius == 0 {
 		return PlacesSearchResponse{}, errors.New("maps: Radius missing, required with Location")
 	}
 
@@ -79,7 +79,7 @@ func (r *TextSearchRequest) params() url.Values {
 		q.Set("location", r.Location.String())
 	}
 
-	if r.Radius != nil {
+	if r.Radius != 0 {
 		q.Set("radius", fmt.Sprint(r.Radius))
 	}
 
@@ -87,12 +87,12 @@ func (r *TextSearchRequest) params() url.Values {
 		q.Set("language", r.Language)
 	}
 
-	if r.MinPrice != nil {
-		q.Set("minprice", fmt.Sprint(*r.MinPrice))
+	if r.MinPrice != "" {
+		q.Set("minprice", string(r.MinPrice))
 	}
 
-	if r.MaxPrice != nil {
-		q.Set("maxprice", fmt.Sprint(*r.MaxPrice))
+	if r.MaxPrice != "" {
+		q.Set("maxprice", string(r.MaxPrice))
 	}
 
 	if r.OpenNow != nil && *r.OpenNow {
@@ -109,13 +109,13 @@ type TextSearchRequest struct {
 	// Location is the latitude/longitude around which to retrieve place information. If you specify a location parameter, you must also specify a radius parameter.
 	Location *LatLng
 	// Radius defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters. Results inside of this region will be ranked higher than results outside of the search circle; however, prominent results from outside of the search radius may be included.
-	Radius *uint
+	Radius uint
 	// Language specifies the language in which to return results. Optional.
 	Language string
 	// minprice restricts results to only those places within the specified price level. Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
-	MinPrice *PriceLevel
+	MinPrice PriceLevel
 	// maxprice restricts results to only those places within the specified price level. Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
-	MaxPrice *PriceLevel
+	MaxPrice PriceLevel
 	// OpenNow returns only those places that are open for business at the time the query is sent. Places that do not specify opening hours in the Google Places database will not be returned if you include this parameter in your query.
 	OpenNow *bool
 	// PageToken returns the next 20 results from a previously run search. Setting a PageToken parameter will execute a search with the same parameters used previously — all parameters other than PageToken will be ignored.
