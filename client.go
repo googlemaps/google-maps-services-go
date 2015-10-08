@@ -23,7 +23,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/kr/pretty"
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
 	"googlemaps.github.io/maps/internal"
@@ -154,7 +153,6 @@ func (c *Client) getJSON(ctx context.Context, config *apiConfig, apiReq apiReque
 		return err
 	}
 	req.URL.RawQuery = q
-	pretty.Print(req.URL)
 	httpResp, err := ctxhttp.Do(ctx, c.httpClient, req)
 	if err != nil {
 		return err
