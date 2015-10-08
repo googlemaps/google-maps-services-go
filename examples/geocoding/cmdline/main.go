@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // Package main contains a simple command line tool for Geocoding API
-// Directions docs: https://developers.google.com/maps/documentation/geocoding/
+// Documentation: https://developers.google.com/maps/documentation/geocoding/
 package main
 
 import (

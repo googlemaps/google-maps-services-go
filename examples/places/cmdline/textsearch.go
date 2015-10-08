@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package main contains a simple command line tool for Geocoding API
-// Directions docs: https://developers.google.com/maps/documentation/geocoding/
+// Package main contains a simple command line tool for Places API Text Search
+// Documentation: https://developers.google.com/places/web-service/search#TextSearchRequests
 package main
 
 import (
