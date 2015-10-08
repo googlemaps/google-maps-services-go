@@ -37,6 +37,9 @@ var (
 	language  = flag.String("language", "", "The language in which to return results.")
 	location  = flag.String("location", "", "The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.")
 	radius    = flag.Uint("radius", 0, "Defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters.")
+	minprice  = flag.String("min_price", "", "Restricts results to only those places within the specified price level.")
+	maxprice  = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
+	opennow   = flag.Bool("open_now", false, "Restricts results to only those places that are open for business at the time the query is sent.")
 )
 
 func usageAndExit(msg string) {
@@ -65,10 +68,12 @@ func main() {
 	r := &maps.TextSearchRequest{
 		Query:    *query,
 		Language: *language,
-		Radius:   radius,
+		Radius:   *radius,
+		OpenNow:  opennow,
 	}
 
 	parseLocation(*location, r)
+	parsePriceLevels(*minprice, *maxprice, r)
 
 	resp, err := client.TextSearch(context.Background(), r)
 	if err != nil {
@@ -92,6 +97,42 @@ func parseLocation(location string, r *maps.TextSearchRequest) {
 		r.Location = &maps.LatLng{
 			Lat: lat,
 			Lng: lng,
+		}
+	}
+}
+
+func parsePriceLevels(minprice string, maxprice string, r *maps.TextSearchRequest) {
+	if minprice != "" {
+		switch minprice {
+		case "0":
+			r.MinPrice = maps.PriceLevelFree
+		case "1":
+			r.MinPrice = maps.PriceLevelInexpensive
+		case "2":
+			r.MinPrice = maps.PriceLevelModerate
+		case "3":
+			r.MinPrice = maps.PriceLevelExpensive
+		case "4":
+			r.MinPrice = maps.PriceLevelVeryExpensive
+		default:
+			usageAndExit(fmt.Sprintf("Unknown min_price level: '%s'", minprice))
+		}
+	}
+
+	if maxprice != "" {
+		switch maxprice {
+		case "0":
+			r.MaxPrice = maps.PriceLevelFree
+		case "1":
+			r.MaxPrice = maps.PriceLevelInexpensive
+		case "2":
+			r.MaxPrice = maps.PriceLevelModerate
+		case "3":
+			r.MaxPrice = maps.PriceLevelExpensive
+		case "4":
+			r.MaxPrice = maps.PriceLevelVeryExpensive
+		default:
+			usageAndExit(fmt.Sprintf("Unknown max_price level: '%s'", maxprice))
 		}
 	}
 }

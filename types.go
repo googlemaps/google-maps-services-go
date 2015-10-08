@@ -79,15 +79,15 @@ type Distance struct {
 }
 
 // PriceLevel is the Price Levels for Places API
-type PriceLevel uint
+type PriceLevel string
 
 // Price Levels for the Places API
 const (
-	PriceLevelFree          = PriceLevel(0)
-	PriceLevelInexpensive   = PriceLevel(1)
-	PriceLevelModerate      = PriceLevel(2)
-	PriceLevelExpensive     = PriceLevel(3)
-	PriceLevelVeryExpensive = PriceLevel(4)
+	PriceLevelFree          = PriceLevel("0")
+	PriceLevelInexpensive   = PriceLevel("1")
+	PriceLevelModerate      = PriceLevel("2")
+	PriceLevelExpensive     = PriceLevel("3")
+	PriceLevelVeryExpensive = PriceLevel("4")
 )
 
 // OpeningHours describes the opening hours for a Place Details result.
