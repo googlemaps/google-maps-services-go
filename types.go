@@ -77,3 +77,40 @@ type Distance struct {
 	// algorithmic situations, e.g. sorting results by some user specified metric.
 	Meters int `json:"value"`
 }
+
+// PriceLevel is the Price Levels for Places API
+type PriceLevel uint
+
+// Price Levels for the Places API
+const (
+	PriceLevelFree          = PriceLevel(0)
+	PriceLevelInexpensive   = PriceLevel(1)
+	PriceLevelModerate      = PriceLevel(2)
+	PriceLevelExpensive     = PriceLevel(3)
+	PriceLevelVeryExpensive = PriceLevel(4)
+)
+
+// OpeningHours describes the opening hours for a Place Details result.
+type OpeningHours struct {
+	// OpenNow is a boolean value indicating if the place is open at the current time. Please note, this field will be null if it isn't present in the response.
+	OpenNow *bool `json:"open_now"`
+
+	// TODO(brettmorgan): periods
+
+	// weekdayText is an array of seven strings representing the formatted opening hours for each day of the week, for example "Monday: 8:30 am – 5:30 pm".
+	WeekdayText []string `json:"weekday_text"`
+	// PermanentlyClosed indicates that the place has permanently shut down. Please note, this field will be null if it isn't present in the response.
+	PermanentlyClosed *bool `json:"permanently_closed"`
+}
+
+// Photo describes a photo available with a Search Result.
+type Photo struct {
+	// PhotoReference is used to identify the photo when you perform a Photo request.
+	PhotoReference string `json:"photo_reference"`
+	// Height is the maximum height of the image.
+	Height int
+	// Width is the maximum width of the image.
+	Width int
+	// htmlAttributions contains any required attributions.
+	HTMLAttributions []string `json:"html_attributions"`
+}
