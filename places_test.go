@@ -132,4 +132,9 @@ func TestTextSearchPizzaInNewYork(t *testing.T) {
 		t.Errorf("expected %+v, was %+v", photoAttribution, photo.HTMLAttributions[0])
 	}
 
+	openNow := false
+	if openNow != *result.OpeningHours.OpenNow {
+		t.Errorf("expected %+v, was %+v", openNow, *result.OpeningHours.OpenNow)
+	}
+
 }
