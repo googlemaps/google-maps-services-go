@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"strconv"
 
 	"golang.org/x/net/context"
 )
@@ -28,16 +29,9 @@ var placesTextSearchAPI = &apiConfig{
 	acceptsClientID: true,
 }
 
-//
 // var placePhotosAPI = &apiConfig{
 // 	host:            "https://maps.googleapis.com",
 // 	path:            "/maps/api/place/photo",
-// 	acceptsClientID: true,
-// }
-//
-// var placesQueryAutocompleteAPI = &apiConfig{
-// 	host:            "https://maps.googleapis.com",
-// 	path:            "/maps/api/place/queryautocomplete/json",
 // 	acceptsClientID: true,
 // }
 
@@ -272,4 +266,75 @@ type PlaceDetailsResult struct {
 // PlaceReview is a review of a Place
 type PlaceReview struct {
 	// TODO(brettmorgan): Fill this in
+}
+
+var placesQueryAutocompleteAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/place/queryautocomplete/json",
+	acceptsClientID: true,
+}
+
+// QueryAutocomplete issues the Places API Query Autocomplete request and retrieves the response
+func (c *Client) QueryAutocomplete(ctx context.Context, r *QueryAutocompleteRequest) (QueryAutocompleteResponse, error) {
+
+	if r.Input == "" {
+		return QueryAutocompleteResponse{}, errors.New("maps: Input missing")
+	}
+
+	var response struct {
+		commonResponse
+	}
+
+	if err := c.getJSON(ctx, placesQueryAutocompleteAPI, r, &response); err != nil {
+		return QueryAutocompleteResponse{}, err
+	}
+
+	if err := response.StatusError(); err != nil {
+		return QueryAutocompleteResponse{}, err
+	}
+
+	return QueryAutocompleteResponse{}, nil
+}
+
+func (r *QueryAutocompleteRequest) params() url.Values {
+	q := make(url.Values)
+
+	q.Set("input", r.Input)
+
+	if r.Offset > 0 {
+		q.Set("offset", strconv.FormatUint(uint64(r.Offset), 10))
+	}
+
+	if r.Location != nil {
+		q.Set("location", r.Location.String())
+	}
+
+	if r.Radius > 0 {
+		q.Set("radius", strconv.FormatUint(uint64(r.Radius), 10))
+	}
+
+	if r.Language != "" {
+		q.Set("language", r.Language)
+	}
+
+	return q
+}
+
+// QueryAutocompleteRequest is the functional options struct for Query Autocomplete
+type QueryAutocompleteRequest struct {
+	// Input is the text string on which to search. The Places service will return candidate matches based on this string and order results based on their perceived relevance.
+	Input string
+	// Offset is the character position in the input term at which the service uses text for predictions. For example, if the input is 'Googl' and the completion point is 3, the service will match on 'Goo'. The offset should generally be set to the position of the text caret. If no offset is supplied, the service will use the entire term.
+	Offset uint
+	// Location is the point around which you wish to retrieve place information.
+	Location *LatLng
+	// Radius is the distance (in meters) within which to return place results. Note that setting a radius biases results to the indicated area, but may not fully restrict results to the specified area.
+	Radius uint
+	// Language is the language in which to return results.
+	Language string
+}
+
+// QueryAutocompleteResponse is ...
+type QueryAutocompleteResponse struct {
+	// TODO(brettmorgan): stuff
 }
