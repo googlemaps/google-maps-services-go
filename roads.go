@@ -46,7 +46,7 @@ func (c *Client) SnapToRoad(ctx context.Context, r *SnapToRoadRequest) (*SnapToR
 
 	response := &SnapToRoadResponse{}
 
-	if err := c.getJSON(ctx, directionsAPI, r, response); err != nil {
+	if err := c.getJSON(ctx, snapToRoadsAPI, r, response); err != nil {
 		return nil, err
 	}
 
@@ -103,7 +103,7 @@ func (c *Client) SpeedLimits(ctx context.Context, r *SpeedLimitsRequest) (*Speed
 
 	response := &SpeedLimitsResponse{}
 
-	if err := c.getJSON(ctx, directionsAPI, r, response); err != nil {
+	if err := c.getJSON(ctx, speedLimitsAPI, r, response); err != nil {
 		return nil, err
 	}
 
