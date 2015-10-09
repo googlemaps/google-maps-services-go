@@ -14,6 +14,7 @@ APIs:
  - [Distance Matrix API]
  - [Elevation API]
  - [Geocoding API]
+ - [Places API]
  - [Roads API]
  - [Time Zone API]
 
@@ -53,6 +54,7 @@ To generate a server key for your project:
     * Distance Matrix API
     * Elevation API
     * Geocoding API
+    * Places API
     * Roads API
     * Time Zone API
  1. Once you've enabled the APIs, click **Credentials** from the left navigation of the Developer
@@ -141,6 +143,7 @@ Native objects for each of the API responses.
 [Distance Matrix API]: https://developers.google.com/maps/documentation/distancematrix/
 [Elevation API]: https://developers.google.com/maps/documentation/elevation/
 [Geocoding API]: https://developers.google.com/maps/documentation/geocoding/
+[Places API]: https://developers.google.com/places/web-service/
 [Roads API]: https://developers.google.com/maps/documentation/roads/
 [Time Zone API]: https://developers.google.com/maps/documentation/timezone/
 
