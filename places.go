@@ -28,11 +28,6 @@ var placesTextSearchAPI = &apiConfig{
 	acceptsClientID: true,
 }
 
-// var placeDetailsAPI = &apiConfig{
-// 	host:            "https://maps.googleapis.com",
-// 	path:            "/maps/api/place/details/json",
-// 	acceptsClientID: true,
-// }
 //
 // var placePhotosAPI = &apiConfig{
 // 	host:            "https://maps.googleapis.com",
@@ -130,9 +125,9 @@ type TextSearchRequest struct {
 // PlacesSearchResponse is the response to a Places API Search request.
 type PlacesSearchResponse struct {
 	// Results is the Place results for the search query
-	Results []PlacesSearchResult `json:"results"`
+	Results []PlacesSearchResult
 	// HTMLAttributions contain a set of attributions about this listing which must be displayed to the user.
-	HTMLAttributions []string `json:"html_attributions"`
+	HTMLAttributions []string
 	// NextPageToken contains a token that can be used to return up to 20 additional results.
 	NextPageToken string
 }
@@ -169,3 +164,112 @@ type PlacesSearchResult struct {
 
 // AltID is the alternative place IDs for a place.
 type AltID struct{}
+
+var placeDetailsAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/place/details/json",
+	acceptsClientID: true,
+}
+
+// PlaceDetails issues the Places API Place Details request and retrieves the response
+func (c *Client) PlaceDetails(ctx context.Context, r *PlaceDetailsRequest) (PlaceDetailsResponse, error) {
+
+	if r.PlaceID == "" {
+		return PlaceDetailsResponse{}, errors.New("maps: PlaceID missing")
+	}
+
+	var response struct {
+		Result           PlaceDetailsResult `json:"result"`
+		HTMLAttributions []string           `json:"html_attributions"`
+		commonResponse
+	}
+
+	if err := c.getJSON(ctx, placeDetailsAPI, r, &response); err != nil {
+		return PlaceDetailsResponse{}, err
+	}
+
+	if err := response.StatusError(); err != nil {
+		return PlaceDetailsResponse{}, err
+	}
+
+	return PlaceDetailsResponse{response.Result, response.HTMLAttributions}, nil
+}
+
+func (r *PlaceDetailsRequest) params() url.Values {
+	q := make(url.Values)
+
+	q.Set("placeid", r.PlaceID)
+
+	if r.Language != "" {
+		q.Set("language", r.Language)
+	}
+
+	return q
+}
+
+// PlaceDetailsRequest is the functional options struct for PlaceDetails
+type PlaceDetailsRequest struct {
+	// PlaceID is a textual identifier that uniquely identifies a place, returned from a Place Search.
+	PlaceID string
+	// Language is the language code, indicating in which language the results should be returned, if possible.
+	Language string
+}
+
+// PlaceDetailsResponse is the response to a Places API Place Detail request.
+type PlaceDetailsResponse struct {
+	// Results is the Place results for the search query
+	Result PlaceDetailsResult
+	// HTMLAttributions contain a set of attributions about this listing which must be displayed to the user.
+	HTMLAttributions []string
+}
+
+// PlaceDetailsResult is an individual Places API Place Details result
+type PlaceDetailsResult struct {
+	// AddressComponents is an array of separate address components used to compose a given address.
+	AddressComponents []AddressComponent `json:"address_components"`
+	// FormattedAddress is the human-readable address of this place
+	FormattedAddress string `json:"formatted_address"`
+	// FormattedPhoneNumber contains the place's phone number in its local format. For example, the formatted_phone_number for Google's Sydney, Australia office is (02) 9374 4000.
+	FormattedPhoneNumber string `json:"formatted_phone_number"`
+	// InternationalPhoneNumber contains the place's phone number in international format. International format includes the country code, and is prefixed with the plus (+) sign. For example, the international_phone_number for Google's Sydney, Australia office is +61 2 9374 4000.
+	InternationalPhoneNumber string `json:"international_phone_number"`
+	// geometry contains geometry information about the result, generally including the location (geocode) of the place and (optionally) the viewport identifying its general area of coverage.
+	Geometry AddressGeometry `json:"geometry"`
+	// Name contains the human-readable name for the returned result. For establishment results, this is usually the business name.
+	Name string `json:"name"`
+	// Icon contains the URL of a recommended icon which may be displayed to the user when indicating this result.
+	Icon string `json:"icon"`
+	// PlaceID is a textual identifier that uniquely identifies a place.
+	PlaceID string `json:"place_id"`
+	// Scope indicates the scope of the PlaceID.
+	Scope string `json:"scope"`
+	// Rating contains the place's rating, from 1.0 to 5.0, based on aggregated user reviews.
+	Rating float32
+	// Types contains an array of feature types describing the given result.
+	Types []string `json:"types"`
+	// OpeningHours may contain whether the place is open now or not.
+	OpeningHours *OpeningHours `json:"opening_hours"`
+	// Photos is an array of photo objects, each containing a reference to an image.
+	Photos []Photo `json:"photos"`
+	// AltIDs — An array of zero, one or more alternative place IDs for the place, with a scope related to each alternative ID.
+	AltIDs []AltID `json:"alt_ids"`
+	// price_level is the price level of the place, on a scale of 0 to 4.
+	PriceLevel int `json:"price_level"`
+	// Vicinity contains a feature name of a nearby location.
+	Vicinity string `json:"vicinity"`
+	// permanently_closed is a boolean flag indicating whether the place has permanently shut down (value true). If the place is not permanently closed, the flag is absent from the response.
+	PermanentlyClosed bool `json:"permanently_closed"`
+	// Reviews is an array of up to five reviews. If a language parameter was specified in the Place Details request, the Places Service will bias the results to prefer reviews written in that language.
+	Reviews []PlaceReview `json:"reviews"`
+	// UTCOffset contains the number of minutes this place’s current timezone is offset from UTC. For example, for places in Sydney, Australia during daylight saving time this would be 660 (+11 hours from UTC), and for places in California outside of daylight saving time this would be -480 (-8 hours from UTC).
+	UTCOffset int `json:"utc_offset"`
+	// Website lists the authoritative website for this place, such as a business' homepage.
+	Website string `json:"website"`
+	// url contains the URL of the official Google page for this place. This will be the establishment's Google+ page if the Google+ page exists, otherwise it will be the Google-owned page that contains the best available information about the place. Applications must link to or embed this page on any screen that shows detailed results about the place to the user.
+	URL string `json:"url"`
+}
+
+// PlaceReview is a review of a Place
+type PlaceReview struct {
+	// TODO(brettmorgan): Fill this in
+}
