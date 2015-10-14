@@ -94,13 +94,28 @@ const (
 type OpeningHours struct {
 	// OpenNow is a boolean value indicating if the place is open at the current time. Please note, this field will be null if it isn't present in the response.
 	OpenNow *bool `json:"open_now"`
-
-	// TODO(brettmorgan): periods
-
+	// Periods is an array of opening periods covering seven days, starting from Sunday, in chronological order.
+	Periods []OpeningHoursPeriod `json:"periods"`
 	// weekdayText is an array of seven strings representing the formatted opening hours for each day of the week, for example "Monday: 8:30 am – 5:30 pm".
 	WeekdayText []string `json:"weekday_text"`
 	// PermanentlyClosed indicates that the place has permanently shut down. Please note, this field will be null if it isn't present in the response.
 	PermanentlyClosed *bool `json:"permanently_closed"`
+}
+
+// OpeningHoursPeriod is a single OpeningHours day describing when the place opens and closes.
+type OpeningHoursPeriod struct {
+	// Open is when the place opens.
+	Open OpeningHoursOpenClose `json:"open"`
+	// Close is when the place closes.
+	Close OpeningHoursOpenClose `json:"close"`
+}
+
+// OpeningHoursOpenClose describes when the place is open.
+type OpeningHoursOpenClose struct {
+	// Day is a number from 0–6, corresponding to the days of the week, starting on Sunday. For example, 2 means Tuesday.
+	Day int `json:"day"`
+	// Time contains a time of day in 24-hour hhmm format. Values are in the range 0000–2359. The time will be reported in the place’s time zone.
+	Time string `json:"time"`
 }
 
 // Photo describes a photo available with a Search Result.
