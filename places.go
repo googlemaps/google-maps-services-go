@@ -265,7 +265,28 @@ type PlaceDetailsResult struct {
 
 // PlaceReview is a review of a Place
 type PlaceReview struct {
-	// TODO(brettmorgan): Fill this in
+	// Aspects contains a collection of AspectRatings, each of which provides a rating of a single attribute of the establishment. The first in the collection is considered the primary aspect.
+	Aspects []PlaceReviewAspect `json:"aspects"`
+	// AuthorName the name of the user who submitted the review. Anonymous reviews are attributed to "A Google user".
+	AuthorName string `json:"author_name"`
+	// author_url the URL to the users Google+ profile, if available.
+	AuthorURL string `json:"author_url"`
+	// Language an IETF language code indicating the language used in the user's review. This field contains the main language tag only, and not the secondary tag indicating country or region.
+	Language string `json:"language"`
+	// Rating the user's overall rating for this place. This is a whole number, ranging from 1 to 5.
+	Rating int `json:"rating"`
+	// Text is the user's review. When reviewing a location with Google Places, text reviews are considered optional. Therefore, this field may by empty. Note that this field may include simple HTML markup.
+	Text string `json:"text"`
+	// Time the time that the review was submitted, measured in the number of seconds since since midnight, January 1, 1970 UTC.
+	Time int64 `json:"time"`
+}
+
+// PlaceReviewAspect provides a rating of a single attribute of the establishment.
+type PlaceReviewAspect struct {
+	// Rating is the user's rating for this particular aspect, from 0 to 3.
+	Rating int `json:"rating"`
+	// Type is the name of the aspect that is being rated. The following types are supported: appeal, atmosphere, decor, facilities, food, overall, quality and service.
+	Type string `json:"type"`
 }
 
 var placesQueryAutocompleteAPI = &apiConfig{
@@ -282,6 +303,7 @@ func (c *Client) QueryAutocomplete(ctx context.Context, r *QueryAutocompleteRequ
 	}
 
 	var response struct {
+		Predictions []QueryAutocompletePrediction `json:"predictions"`
 		commonResponse
 	}
 
@@ -293,7 +315,7 @@ func (c *Client) QueryAutocomplete(ctx context.Context, r *QueryAutocompleteRequ
 		return QueryAutocompleteResponse{}, err
 	}
 
-	return QueryAutocompleteResponse{}, nil
+	return QueryAutocompleteResponse{response.Predictions}, nil
 }
 
 func (r *QueryAutocompleteRequest) params() url.Values {
@@ -334,7 +356,37 @@ type QueryAutocompleteRequest struct {
 	Language string
 }
 
-// QueryAutocompleteResponse is ...
+// QueryAutocompleteResponse is a response to a Query Autocomplete request.
 type QueryAutocompleteResponse struct {
-	// TODO(brettmorgan): stuff
+	Predictions []QueryAutocompletePrediction
+}
+
+// QueryAutocompletePrediction represents a single Query Autocomplete result returned from the Google Places API Web Service.
+type QueryAutocompletePrediction struct {
+	// Description of the matched prediction.
+	Description string `json:"description"`
+	// PlaceID of the Place
+	PlaceID string `json:"place_id"`
+	// Types is an array indicating the type of the address component.
+	Types []string `json:"types"`
+	// MatchedSubstring describes the location of the entered term in the prediction result text, so that the term can be highlighted if desired.
+	MatchedSubstrings []QueryAutocompleteMatchedSubstring `json:"matched_substrings"`
+	// Terms contains an array of terms identifying each section of the returned description (a section of the description is generally terminated with a comma).
+	Terms []QueryAutocompleteTermOffset `json:"terms"`
+}
+
+// QueryAutocompleteMatchedSubstring describes the location of the entered term in the prediction result text, so that the term can be highlighted if desired.
+type QueryAutocompleteMatchedSubstring struct {
+	// Length describes the length of the matched substring.
+	Length int `json:"length"`
+	// Offset defines the start position of the matched substring.
+	Offset int `json:"offset"`
+}
+
+// QueryAutocompleteTermOffset identifies each section of the returned description (a section of the description is generally terminated with a comma).
+type QueryAutocompleteTermOffset struct {
+	// Value is the text of the matched term.
+	Value string `json:"value"`
+	// Offset defines the start position of this term in the description, measured in Unicode characters.
+	Offset int `json:"offset"`
 }
