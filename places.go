@@ -141,7 +141,7 @@ type PlacesSearchResult struct {
 	// Scope indicates the scope of the PlaceID.
 	Scope string `json:"scope"`
 	// Rating contains the place's rating, from 1.0 to 5.0, based on aggregated user reviews.
-	Rating float32
+	Rating float32 `json:"rating"`
 	// Types contains an array of feature types describing the given result.
 	Types []string `json:"types"`
 	// OpeningHours may contain whether the place is open now or not.
@@ -166,10 +166,10 @@ var placeDetailsAPI = &apiConfig{
 }
 
 // PlaceDetails issues the Places API Place Details request and retrieves the response
-func (c *Client) PlaceDetails(ctx context.Context, r *PlaceDetailsRequest) (PlaceDetailsResponse, error) {
+func (c *Client) PlaceDetails(ctx context.Context, r *PlaceDetailsRequest) (PlaceDetailsResult, error) {
 
 	if r.PlaceID == "" {
-		return PlaceDetailsResponse{}, errors.New("maps: PlaceID missing")
+		return PlaceDetailsResult{}, errors.New("maps: PlaceID missing")
 	}
 
 	var response struct {
@@ -179,14 +179,15 @@ func (c *Client) PlaceDetails(ctx context.Context, r *PlaceDetailsRequest) (Plac
 	}
 
 	if err := c.getJSON(ctx, placeDetailsAPI, r, &response); err != nil {
-		return PlaceDetailsResponse{}, err
+		return PlaceDetailsResult{}, err
 	}
 
 	if err := response.StatusError(); err != nil {
-		return PlaceDetailsResponse{}, err
+		return PlaceDetailsResult{}, err
 	}
 
-	return PlaceDetailsResponse{response.Result, response.HTMLAttributions}, nil
+	response.Result.HTMLAttributions = response.HTMLAttributions
+	return response.Result, nil
 }
 
 func (r *PlaceDetailsRequest) params() url.Values {
@@ -207,14 +208,6 @@ type PlaceDetailsRequest struct {
 	PlaceID string
 	// Language is the language code, indicating in which language the results should be returned, if possible.
 	Language string
-}
-
-// PlaceDetailsResponse is the response to a Places API Place Detail request.
-type PlaceDetailsResponse struct {
-	// Results is the Place results for the search query
-	Result PlaceDetailsResult
-	// HTMLAttributions contain a set of attributions about this listing which must be displayed to the user.
-	HTMLAttributions []string
 }
 
 // PlaceDetailsResult is an individual Places API Place Details result
@@ -261,6 +254,8 @@ type PlaceDetailsResult struct {
 	Website string `json:"website"`
 	// url contains the URL of the official Google page for this place. This will be the establishment's Google+ page if the Google+ page exists, otherwise it will be the Google-owned page that contains the best available information about the place. Applications must link to or embed this page on any screen that shows detailed results about the place to the user.
 	URL string `json:"url"`
+	// HTMLAttributions contain a set of attributions about this listing which must be displayed to the user.
+	HTMLAttributions []string
 }
 
 // PlaceReview is a review of a Place
@@ -269,7 +264,7 @@ type PlaceReview struct {
 	Aspects []PlaceReviewAspect `json:"aspects"`
 	// AuthorName the name of the user who submitted the review. Anonymous reviews are attributed to "A Google user".
 	AuthorName string `json:"author_name"`
-	// author_url the URL to the users Google+ profile, if available.
+	// author_url the URL to the user's Google+ profile, if available.
 	AuthorURL string `json:"author_url"`
 	// Language an IETF language code indicating the language used in the user's review. This field contains the main language tag only, and not the secondary tag indicating country or region.
 	Language string `json:"language"`
@@ -278,7 +273,7 @@ type PlaceReview struct {
 	// Text is the user's review. When reviewing a location with Google Places, text reviews are considered optional. Therefore, this field may by empty. Note that this field may include simple HTML markup.
 	Text string `json:"text"`
 	// Time the time that the review was submitted, measured in the number of seconds since since midnight, January 1, 1970 UTC.
-	Time int64 `json:"time"`
+	Time int `json:"time"`
 }
 
 // PlaceReviewAspect provides a rating of a single attribute of the establishment.
