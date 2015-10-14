@@ -17,6 +17,8 @@
 
 package maps
 
+import "time"
+
 // Mode is for specifying travel mode.
 type Mode string
 
@@ -113,7 +115,7 @@ type OpeningHoursPeriod struct {
 // OpeningHoursOpenClose describes when the place is open.
 type OpeningHoursOpenClose struct {
 	// Day is a number from 0–6, corresponding to the days of the week, starting on Sunday. For example, 2 means Tuesday.
-	Day int `json:"day"`
+	Day time.Weekday `json:"day"`
 	// Time contains a time of day in 24-hour hhmm format. Values are in the range 0000–2359. The time will be reported in the place’s time zone.
 	Time string `json:"time"`
 }
@@ -123,9 +125,9 @@ type Photo struct {
 	// PhotoReference is used to identify the photo when you perform a Photo request.
 	PhotoReference string `json:"photo_reference"`
 	// Height is the maximum height of the image.
-	Height int
+	Height int `json:"height"`
 	// Width is the maximum width of the image.
-	Width int
+	Width int `json:"width"`
 	// htmlAttributions contains any required attributions.
 	HTMLAttributions []string `json:"html_attributions"`
 }
