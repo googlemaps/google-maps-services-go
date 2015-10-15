@@ -23,7 +23,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/googlemaps/google-maps-services-go/internal"
+	"developers.google.com/maps/internal"
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
 )
