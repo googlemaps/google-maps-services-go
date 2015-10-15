@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"strings"
 
-	maps "github.com/googlemaps/google-maps-services-go"
+	"developers.google.com/maps"
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
 )
