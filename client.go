@@ -23,9 +23,9 @@ import (
 	"net/url"
 	"time"
 
-	"developers.google.com/maps/internal"
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
+	"googlemaps.github.io/maps/internal"
 )
 
 // Client may be used to make requests to the Google Maps WebService APIs
