@@ -24,9 +24,9 @@ import (
 	"strings"
 	"time"
 
-	"developers.google.com/maps"
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
+	"googlemaps.github.io/maps"
 )
 
 var (
