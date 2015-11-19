@@ -29,12 +29,6 @@ var placesTextSearchAPI = &apiConfig{
 	acceptsClientID: true,
 }
 
-// var placePhotosAPI = &apiConfig{
-// 	host:            "https://maps.googleapis.com",
-// 	path:            "/maps/api/place/photo",
-// 	acceptsClientID: true,
-// }
-
 // TextSearch issues the Places API Text Search request and retrieves the Response
 func (c *Client) TextSearch(ctx context.Context, r *TextSearchRequest) (PlacesSearchResponse, error) {
 
@@ -384,4 +378,52 @@ type QueryAutocompleteTermOffset struct {
 	Value string `json:"value"`
 	// Offset defines the start position of this term in the description, measured in Unicode characters.
 	Offset int `json:"offset"`
+}
+
+// PlacePhotoRequest is the functional options struct for Places Photo API
+type PlacePhotoRequest struct {
+	// PhotoReference is a string used to identify the photo when you perform a Photo request.
+	PhotoReference string
+	// MaxHeight is the maximum height of the image.
+	MaxHeight uint
+	// MaxWidth is the maximum width of the image.
+	MaxWidth uint
+}
+
+// PlacePhoto issues the Places API Photo request and retrieves the response
+func (c *Client) PlacePhoto(ctx context.Context, r *PlacePhotoRequest) (PlacePhotoResponse, error) {
+
+	if r.PhotoReference == "" {
+		return PlacePhotoResponse{}, errors.New("maps: PhotoReference missing")
+	}
+
+	if r.MaxHeight == 0 && r.MaxWidth == 0 {
+		return PlacePhotoResponse{}, errors.New("maps: both MaxHeight & MaxWidth missing")
+	}
+
+	if err := c.getJSON(ctx, placesPhotoAPI, r, &response); err != nil {
+		return QueryAutocompleteResponse{}, err
+	}
+
+	if err := response.StatusError(); err != nil {
+		return QueryAutocompleteResponse{}, err
+	}
+
+	return QueryAutocompleteResponse{response.Predictions}, nil
+}
+
+func (r *PlacePhotoRequest) params() url.Values {
+	q := make(url.Values)
+
+	q.Set("photoreference", r.PhotoReference)
+
+	if r.MaxHeight > 0 {
+		q.Set("maxheight", strconv.FormatUint(uint64(r.MaxHeight), 10))
+	}
+
+	if r.MaxWidth > 0 {
+		q.Set("maxwidth", strconv.FormatUint(uint64(r.MaxWidth), 10))
+	}
+
+	return q
 }

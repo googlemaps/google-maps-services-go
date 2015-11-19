@@ -66,8 +66,8 @@ func main() {
 
 	r := &maps.PlacePhotoRequest{
 		PhotoReference: *photoreference,
-		MaxHeight:      *maxheight,
-		MaxWidth:       *maxwidth,
+		MaxHeight:      uint(*maxheight),
+		MaxWidth:       uint(*maxwidth),
 	}
 
 	resp, err := client.PlacePhoto(context.Background(), r)
