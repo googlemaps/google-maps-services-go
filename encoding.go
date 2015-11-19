@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"net/url"
 
-	"developers.google.com/maps/internal"
+	"googlemaps.github.io/maps/internal"
 )
 
 // safeLeg is a raw version of Leg that does not have custom encoding or

@@ -42,7 +42,7 @@ func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingR
 		commonResponse
 	}
 
-	if err := c.getJSON(ctx, directionsAPI, r, &response); err != nil {
+	if err := c.getJSON(ctx, geocodingAPI, r, &response); err != nil {
 		return nil, err
 	}
 
