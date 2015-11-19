@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -26,6 +27,9 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
 	"googlemaps.github.io/maps/internal"
+
+	// Importing image/jpeg for it's decoder
+	_ "image/jpeg"
 )
 
 // Client may be used to make requests to the Google Maps WebService APIs
@@ -132,10 +136,10 @@ type apiRequest interface {
 	params() url.Values
 }
 
-func (c *Client) getJSON(ctx context.Context, config *apiConfig, apiReq apiRequest, resp interface{}) error {
+func (c *Client) get(ctx context.Context, config *apiConfig, apiReq apiRequest) (*http.Response, error) {
 	select {
 	case <-ctx.Done():
-		return ctx.Err()
+		return nil, ctx.Err()
 	case <-c.rateLimiter:
 		// Execute request.
 	}
@@ -146,20 +150,44 @@ func (c *Client) getJSON(ctx context.Context, config *apiConfig, apiReq apiReque
 	}
 	req, err := http.NewRequest("GET", host+config.path, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	q, err := c.generateAuthQuery(config.path, apiReq.params(), config.acceptsClientID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req.URL.RawQuery = q
-	httpResp, err := ctxhttp.Do(ctx, c.httpClient, req)
+	return ctxhttp.Do(ctx, c.httpClient, req)
+}
+
+func (c *Client) getJSON(ctx context.Context, config *apiConfig, apiReq apiRequest, resp interface{}) error {
+	httpResp, err := c.get(ctx, config, apiReq)
 	if err != nil {
 		return err
 	}
 	defer httpResp.Body.Close()
 
 	return json.NewDecoder(httpResp.Body).Decode(resp)
+}
+
+type binaryResponse struct {
+	statusCode  int
+	contentType string
+	data        []byte
+}
+
+func (c *Client) getBinary(ctx context.Context, config *apiConfig, apiReq apiRequest) (binaryResponse, error) {
+	httpResp, err := c.get(ctx, config, apiReq)
+	if err != nil {
+		return binaryResponse{}, err
+	}
+	defer httpResp.Body.Close()
+	content, err := ioutil.ReadAll(httpResp.Body)
+	if err != nil {
+		return binaryResponse{}, err
+	}
+
+	return binaryResponse{httpResp.StatusCode, httpResp.Header.Get("Content-Type"), content}, nil
 }
 
 func (c *Client) generateAuthQuery(path string, q url.Values, acceptClientID bool) (string, error) {

@@ -17,12 +17,14 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"image"
+	"io/ioutil"
 	"log"
 	"os"
 
-	"github.com/kr/pretty"
 	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
 )
@@ -32,9 +34,9 @@ var (
 	clientID       = flag.String("client_id", "", "ClientID for Maps for Work API access.")
 	signature      = flag.String("signature", "", "Signature for Maps for Work API access.")
 	photoreference = flag.String("photoreference", "", "Textual identifier that uniquely identifies a place photo.")
-	maxheight      = flag.Int("maxheight", 0, "pecifies the maximum desired height, in pixels, of the image returned by the Place Photos service.")
-	maxwidth       = flag.Int("maxwidth", 0, "pecifies the maximum desired width, in pixels, of the image returned by the Place Photos service.")
-	outfile        = flag.String("out", "", "directory to write image to.")
+	maxheight      = flag.Int("maxheight", 0, "Specifies the maximum desired height, in pixels, of the image returned by the Place Photos service. One of maxheight and maxwidth is required.")
+	maxwidth       = flag.Int("maxwidth", 0, "Specifies the maximum desired width, in pixels, of the image returned by the Place Photos service. One of maxheight and maxwidth is required.")
+	basename       = flag.String("basename", "", "Base name of file to write image to. If not specified, no file will be written.")
 )
 
 func usageAndExit(msg string) {
@@ -44,12 +46,14 @@ func usageAndExit(msg string) {
 	os.Exit(2)
 }
 
+func check(e error) {
+	if e != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+}
+
 func main() {
 	flag.Parse()
-
-	if *outfile == "" {
-		usageAndExit("out directory required")
-	}
 
 	var client *maps.Client
 	var err error
@@ -60,9 +64,7 @@ func main() {
 	} else {
 		usageAndExit("Please specify an API Key, or Client ID and Signature.")
 	}
-	if err != nil {
-		log.Fatalf("fatal error: %s", err)
-	}
+	check(err)
 
 	r := &maps.PlacePhotoRequest{
 		PhotoReference: *photoreference,
@@ -71,9 +73,17 @@ func main() {
 	}
 
 	resp, err := client.PlacePhoto(context.Background(), r)
-	if err != nil {
-		log.Fatalf("error %v", err)
-	}
+	check(err)
 
-	pretty.Println(resp)
+	log.Printf("Content-Type: %v\n", resp.ContentType)
+	img, format, err := image.Decode(bytes.NewBuffer(resp.Image))
+	check(err)
+	log.Printf("Image bounds: %v", img.Bounds())
+
+	if *basename != "" {
+		filename := fmt.Sprintf("%s.%s", *basename, format)
+		err := ioutil.WriteFile(filename, resp.Image, 0644)
+		check(err)
+		log.Printf("Wrote image to %s\n", filename)
+	}
 }

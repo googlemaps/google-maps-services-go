@@ -380,14 +380,10 @@ type QueryAutocompleteTermOffset struct {
 	Offset int `json:"offset"`
 }
 
-// PlacePhotoRequest is the functional options struct for Places Photo API
-type PlacePhotoRequest struct {
-	// PhotoReference is a string used to identify the photo when you perform a Photo request.
-	PhotoReference string
-	// MaxHeight is the maximum height of the image.
-	MaxHeight uint
-	// MaxWidth is the maximum width of the image.
-	MaxWidth uint
+var placesPhotoAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/place/photo",
+	acceptsClientID: true,
 }
 
 // PlacePhoto issues the Places API Photo request and retrieves the response
@@ -401,15 +397,12 @@ func (c *Client) PlacePhoto(ctx context.Context, r *PlacePhotoRequest) (PlacePho
 		return PlacePhotoResponse{}, errors.New("maps: both MaxHeight & MaxWidth missing")
 	}
 
-	if err := c.getJSON(ctx, placesPhotoAPI, r, &response); err != nil {
-		return QueryAutocompleteResponse{}, err
+	resp, err := c.getBinary(ctx, placesPhotoAPI, r)
+	if err != nil {
+		return PlacePhotoResponse{}, err
 	}
 
-	if err := response.StatusError(); err != nil {
-		return QueryAutocompleteResponse{}, err
-	}
-
-	return QueryAutocompleteResponse{response.Predictions}, nil
+	return PlacePhotoResponse{resp.contentType, resp.data}, nil
 }
 
 func (r *PlacePhotoRequest) params() url.Values {
@@ -426,4 +419,22 @@ func (r *PlacePhotoRequest) params() url.Values {
 	}
 
 	return q
+}
+
+// PlacePhotoRequest is the functional options struct for Places Photo API
+type PlacePhotoRequest struct {
+	// PhotoReference is a string used to identify the photo when you perform a Photo request.
+	PhotoReference string
+	// MaxHeight is the maximum height of the image.
+	MaxHeight uint
+	// MaxWidth is the maximum width of the image.
+	MaxWidth uint
+}
+
+// PlacePhotoResponse is a response to the Place Photo request
+type PlacePhotoResponse struct {
+	// ContentType is the server reported type of the Image.
+	ContentType string
+	// Image is the server returned image
+	Image []byte
 }
