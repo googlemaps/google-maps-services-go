@@ -70,19 +70,20 @@ Your API key should be 40 characters long, and begin with `AIza`.
 
 ## Installation
 
-    $ go get github.com/googlemaps/google-maps-services-go
+    $ go get googlemaps.github.io/maps
 
 ## Developer Documentation
 
-View the [reference documentation](https://godoc.org/github.com/googlemaps/google-maps-services-go)
+View the [reference documentation](https://godoc.org/googlemaps.github.io/go)
 
-Additional documentation for the included web services is available at
-https://developers.google.com/maps/.
+Additional documentation for the included  web services is available at
+https://developers.google.com/maps/ and https://developers.google.com/places/.
 
  - [Directions API]
  - [Distance Matrix API]
  - [Elevation API]
  - [Geocoding API]
+ - [Places API]
  - [Time Zone API]
  - [Roads API]
 
@@ -95,7 +96,7 @@ package main
 import (
 	"log"
 
-	maps "github.com/googlemaps/google-maps-services-go"
+	"googlemaps.github.io/maps"
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
 )
