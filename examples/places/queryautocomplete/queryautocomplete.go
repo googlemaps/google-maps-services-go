@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package main contains a simple command line tool for Timezone API
-// Directions docs: https://developers.google.com/maps/documentation/timezone/
+// Package main contains a simple command line tool for Places API Query Autocomplete
+// Documentation: https://developers.google.com/places/web-service/query
 package main
 
 import (
@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"time"
 
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
@@ -33,9 +31,11 @@ var (
 	apiKey    = flag.String("key", "", "API Key for using Google Maps API.")
 	clientID  = flag.String("client_id", "", "ClientID for Maps for Work API access.")
 	signature = flag.String("signature", "", "Signature for Maps for Work API access.")
-	location  = flag.String("location", "", "a comma-separated lat,lng tuple (eg. location=-33.86,151.20), representing the location to look up.")
-	timestamp = flag.String("timestamp", "", "specifies the desired time as seconds since midnight, January 1, 1970 UTC.")
+	input     = flag.String("input", "", "Text string on which to search.")
 	language  = flag.String("language", "", "The language in which to return results.")
+	offset    = flag.Uint("offset", 0, "The character position in the input term at which the service uses text for predictions.")
+	location  = flag.String("location", "", "The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.")
+	radius    = flag.Uint("radius", 0, "Defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters.")
 )
 
 func usageAndExit(msg string) {
@@ -65,28 +65,25 @@ func main() {
 	}
 	check(err)
 
-	t, err := strconv.Atoi(*timestamp)
-	check(err)
-
-	r := &maps.TimezoneRequest{
-		Language:  *language,
-		Timestamp: time.Unix(int64(t), 0),
+	r := &maps.QueryAutocompleteRequest{
+		Input:    *input,
+		Language: *language,
+		Radius:   *radius,
+		Offset:   *offset,
 	}
 
 	parseLocation(*location, r)
 
-	resp, err := client.Timezone(context.Background(), r)
+	resp, err := client.QueryAutocomplete(context.Background(), r)
 	check(err)
 
 	pretty.Println(resp)
 }
 
-func parseLocation(location string, r *maps.TimezoneRequest) {
+func parseLocation(location string, r *maps.QueryAutocompleteRequest) {
 	if location != "" {
 		l, err := maps.ParseLatLng(location)
 		check(err)
 		r.Location = &l
-	} else {
-		usageAndExit("location is required")
 	}
 }

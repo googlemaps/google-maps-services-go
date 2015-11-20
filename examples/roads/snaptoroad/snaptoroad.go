@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/kr/pretty"
@@ -42,15 +41,19 @@ func usageAndExit(msg string) {
 	os.Exit(2)
 }
 
+func check(err error) {
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+}
+
 func main() {
 	flag.Parse()
 	if *apiKey == "" {
 		usageAndExit("Please specify an API Key.")
 	}
 	client, err := maps.NewClient(maps.WithAPIKey(*apiKey))
-	if err != nil {
-		log.Fatalf("error %v", err)
-	}
+	check(err)
 	r := &maps.SnapToRoadRequest{
 		Interpolate: *interpolate,
 	}
@@ -61,9 +64,7 @@ func main() {
 	parsePath(*path, r)
 
 	resp, err := client.SnapToRoad(context.Background(), r)
-	if err != nil {
-		log.Fatalf("error %v", err)
-	}
+	check(err)
 
 	pretty.Println(resp)
 }
@@ -73,16 +74,9 @@ func parsePath(path string, r *maps.SnapToRoadRequest) {
 	if path != "" {
 		ls := strings.Split(path, "|")
 		for _, l := range ls {
-			ll := strings.Split(l, ",")
-			lat, err := strconv.ParseFloat(ll[0], 64)
-			if err != nil {
-				usageAndExit(fmt.Sprintf("Could not parse path: %v", err))
-			}
-			lng, err := strconv.ParseFloat(ll[1], 64)
-			if err != nil {
-				usageAndExit(fmt.Sprintf("Could not parse path: %v", err))
-			}
-			r.Path = append(r.Path, maps.LatLng{Lat: lat, Lng: lng})
+			ll, err := maps.ParseLatLng(l)
+			check(err)
+			r.Path = append(r.Path, ll)
 		}
 	} else {
 		usageAndExit("Path required")

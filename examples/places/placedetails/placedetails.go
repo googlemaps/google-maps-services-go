@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package main contains a simple command line tool for Timezone API
-// Directions docs: https://developers.google.com/maps/documentation/timezone/
+// Package main contains a simple command line tool for Places API Text Search
+// Documentation: https://developers.google.com/places/web-service/search#TextSearchRequests
 package main
 
 import (
@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"time"
 
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
@@ -33,9 +31,7 @@ var (
 	apiKey    = flag.String("key", "", "API Key for using Google Maps API.")
 	clientID  = flag.String("client_id", "", "ClientID for Maps for Work API access.")
 	signature = flag.String("signature", "", "Signature for Maps for Work API access.")
-	location  = flag.String("location", "", "a comma-separated lat,lng tuple (eg. location=-33.86,151.20), representing the location to look up.")
-	timestamp = flag.String("timestamp", "", "specifies the desired time as seconds since midnight, January 1, 1970 UTC.")
-	language  = flag.String("language", "", "The language in which to return results.")
+	placeID   = flag.String("place_id", "", "Textual identifier that uniquely identifies a place.")
 )
 
 func usageAndExit(msg string) {
@@ -65,28 +61,12 @@ func main() {
 	}
 	check(err)
 
-	t, err := strconv.Atoi(*timestamp)
-	check(err)
-
-	r := &maps.TimezoneRequest{
-		Language:  *language,
-		Timestamp: time.Unix(int64(t), 0),
+	r := &maps.PlaceDetailsRequest{
+		PlaceID: *placeID,
 	}
 
-	parseLocation(*location, r)
-
-	resp, err := client.Timezone(context.Background(), r)
+	resp, err := client.PlaceDetails(context.Background(), r)
 	check(err)
 
 	pretty.Println(resp)
-}
-
-func parseLocation(location string, r *maps.TimezoneRequest) {
-	if location != "" {
-		l, err := maps.ParseLatLng(location)
-		check(err)
-		r.Location = &l
-	} else {
-		usageAndExit("location is required")
-	}
 }
