@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -173,7 +173,7 @@ func (c *Client) getJSON(ctx context.Context, config *apiConfig, apiReq apiReque
 type binaryResponse struct {
 	statusCode  int
 	contentType string
-	data        []byte
+	data        io.ReadCloser
 }
 
 func (c *Client) getBinary(ctx context.Context, config *apiConfig, apiReq apiRequest) (binaryResponse, error) {
@@ -181,13 +181,8 @@ func (c *Client) getBinary(ctx context.Context, config *apiConfig, apiReq apiReq
 	if err != nil {
 		return binaryResponse{}, err
 	}
-	defer httpResp.Body.Close()
-	content, err := ioutil.ReadAll(httpResp.Body)
-	if err != nil {
-		return binaryResponse{}, err
-	}
 
-	return binaryResponse{httpResp.StatusCode, httpResp.Header.Get("Content-Type"), content}, nil
+	return binaryResponse{httpResp.StatusCode, httpResp.Header.Get("Content-Type"), httpResp.Body}, nil
 }
 
 func (c *Client) generateAuthQuery(path string, q url.Values, acceptClientID bool) (string, error) {

@@ -17,11 +17,9 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
-	"image"
-	"io/ioutil"
+	"image/jpeg"
 	"log"
 	"os"
 
@@ -46,8 +44,8 @@ func usageAndExit(msg string) {
 	os.Exit(2)
 }
 
-func check(e error) {
-	if e != nil {
+func check(err error) {
+	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
 }
@@ -76,14 +74,17 @@ func main() {
 	check(err)
 
 	log.Printf("Content-Type: %v\n", resp.ContentType)
-	img, format, err := image.Decode(bytes.NewBuffer(resp.Image))
+	img, err := resp.Image()
 	check(err)
 	log.Printf("Image bounds: %v", img.Bounds())
 
 	if *basename != "" {
-		filename := fmt.Sprintf("%s.%s", *basename, format)
-		err := ioutil.WriteFile(filename, resp.Image, 0644)
+		filename := fmt.Sprintf("%s.%s", *basename, "jpg")
+		f, err := os.Create(filename)
 		check(err)
+		err = jpeg.Encode(f, img, &jpeg.Options{Quality: 85})
+		check(err)
+
 		log.Printf("Wrote image to %s\n", filename)
 	}
 }

@@ -17,10 +17,15 @@ package maps
 import (
 	"errors"
 	"fmt"
+	"image"
+	"io"
 	"net/url"
 	"strconv"
 
 	"golang.org/x/net/context"
+
+	// Included for image/jpeg's decoder
+	_ "image/jpeg"
 )
 
 var placesTextSearchAPI = &apiConfig{
@@ -100,9 +105,9 @@ type TextSearchRequest struct {
 	Radius uint
 	// Language specifies the language in which to return results. Optional.
 	Language string
-	// minprice restricts results to only those places within the specified price level. Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
+	// MinPrice restricts results to only those places within the specified price level. Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
 	MinPrice PriceLevel
-	// maxprice restricts results to only those places within the specified price level. Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
+	// MaxPrice restricts results to only those places within the specified price level. Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
 	MaxPrice PriceLevel
 	// OpenNow returns only those places that are open for business at the time the query is sent. Places that do not specify opening hours in the Google Places database will not be returned if you include this parameter in your query.
 	OpenNow bool
@@ -124,7 +129,7 @@ type PlacesSearchResponse struct {
 type PlacesSearchResult struct {
 	// FormattedAddress is the human-readable address of this place
 	FormattedAddress string `json:"formatted_address"`
-	// geometry contains geometry information about the result, generally including the location (geocode) of the place and (optionally) the viewport identifying its general area of coverage.
+	// Geometry contains geometry information about the result, generally including the location (geocode) of the place and (optionally) the viewport identifying its general area of coverage.
 	Geometry AddressGeometry `json:"geometry"`
 	// Name contains the human-readable name for the returned result. For establishment results, this is usually the business name.
 	Name string `json:"name"`
@@ -144,14 +149,19 @@ type PlacesSearchResult struct {
 	Photos []Photo `json:"photos"`
 	// AltIDs — An array of zero, one or more alternative place IDs for the place, with a scope related to each alternative ID.
 	AltIDs []AltID `json:"alt_ids"`
-	// price_level is the price level of the place, on a scale of 0 to 4.
+	// PriceLevel is the price level of the place, on a scale of 0 to 4.
 	PriceLevel int `json:"price_level"`
 	// Vicinity contains a feature name of a nearby location.
 	Vicinity string `json:"vicinity"`
 }
 
 // AltID is the alternative place IDs for a place.
-type AltID struct{}
+type AltID struct {
+	// PlaceID is the APP scoped Place ID that you received when you initially created this Place, before it was given a Google wide Place ID.
+	PlaceID string `json:"place_id"`
+	// Scope is the scope of this alternative place ID. It will always be APP, indicating that the alternative place ID is recognised by your application only.
+	Scope string `json:"scope"`
+}
 
 var placeDetailsAPI = &apiConfig{
 	host:            "https://maps.googleapis.com",
@@ -214,7 +224,7 @@ type PlaceDetailsResult struct {
 	FormattedPhoneNumber string `json:"formatted_phone_number"`
 	// InternationalPhoneNumber contains the place's phone number in international format. International format includes the country code, and is prefixed with the plus (+) sign. For example, the international_phone_number for Google's Sydney, Australia office is +61 2 9374 4000.
 	InternationalPhoneNumber string `json:"international_phone_number"`
-	// geometry contains geometry information about the result, generally including the location (geocode) of the place and (optionally) the viewport identifying its general area of coverage.
+	// Geometry contains geometry information about the result, generally including the location (geocode) of the place and (optionally) the viewport identifying its general area of coverage.
 	Geometry AddressGeometry `json:"geometry"`
 	// Name contains the human-readable name for the returned result. For establishment results, this is usually the business name.
 	Name string `json:"name"`
@@ -234,11 +244,11 @@ type PlaceDetailsResult struct {
 	Photos []Photo `json:"photos"`
 	// AltIDs — An array of zero, one or more alternative place IDs for the place, with a scope related to each alternative ID.
 	AltIDs []AltID `json:"alt_ids"`
-	// price_level is the price level of the place, on a scale of 0 to 4.
+	// PriceLevel is the price level of the place, on a scale of 0 to 4.
 	PriceLevel int `json:"price_level"`
 	// Vicinity contains a feature name of a nearby location.
 	Vicinity string `json:"vicinity"`
-	// permanently_closed is a boolean flag indicating whether the place has permanently shut down (value true). If the place is not permanently closed, the flag is absent from the response.
+	// PermanentlyClosed is a boolean flag indicating whether the place has permanently shut down (value true). If the place is not permanently closed, the flag is absent from the response.
 	PermanentlyClosed bool `json:"permanently_closed"`
 	// Reviews is an array of up to five reviews. If a language parameter was specified in the Place Details request, the Places Service will bias the results to prefer reviews written in that language.
 	Reviews []PlaceReview `json:"reviews"`
@@ -246,7 +256,7 @@ type PlaceDetailsResult struct {
 	UTCOffset int `json:"utc_offset"`
 	// Website lists the authoritative website for this place, such as a business' homepage.
 	Website string `json:"website"`
-	// url contains the URL of the official Google page for this place. This will be the establishment's Google+ page if the Google+ page exists, otherwise it will be the Google-owned page that contains the best available information about the place. Applications must link to or embed this page on any screen that shows detailed results about the place to the user.
+	// URL contains the URL of the official Google page for this place. This will be the establishment's Google+ page if the Google+ page exists, otherwise it will be the Google-owned page that contains the best available information about the place. Applications must link to or embed this page on any screen that shows detailed results about the place to the user.
 	URL string `json:"url"`
 	// HTMLAttributions contain a set of attributions about this listing which must be displayed to the user.
 	HTMLAttributions []string
@@ -258,7 +268,7 @@ type PlaceReview struct {
 	Aspects []PlaceReviewAspect `json:"aspects"`
 	// AuthorName the name of the user who submitted the review. Anonymous reviews are attributed to "A Google user".
 	AuthorName string `json:"author_name"`
-	// author_url the URL to the user's Google+ profile, if available.
+	// AuthorURL the URL to the user's Google+ profile, if available.
 	AuthorURL string `json:"author_url"`
 	// Language an IETF language code indicating the language used in the user's review. This field contains the main language tag only, and not the secondary tag indicating country or region.
 	Language string `json:"language"`
@@ -267,7 +277,7 @@ type PlaceReview struct {
 	// Text is the user's review. When reviewing a location with Google Places, text reviews are considered optional. Therefore, this field may by empty. Note that this field may include simple HTML markup.
 	Text string `json:"text"`
 	// Time the time that the review was submitted, measured in the number of seconds since since midnight, January 1, 1970 UTC.
-	Time int `json:"time"`
+	Time int `json:"time"` // TODO(samthor): convert this to a real time.Time
 }
 
 // PlaceReviewAspect provides a rating of a single attribute of the establishment.
@@ -354,7 +364,7 @@ type QueryAutocompleteResponse struct {
 type QueryAutocompletePrediction struct {
 	// Description of the matched prediction.
 	Description string `json:"description"`
-	// PlaceID of the Place
+	// PlaceID is the ID of the Place
 	PlaceID string `json:"place_id"`
 	// Types is an array indicating the type of the address component.
 	Types []string `json:"types"`
@@ -425,9 +435,9 @@ func (r *PlacePhotoRequest) params() url.Values {
 type PlacePhotoRequest struct {
 	// PhotoReference is a string used to identify the photo when you perform a Photo request.
 	PhotoReference string
-	// MaxHeight is the maximum height of the image.
+	// MaxHeight is the maximum height of the image. One of MaxHeight and MaxWidth is required.
 	MaxHeight uint
-	// MaxWidth is the maximum width of the image.
+	// MaxWidth is the maximum width of the image. One of MaxHeight and MaxWidth is required.
 	MaxWidth uint
 }
 
@@ -435,6 +445,16 @@ type PlacePhotoRequest struct {
 type PlacePhotoResponse struct {
 	// ContentType is the server reported type of the Image.
 	ContentType string
-	// Image is the server returned image
-	Image []byte
+	// Data is the server returned image data. You must close this after you are finished.
+	Data io.ReadCloser
+}
+
+// Image will read and close  response.Data and return it as an image.
+func (resp *PlacePhotoResponse) Image() (image.Image, error) {
+	defer resp.Data.Close()
+	if resp.ContentType != "image/jpeg" {
+		return nil, errors.New("Image of unknown format: " + resp.ContentType)
+	}
+	img, _, err := image.Decode(resp.Data)
+	return img, err
 }

@@ -368,3 +368,30 @@ func TestPlaceDetails(t *testing.T) {
 	}
 
 }
+
+func TestPlacePhoto(t *testing.T) {
+	photoReference := "ThisIsNotAPhotoReference"
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&maxheight=400&photoreference=ThisIsNotAPhotoReference"
+
+	server := mockServerForQuery(expectedQuery, 200, "An Image?")
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &PlacePhotoRequest{
+		PhotoReference: photoReference,
+		MaxHeight:      400,
+	}
+
+	_, err := c.PlacePhoto(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+
+}

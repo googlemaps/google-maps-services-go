@@ -101,38 +101,30 @@ func parseLocation(location string, r *maps.TextSearchRequest) {
 	}
 }
 
+func parsePriceLevel(priceLevel string) maps.PriceLevel {
+	switch priceLevel {
+	case "0":
+		return maps.PriceLevelFree
+	case "1":
+		return maps.PriceLevelInexpensive
+	case "2":
+		return maps.PriceLevelModerate
+	case "3":
+		return maps.PriceLevelExpensive
+	case "4":
+		return maps.PriceLevelVeryExpensive
+	default:
+		usageAndExit(fmt.Sprintf("Unknown price level: '%s'", priceLevel))
+	}
+	return maps.PriceLevelFree
+}
+
 func parsePriceLevels(minprice string, maxprice string, r *maps.TextSearchRequest) {
 	if minprice != "" {
-		switch minprice {
-		case "0":
-			r.MinPrice = maps.PriceLevelFree
-		case "1":
-			r.MinPrice = maps.PriceLevelInexpensive
-		case "2":
-			r.MinPrice = maps.PriceLevelModerate
-		case "3":
-			r.MinPrice = maps.PriceLevelExpensive
-		case "4":
-			r.MinPrice = maps.PriceLevelVeryExpensive
-		default:
-			usageAndExit(fmt.Sprintf("Unknown min_price level: '%s'", minprice))
-		}
+		r.MinPrice = parsePriceLevel(minprice)
 	}
 
 	if maxprice != "" {
-		switch maxprice {
-		case "0":
-			r.MaxPrice = maps.PriceLevelFree
-		case "1":
-			r.MaxPrice = maps.PriceLevelInexpensive
-		case "2":
-			r.MaxPrice = maps.PriceLevelModerate
-		case "3":
-			r.MaxPrice = maps.PriceLevelExpensive
-		case "4":
-			r.MaxPrice = maps.PriceLevelVeryExpensive
-		default:
-			usageAndExit(fmt.Sprintf("Unknown max_price level: '%s'", maxprice))
-		}
+		r.MaxPrice = parsePriceLevel(minprice)
 	}
 }
