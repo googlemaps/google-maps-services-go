@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/kr/pretty"
@@ -45,6 +44,12 @@ func usageAndExit(msg string) {
 	os.Exit(2)
 }
 
+func check(err error) {
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+}
+
 func main() {
 	flag.Parse()
 
@@ -57,9 +62,7 @@ func main() {
 	} else {
 		usageAndExit("Please specify an API Key, or Client ID and Signature.")
 	}
-	if err != nil {
-		log.Fatalf("fatal error: %s", err)
-	}
+	check(err)
 
 	r := &maps.ElevationRequest{}
 
@@ -69,17 +72,13 @@ func main() {
 
 	if *locations != "" {
 		l, err := decodeLocations(*locations)
-		if err != nil {
-			log.Fatalf("Could not parse locations: %#v", err)
-		}
+		check(err)
 		r.Locations = l
 	}
 
 	if *path != "" {
 		p, err := decodePath(*path)
-		if err != nil {
-			log.Fatalf("Could not parse path: %#v", err)
-		}
+		check(err)
 		r.Path = p
 	}
 
@@ -98,39 +97,15 @@ func decodeLocations(location string) ([]maps.LatLng, error) {
 	if strings.HasPrefix(location, "enc:") {
 		return maps.DecodePolyline(location[len("enc:"):]), nil
 	}
-	result := []maps.LatLng{}
 
-	// TODO: break this out into a helper function
 	if strings.Contains(location, "|") {
-		// | delimited list of locations
-		ls := strings.Split(location, "|")
-		for _, l := range ls {
-			ll := strings.Split(l, ",")
-			lat, err := strconv.ParseFloat(ll[0], 64)
-			if err != nil {
-				return result, err
-			}
-			lng, err := strconv.ParseFloat(ll[1], 64)
-			if err != nil {
-				return result, err
-			}
-			result = append(result, maps.LatLng{Lat: lat, Lng: lng})
-		}
-		return result, nil
+		return maps.ParseLatLngList(location)
 	}
 
 	// single location
-	ll := strings.Split(location, ",")
-	lat, err := strconv.ParseFloat(ll[0], 64)
-	if err != nil {
-		return result, err
-	}
-	lng, err := strconv.ParseFloat(ll[1], 64)
-	if err != nil {
-		return result, err
-	}
-	result = append(result, maps.LatLng{Lat: lat, Lng: lng})
-	return result, nil
+	ll, err := maps.ParseLatLng(location)
+	check(err)
+	return []maps.LatLng{ll}, nil
 }
 
 // decodePath takes a location argument string and decodes it.
@@ -145,16 +120,9 @@ func decodePath(path string) ([]maps.LatLng, error) {
 		// | delimited list of locations
 		ls := strings.Split(path, "|")
 		for _, l := range ls {
-			ll := strings.Split(l, ",")
-			lat, err := strconv.ParseFloat(ll[0], 64)
-			if err != nil {
-				return result, err
-			}
-			lng, err := strconv.ParseFloat(ll[1], 64)
-			if err != nil {
-				return result, err
-			}
-			result = append(result, maps.LatLng{Lat: lat, Lng: lng})
+			ll, err := maps.ParseLatLng(l)
+			check(err)
+			result = append(result, ll)
 		}
 		return result, nil
 	}

@@ -22,7 +22,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/kr/pretty"
@@ -46,6 +45,12 @@ func usageAndExit(msg string) {
 	os.Exit(2)
 }
 
+func check(err error) {
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+}
+
 func main() {
 	flag.Parse()
 
@@ -58,17 +63,10 @@ func main() {
 	} else {
 		usageAndExit("Please specify an API Key, or Client ID and Signature.")
 	}
-	if err != nil {
-		log.Fatalf("fatal error: %s", err)
-	}
+	check(err)
 
-	if err != nil {
-		log.Fatalf("error %v", err)
-	}
 	t, err := strconv.Atoi(*timestamp)
-	if err != nil {
-		usageAndExit(fmt.Sprintf("Could not convert timestamp to int: %v", err))
-	}
+	check(err)
 
 	r := &maps.TimezoneRequest{
 		Language:  *language,
@@ -78,28 +76,16 @@ func main() {
 	parseLocation(*location, r)
 
 	resp, err := client.Timezone(context.Background(), r)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
+	check(err)
 
 	pretty.Println(resp)
 }
 
 func parseLocation(location string, r *maps.TimezoneRequest) {
 	if location != "" {
-		l := strings.Split(location, ",")
-		lat, err := strconv.ParseFloat(l[0], 64)
-		if err != nil {
-			log.Fatalf("Couldn't parse latlng: %#v", err)
-		}
-		lng, err := strconv.ParseFloat(l[1], 64)
-		if err != nil {
-			log.Fatalf("Couldn't parse latlng: %#v", err)
-		}
-		r.Location = &maps.LatLng{
-			Lat: lat,
-			Lng: lng,
-		}
+		l, err := maps.ParseLatLng(location)
+		check(err)
+		r.Location = &l
 	} else {
 		usageAndExit("location is required")
 	}

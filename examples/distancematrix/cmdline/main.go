@@ -51,6 +51,12 @@ func usageAndExit(msg string) {
 	os.Exit(2)
 }
 
+func check(err error) {
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+}
+
 func main() {
 	flag.Parse()
 
@@ -63,9 +69,7 @@ func main() {
 	} else {
 		usageAndExit("Please specify an API Key, or Client ID and Signature.")
 	}
-	if err != nil {
-		log.Fatalf("fatal error: %s", err)
-	}
+	check(err)
 
 	r := &maps.DistanceMatrixRequest{
 		Language:      *language,
@@ -87,9 +91,7 @@ func main() {
 	lookupTransitRoutingPreference(*transitRoutingPreference, r)
 
 	resp, err := client.DistanceMatrix(context.Background(), r)
-	if err != nil {
-		log.Fatalf("fatal error: %s", err)
-	}
+	check(err)
 
 	pretty.Println(resp)
 }

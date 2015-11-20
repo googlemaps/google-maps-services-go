@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/kr/pretty"
@@ -41,6 +40,12 @@ func usageAndExit(msg string) {
 	fmt.Println("Flags:")
 	flag.PrintDefaults()
 	os.Exit(2)
+}
+
+func check(err error) {
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
 }
 
 func main() {
@@ -80,16 +85,9 @@ func parsePath(path string, r *maps.SpeedLimitsRequest) {
 	if path != "" {
 		ls := strings.Split(path, "|")
 		for _, l := range ls {
-			ll := strings.Split(l, ",")
-			lat, err := strconv.ParseFloat(ll[0], 64)
-			if err != nil {
-				usageAndExit(fmt.Sprintf("Could not parse path: %v", err))
-			}
-			lng, err := strconv.ParseFloat(ll[1], 64)
-			if err != nil {
-				usageAndExit(fmt.Sprintf("Could not parse path: %v", err))
-			}
-			r.Path = append(r.Path, maps.LatLng{Lat: lat, Lng: lng})
+			ll, err := maps.ParseLatLng(l)
+			check(err)
+			r.Path = append(r.Path, ll)
 		}
 	}
 }

@@ -17,12 +17,43 @@ package maps
 import (
 	"fmt"
 	"math"
+	"strconv"
+	"strings"
 )
 
 // LatLng represents a location on the Earth.
 type LatLng struct {
 	Lat float64 `json:"lat"`
 	Lng float64 `json:"lng"`
+}
+
+// ParseLatLng will parse a string representation of a Lat,Lng pair.
+func ParseLatLng(location string) (LatLng, error) {
+	l := strings.Split(location, ",")
+	lat, err := strconv.ParseFloat(l[0], 64)
+	if err != nil {
+		return LatLng{}, err
+	}
+	lng, err := strconv.ParseFloat(l[1], 64)
+	if err != nil {
+		return LatLng{}, err
+	}
+	return LatLng{Lat: lat, Lng: lng}, nil
+}
+
+// ParseLatLngList will parse a string of | separated Lat,Lng pairs.
+func ParseLatLngList(locations string) ([]LatLng, error) {
+	result := []LatLng{}
+
+	ls := strings.Split(locations, "|")
+	for _, l := range ls {
+		ll, err := ParseLatLng(l)
+		if err != nil {
+			return []LatLng{}, err
+		}
+		result = append(result, ll)
+	}
+	return result, nil
 }
 
 func (l *LatLng) String() string {

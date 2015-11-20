@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"strings"
 
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
@@ -49,6 +47,12 @@ func usageAndExit(msg string) {
 	os.Exit(2)
 }
 
+func check(err error) {
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+}
+
 func main() {
 	flag.Parse()
 
@@ -61,9 +65,7 @@ func main() {
 	} else {
 		usageAndExit("Please specify an API Key, or Client ID and Signature.")
 	}
-	if err != nil {
-		log.Fatalf("fatal error: %s", err)
-	}
+	check(err)
 
 	r := &maps.TextSearchRequest{
 		Query:    *query,
@@ -76,28 +78,16 @@ func main() {
 	parsePriceLevels(*minprice, *maxprice, r)
 
 	resp, err := client.TextSearch(context.Background(), r)
-	if err != nil {
-		log.Fatalf("error %v", err)
-	}
+	check(err)
 
 	pretty.Println(resp)
 }
 
 func parseLocation(location string, r *maps.TextSearchRequest) {
 	if location != "" {
-		l := strings.Split(location, ",")
-		lat, err := strconv.ParseFloat(l[0], 64)
-		if err != nil {
-			log.Fatalf("Couldn't parse latlng: %#v", err)
-		}
-		lng, err := strconv.ParseFloat(l[1], 64)
-		if err != nil {
-			log.Fatalf("Couldn't parse latlng: %#v", err)
-		}
-		r.Location = &maps.LatLng{
-			Lat: lat,
-			Lng: lng,
-		}
+		l, err := maps.ParseLatLng(location)
+		check(err)
+		r.Location = &l
 	}
 }
 
