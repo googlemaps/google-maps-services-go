@@ -235,7 +235,7 @@ type PlaceDetailsResult struct {
 	// Scope indicates the scope of the PlaceID.
 	Scope string `json:"scope"`
 	// Rating contains the place's rating, from 1.0 to 5.0, based on aggregated user reviews.
-	Rating float32
+	Rating float32 `json:"rating"`
 	// Types contains an array of feature types describing the given result.
 	Types []string `json:"types"`
 	// OpeningHours may contain whether the place is open now or not.
