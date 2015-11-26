@@ -147,7 +147,7 @@ type DirectionsRequest struct {
 	TransitMode []TransitMode
 	// TransitRoutingPreference specifies preferences for transit routes. Optional.
 	TransitRoutingPreference TransitRoutingPreference
-	//TrafficModel specifies traffic prediction model when requesting future directions. Optional.
+	// TrafficModel specifies traffic prediction model when requesting future directions. Optional.
 	TrafficModel TrafficModel
 }
 
@@ -155,7 +155,7 @@ type DirectionsRequest struct {
 type GeocodedWaypoint struct {
 	// GeocoderStatus indicates the status code resulting from the geocoding operation. This field may contain the following values.
 	GeocoderStatus string `json:"geocoder_status"`
-	// partial_match indicates that the geocoder did not return an exact match for the original request, though it was able to match part of the requested address.
+	// PartialMatch indicates that the geocoder did not return an exact match for the original request, though it was able to match part of the requested address.
 	PartialMatch bool `json:"partial_match"`
 	// PlaceID is a unique identifier that can be used with other Google APIs.
 	PlaceID string `json:"place_id"`
