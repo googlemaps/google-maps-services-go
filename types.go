@@ -80,6 +80,16 @@ type Distance struct {
 	Meters int `json:"value"`
 }
 
+// TrafficModel specifies traffic prediction model when requesting future directions.
+type TrafficModel string
+
+// Traffic prediction model when requesting future directions.
+const (
+	TrafficModelBestGuess   = TrafficModel("best_guess")
+	TrafficModelOptimistic  = TrafficModel("optimistic")
+	TrafficModelPessimistic = TrafficModel("pessimistic")
+)
+
 // PriceLevel is the Price Levels for Places API
 type PriceLevel string
 

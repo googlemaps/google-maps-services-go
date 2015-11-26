@@ -31,9 +31,10 @@ type safeLeg Leg
 // encodedLeg is the actual encoded version of Leg as per the Maps APIs.
 type encodedLeg struct {
 	safeLeg
-	EncDuration      *internal.Duration `json:"duration"`
-	EncArrivalTime   *internal.DateTime `json:"arrival_time"`
-	EncDepartureTime *internal.DateTime `json:"departure_time"`
+	EncDuration          *internal.Duration `json:"duration"`
+	EncDurationInTraffic *internal.Duration `json:"duration_in_traffic"`
+	EncArrivalTime       *internal.DateTime `json:"arrival_time"`
+	EncDepartureTime     *internal.DateTime `json:"departure_time"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler for Leg. This decodes the API
@@ -47,6 +48,7 @@ func (leg *Leg) UnmarshalJSON(data []byte) error {
 	*leg = Leg(x.safeLeg)
 
 	leg.Duration = x.EncDuration.Duration()
+	leg.DurationInTraffic = x.EncDurationInTraffic.Duration()
 	leg.ArrivalTime = x.EncArrivalTime.Time()
 	leg.DepartureTime = x.EncDepartureTime.Time()
 
@@ -60,6 +62,7 @@ func (leg *Leg) MarshalJSON() ([]byte, error) {
 	x.safeLeg = safeLeg(*leg)
 
 	x.EncDuration = internal.NewDuration(leg.Duration)
+	x.EncDurationInTraffic = internal.NewDuration(leg.DurationInTraffic)
 	x.EncArrivalTime = internal.NewDateTime(leg.ArrivalTime)
 	x.EncDepartureTime = internal.NewDateTime(leg.DepartureTime)
 

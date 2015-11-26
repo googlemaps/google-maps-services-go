@@ -31,40 +31,41 @@ var directionsAPI = &apiConfig{
 }
 
 // Directions issues the Directions request and retrieves the Response
-func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route, error) {
+func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route, []GeocodedWaypoint, error) {
 	if r.Origin == "" {
-		return nil, errors.New("maps: origin missing")
+		return nil, nil, errors.New("maps: origin missing")
 	}
 	if r.Destination == "" {
-		return nil, errors.New("maps: destination missing")
+		return nil, nil, errors.New("maps: destination missing")
 	}
 	if r.Mode != "" && TravelModeDriving != r.Mode && TravelModeWalking != r.Mode && TravelModeBicycling != r.Mode && TravelModeTransit != r.Mode {
-		return nil, fmt.Errorf("maps: unknown Mode: '%s'", r.Mode)
+		return nil, nil, fmt.Errorf("maps: unknown Mode: '%s'", r.Mode)
 	}
 	if r.DepartureTime != "" && r.ArrivalTime != "" {
-		return nil, errors.New("maps: DepartureTime and ArrivalTime both specified")
+		return nil, nil, errors.New("maps: DepartureTime and ArrivalTime both specified")
 	}
 	if len(r.TransitMode) != 0 && r.Mode != TravelModeTransit {
-		return nil, errors.New("maps: TransitMode specified while Mode != TravelModeTransit")
+		return nil, nil, errors.New("maps: TransitMode specified while Mode != TravelModeTransit")
 	}
 	if r.TransitRoutingPreference != "" && r.Mode != TravelModeTransit {
-		return nil, errors.New("maps: mode of transit '" + string(r.Mode) + "' invalid for TransitRoutingPreference")
+		return nil, nil, errors.New("maps: mode of transit '" + string(r.Mode) + "' invalid for TransitRoutingPreference")
 	}
 
 	var response struct {
-		Routes []Route `json:"routes"`
+		Routes            []Route            `json:"routes"`
+		GeocodedWaypoints []GeocodedWaypoint `json:"geocoded_waypoints"`
 		commonResponse
 	}
 
 	if err := c.getJSON(ctx, directionsAPI, r, &response); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if err := response.StatusError(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return response.Routes, nil
+	return response.Routes, response.GeocodedWaypoints, nil
 }
 
 func (r *DirectionsRequest) params() url.Values {
@@ -73,6 +74,12 @@ func (r *DirectionsRequest) params() url.Values {
 	q.Set("destination", r.Destination)
 	if r.Mode != "" {
 		q.Set("mode", string(r.Mode))
+	}
+	if r.DepartureTime != "" {
+		q.Set("departure_time", r.DepartureTime)
+	}
+	if r.ArrivalTime != "" {
+		q.Set("arrival_time", r.ArrivalTime)
 	}
 	if len(r.Waypoints) != 0 {
 		q.Set("waypoints", strings.Join(r.Waypoints, "|"))
@@ -106,6 +113,9 @@ func (r *DirectionsRequest) params() url.Values {
 	if r.TransitRoutingPreference != "" {
 		q.Set("transit_routing_preference", string(r.TransitRoutingPreference))
 	}
+	if r.TrafficModel != "" {
+		q.Set("traffic_model", string(r.TrafficModel))
+	}
 	return q
 }
 
@@ -137,6 +147,20 @@ type DirectionsRequest struct {
 	TransitMode []TransitMode
 	// TransitRoutingPreference specifies preferences for transit routes. Optional.
 	TransitRoutingPreference TransitRoutingPreference
+	//TrafficModel specifies traffic prediction model when requesting future directions. Optional.
+	TrafficModel TrafficModel
+}
+
+// GeocodedWaypoint represents the geocoded point for origin, supplied waypoints, or destination for a requested direction request.
+type GeocodedWaypoint struct {
+	// GeocoderStatus indicates the status code resulting from the geocoding operation. This field may contain the following values.
+	GeocoderStatus string `json:"geocoder_status"`
+	// partial_match indicates that the geocoder did not return an exact match for the original request, though it was able to match part of the requested address.
+	PartialMatch bool `json:"partial_match"`
+	// PlaceID is a unique identifier that can be used with other Google APIs.
+	PlaceID string `json:"place_id"`
+	// Types indicates the address type of the geocoding result used for calculating directions.
+	Types []string `json:"types"`
 }
 
 // Route represents a single route between an origin and a destination.
@@ -178,7 +202,10 @@ type Leg struct {
 	Distance `json:"distance"`
 
 	// Duration indicates total time required for this leg.
-	time.Duration `json:"duration"`
+	Duration time.Duration `json:"duration"`
+
+	// DurationInTraffic indicates the total duration of this leg. This value is an estimate of the time in traffic based on current and historical traffic conditions.
+	DurationInTraffic time.Duration `json:"duration_in_traffic"`
 
 	// ArrivalTime contains the estimated time of arrival for this leg. This property is only
 	// returned for transit directions.
