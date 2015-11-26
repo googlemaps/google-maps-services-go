@@ -47,6 +47,7 @@ var (
 	transitMode              = flag.String("transit_mode", "", "Specifies one or more preferred modes of transit, | separated. This parameter may only be specified for transit directions.")
 	transitRoutingPreference = flag.String("transit_routing_preference", "", "Specifies preferences for transit routes.")
 	iterations               = flag.Int("iterations", 1, "Number of times to make API request.")
+	trafficModel             = flag.String("traffic_model", "", "Specifies traffic prediction model when request future directions. Valid values are optimistic, best_guess, and pessimistic. Optional.")
 )
 
 func usageAndExit(msg string) {
@@ -89,6 +90,7 @@ func main() {
 	lookupMode(*mode, r)
 	lookupUnits(*units, r)
 	lookupTransitRoutingPreference(*transitRoutingPreference, r)
+	lookupTrafficModel(*trafficModel, r)
 
 	if *waypoints != "" {
 		r.Waypoints = strings.Split(*waypoints, "|")
@@ -126,16 +128,17 @@ func main() {
 	}
 
 	if *iterations == 1 {
-		resp, err := client.Directions(context.Background(), r)
+		routes, waypoints, err := client.Directions(context.Background(), r)
 		check(err)
 
-		pretty.Println(resp)
+		pretty.Println(waypoints)
+		pretty.Println(routes)
 	} else {
 		done := make(chan iterationResult)
 		for i := 0; i < *iterations; i++ {
 			go func(i int) {
 				startTime := time.Now()
-				_, err := client.Directions(context.Background(), r)
+				_, _, err := client.Directions(context.Background(), r)
 				done <- iterationResult{
 					fmt.Sprintf("Iteration %2d: round trip %.2f seconds", i, float64(time.Now().Sub(startTime))/1000000000),
 					err,
@@ -199,5 +202,20 @@ func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.Dir
 		// ignore
 	default:
 		log.Fatalf("Unknown transit routing preference %s", transitRoutingPreference)
+	}
+}
+
+func lookupTrafficModel(trafficModel string, r *maps.DirectionsRequest) {
+	switch trafficModel {
+	case "optimistic":
+		r.TrafficModel = maps.TrafficModelOptimistic
+	case "best_guess":
+		r.TrafficModel = maps.TrafficModelBestGuess
+	case "pessimistic":
+		r.TrafficModel = maps.TrafficModelPessimistic
+	case "":
+		// ignore
+	default:
+		log.Fatalf("Unknown traffic mode %s", trafficModel)
 	}
 }

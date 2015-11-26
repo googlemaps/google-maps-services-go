@@ -324,3 +324,29 @@ func TestDirectionsRequestURL(t *testing.T) {
 		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }
+
+func TestTrafficModel(t *testing.T) {
+	expectedQuery := "destination=Parramatta+Town+Hall&key=AIzaNotReallyAnAPIKey&mode=driving&origin=Sydney+Town+Hall&traffic_model=pessimistic"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &DirectionsRequest{
+		Origin:        "Sydney Town Hall",
+		Destination:   "Parramatta Town Hall",
+		Mode:          TravelModeDriving,
+		DepartureTime: "now",
+		TrafficModel:  TrafficModelPessimistic,
+	}
+
+	_, err := c.Directions(context.Background(), r)
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
