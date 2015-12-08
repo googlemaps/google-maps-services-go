@@ -1,6 +1,7 @@
 Go Client for Google Maps Services
 ==================================
 
+[![Build Status](https://travis-ci.org/googlemaps/google-maps-services-go.svg?branch=master)](https://travis-ci.org/googlemaps/google-maps-services-go)
 [![GoDoc](https://godoc.org/googlemaps.github.io/maps?status.svg)](https://godoc.org/googlemaps.github.io/maps)
 
 ## Description
