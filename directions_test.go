@@ -138,7 +138,7 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 		Destination: "Parramatta",
 	}
 
-	resp, err := c.Directions(context.Background(), r)
+	resp, _, err := c.Directions(context.Background(), r)
 
 	if len(resp) != 1 {
 		t.Errorf("Expected length of response is 1, was %+v", len(resp))
@@ -193,7 +193,7 @@ func TestDirectionsMissingOrigin(t *testing.T) {
 		Destination: "Parramatta",
 	}
 
-	if _, err := c.Directions(context.Background(), r); err == nil {
+	if _, _, err := c.Directions(context.Background(), r); err == nil {
 		t.Errorf("Missing Origin should return error")
 	}
 }
@@ -204,7 +204,7 @@ func TestDirectionsMissingDestination(t *testing.T) {
 		Origin: "Sydney",
 	}
 
-	if _, err := c.Directions(context.Background(), r); err == nil {
+	if _, _, err := c.Directions(context.Background(), r); err == nil {
 		t.Errorf("Missing Destination should return error")
 	}
 }
@@ -217,7 +217,7 @@ func TestDirectionsBadMode(t *testing.T) {
 		Mode:        "Not a Mode",
 	}
 
-	if _, err := c.Directions(context.Background(), r); err == nil {
+	if _, _, err := c.Directions(context.Background(), r); err == nil {
 		t.Errorf("Bad Mode should return error")
 	}
 }
@@ -231,7 +231,7 @@ func TestDirectionsDeclaringBothDepartureAndArrivalTime(t *testing.T) {
 		ArrivalTime:   "4pm",
 	}
 
-	if _, err := c.Directions(context.Background(), r); err == nil {
+	if _, _, err := c.Directions(context.Background(), r); err == nil {
 		t.Errorf("Declaring both DepartureTime and ArrivalTime should return error")
 	}
 }
@@ -246,7 +246,7 @@ func TestDirectionsTravelModeTransit(t *testing.T) {
 		TransitMode: transitModes,
 	}
 
-	if _, err := c.Directions(context.Background(), r); err == nil {
+	if _, _, err := c.Directions(context.Background(), r); err == nil {
 		t.Errorf("Declaring TransitMode without Mode=Transit should return error")
 	}
 }
@@ -259,7 +259,7 @@ func TestDirectionsTransitRoutingPreference(t *testing.T) {
 		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
 	}
 
-	if _, err := c.Directions(context.Background(), r); err == nil {
+	if _, _, err := c.Directions(context.Background(), r); err == nil {
 		t.Errorf("Declaring TransitRoutingPreference without Mode=TravelModeTransit should return error")
 	}
 }
@@ -273,7 +273,7 @@ func TestDirectionsWithCancelledContext(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	if _, err := c.Directions(ctx, r); err == nil {
+	if _, _, err := c.Directions(ctx, r); err == nil {
 		t.Errorf("Cancelled context should return non-nil err")
 	}
 }
@@ -288,7 +288,7 @@ func TestDirectionsFailingServer(t *testing.T) {
 		Destination: "Parramatta",
 	}
 
-	if _, err := c.Directions(context.Background(), r); err == nil {
+	if _, _, err := c.Directions(context.Background(), r); err == nil {
 		t.Errorf("Failing server should return error")
 	}
 }
@@ -316,8 +316,7 @@ func TestDirectionsRequestURL(t *testing.T) {
 		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
 	}
 
-	_, err := c.Directions(context.Background(), r)
-	if err != nil {
+	if _, _, err := c.Directions(context.Background(), r); err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
 	}
 	if server.successful != 1 {
@@ -326,8 +325,7 @@ func TestDirectionsRequestURL(t *testing.T) {
 }
 
 func TestTrafficModel(t *testing.T) {
-	expectedQuery := "destination=Parramatta+Town+Hall&key=AIzaNotReallyAnAPIKey&mode=driving&origin=Sydney+Town+Hall&traffic_model=pessimistic"
-
+	expectedQuery := "departure_time=now&destination=Parramatta+Town+Hall&key=AIzaNotReallyAnAPIKey&mode=driving&origin=Sydney+Town+Hall&traffic_model=pessimistic"
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
@@ -342,8 +340,7 @@ func TestTrafficModel(t *testing.T) {
 		TrafficModel:  TrafficModelPessimistic,
 	}
 
-	_, err := c.Directions(context.Background(), r)
-	if err != nil {
+	if _, _, err := c.Directions(context.Background(), r); err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
 	}
 	if server.successful != 1 {
