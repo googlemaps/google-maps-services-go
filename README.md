@@ -1,6 +1,8 @@
 Go Client for Google Maps Services
 ==================================
 
+[![GoDoc](https://godoc.org/googlemaps.github.io/maps?status.svg)](https://godoc.org/googlemaps.github.io/maps)
+
 ## Description
 Use Go? Want to [geocode][Geocoding API] something? Looking for [directions][Directions API]?
 Maybe [matrices of directions][Distance Matrix API]? This library brings the [Google Maps API Web
@@ -74,7 +76,7 @@ Your API key should be 40 characters long, and begin with `AIza`.
 
 ## Developer Documentation
 
-View the [reference documentation](https://godoc.org/googlemaps.github.io/go)
+View the [reference documentation](https://godoc.org/googlemaps.github.io/maps)
 
 Additional documentation for the included  web services is available at
 https://developers.google.com/maps/ and https://developers.google.com/places/.
