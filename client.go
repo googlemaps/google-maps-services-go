@@ -68,7 +68,7 @@ func NewClient(options ...ClientOption) (*Client, error) {
 	}
 	go func() {
 		// Refill rateLimiter continuously
-		for range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
+		for _ = range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
 			c.rateLimiter <- 1
 		}
 	}()
