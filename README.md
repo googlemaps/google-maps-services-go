@@ -113,7 +113,7 @@ func main() {
 		Origin:      "Sydney",
 		Destination: "Perth",
 	}
-	resp, err := c.Directions(context.Background(), r)
+	resp, _, err := c.Directions(context.Background(), r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
