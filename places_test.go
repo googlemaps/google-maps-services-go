@@ -170,7 +170,7 @@ func TestTextSearchMinimalRequestURL(t *testing.T) {
 }
 
 func TestTextSearchAllTheThingsRequestURL(t *testing.T) {
-	expectedQuery := "key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&maxprice=2&minprice=0&opennow=true&query=Pizza+in+New+York&radius=1000"
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&maxprice=2&minprice=0&opennow=true&pagetoken=NextPageToken&query=Pizza+in+New+York&radius=1000"
 
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
