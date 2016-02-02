@@ -153,6 +153,8 @@ type PlacesSearchResult struct {
 	PriceLevel int `json:"price_level"`
 	// Vicinity contains a feature name of a nearby location.
 	Vicinity string `json:"vicinity"`
+	// PermanentlyClosed is a boolean flag indicating whether the place has permanently shut down.
+	PermanentlyClosed bool `json:"permanently_closed"`
 }
 
 // AltID is the alternative place IDs for a place.

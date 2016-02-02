@@ -395,3 +395,70 @@ func TestPlacePhoto(t *testing.T) {
 	}
 
 }
+
+func TestTextSearchWithPermanentlyClosed(t *testing.T) {
+	response := `
+	{
+	   "html_attributions" : [],
+	   "results" : [
+	      {
+	         "formatted_address" : "5 Martinez Ave, West End QLD 4810, Australia",
+	         "geometry" : {
+	            "location" : {
+	               "lat" : -19.2690427,
+	               "lng" : 146.7832313
+	            }
+	         },
+	         "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/school-71.png",
+	         "id" : "6b19d85f4ac1dd71ba400d8ad7fe540a64beacc7",
+	         "name" : "ABC Learning Centre",
+	         "permanently_closed" : true,
+	         "place_id" : "ChIJLdqTiaj51WsRv4Mkbq2qQEU",
+	         "reference" : "CnRmAAAAJJuaK6n6aI7imGz2zcqHpBanTQcafAIyja-5pGX6q67WDRT4DJ8M6HcjfxRCbOM-7RAw10sU9l-lZktErhP4mVmavboCyI_QG8iAHNjBPlqYcfFYjJLUE4gtrYvYhx1VGG88wYBbQXXAH4hcGQc3-xIQyNcdcFc9rmijjlL5g1U4KxoUYxqZLWwPfDWy1hkU0DqTUbAm26k",
+	         "types" : [ "school", "point_of_interest", "establishment" ]
+	      }
+	   ],
+	   "status" : "OK"
+  }`
+	server := mockServer(200, response)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
+	r := &TextSearchRequest{
+		Query: "ABC Learning Centres in australia",
+	}
+
+	resp, err := c.TextSearch(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("r.Get returned non nil error: %v", err)
+		return
+	}
+
+	result := resp.Results[0]
+
+	formattedAddress := "5 Martinez Ave, West End QLD 4810, Australia"
+	if formattedAddress != result.FormattedAddress {
+		t.Errorf("expected %+v, was %+v", formattedAddress, result.FormattedAddress)
+	}
+
+	icon := "https://maps.gstatic.com/mapfiles/place_api/icons/school-71.png"
+	if icon != result.Icon {
+		t.Errorf("expected %+v, was %+v", icon, result.Icon)
+	}
+
+	name := "ABC Learning Centre"
+	if name != result.Name {
+		t.Errorf("expected %+v, was %+v", name, result.Name)
+	}
+
+	permanentlyClosed := true
+	if permanentlyClosed != result.PermanentlyClosed {
+		t.Errorf("expected %+v, was %+v", permanentlyClosed, result.PermanentlyClosed)
+	}
+
+	placeID := "ChIJLdqTiaj51WsRv4Mkbq2qQEU"
+	if placeID != result.PlaceID {
+		t.Errorf("expected %+v, was %+v", placeID, result.PlaceID)
+	}
+}
