@@ -92,6 +92,10 @@ func (r *TextSearchRequest) params() url.Values {
 		q.Set("opennow", "true")
 	}
 
+	if r.PageToken != "" {
+		q.Set("pagetoken", r.PageToken)
+	}
+
 	return q
 }
 
