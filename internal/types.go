@@ -26,7 +26,7 @@ type DateTime struct {
 	// example, "America/New_York" or "Australia/Sydney".
 	TimeZone string `json:"time_zone"`
 
-	// Value is the number of milliseconds since midnight 01 January, 1970 UTC.
+	// Value is the number of seconds since midnight 01 January, 1970 UTC.
 	Value int64 `json:"value"`
 }
 
@@ -37,7 +37,7 @@ func (dt *DateTime) Time() time.Time {
 	}
 
 	loc, err := time.LoadLocation(dt.TimeZone)
-	t := time.Unix(0, dt.Value*1e6)
+	t := time.Unix(dt.Value, 0)
 	if err == nil && loc != nil {
 		t = t.In(loc)
 	}
@@ -55,7 +55,7 @@ func NewDateTime(t time.Time) *DateTime {
 	return &DateTime{
 		Text:     t.Format(time.RFC1123), // TODO(samthor): better format
 		TimeZone: loc.String(),
-		Value:    t.UnixNano() / int64(time.Millisecond),
+		Value:    t.UnixNano() / int64(time.Second),
 	}
 }
 
