@@ -146,9 +146,6 @@ type Photo struct {
 	HTMLAttributions []string `json:"html_attributions"`
 }
 
-// Rankby specifies the order in which results are listed
-type Rankby string
-
 // Component specifies a key for the parts of a structured address.
 // See https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering for more detail.
 type Component string
@@ -165,6 +162,9 @@ const (
 	// ComponentCountry matches a country name or a two letter ISO 3166-1 country code
 	ComponentCountry = Component("country")
 )
+
+// Rankby specifies the order in which results are listed
+type Rankby string
 
 // Rankby options for Places Search
 const (
