@@ -92,25 +92,19 @@ func (r *GeocodingRequest) params() url.Values {
 	return q
 }
 
-// Component specifies a key for the parts of a structured address.
-// See https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering for more detail.
-type Component string
-
-const (
-	// ComponentRoute matches long or short name of a route
-	ComponentRoute = Component("route")
-	// ComponentLocality matches against both locality and sublocality types
-	ComponentLocality = Component("locality")
-	// ComponentAdministrativeArea matches all the administrative_area levels
-	ComponentAdministrativeArea = Component("administrative_area")
-	// ComponentPostalCode matches postal_code and postal_code_prefix
-	ComponentPostalCode = Component("postal_code")
-	// ComponentCountry matches a country name or a two letter ISO 3166-1 country code
-	ComponentCountry = Component("country")
-)
-
 // GeocodeAccuracy is the type of a location result from the Geocoding API.
 type GeocodeAccuracy string
+
+const (
+	// GeocodeAccuracyRooftop restricts the results to addresses for which Google has location information accurate down to street address precision
+	GeocodeAccuracyRooftop = GeocodeAccuracy("ROOFTOP")
+	// GeocodeAccuracyRangeInterpolated restricts the results to those that reflect an approximation interpolated between two precise points.
+	GeocodeAccuracyRangeInterpolated = GeocodeAccuracy("RANGE_INTERPOLATED")
+	// GeocodeAccuracyGeometricCenter restricts the results to geometric centers of a location such as a polyline or polygon.
+	GeocodeAccuracyGeometricCenter = GeocodeAccuracy("GEOMETRIC_CENTER")
+	// GeocodeAccuracyApproximate restricts the results to those that are characterized as approximate.
+	GeocodeAccuracyApproximate = GeocodeAccuracy("APPROXIMATE")
+)
 
 // GeocodingRequest is the request structure for Geocoding API
 type GeocodingRequest struct {
