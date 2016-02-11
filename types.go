@@ -155,9 +155,6 @@ const (
 	RankbyDistance   = Rankby("distance")
 )
 
-// PlaceType TODO(brettmorgan)
-type PlaceType string
-
 const (
 	// GeocodeAccuracyRooftop restricts the results to addresses for which Google has location information accurate down to street address precision
 	GeocodeAccuracyRooftop = GeocodeAccuracy("ROOFTOP")
@@ -168,6 +165,9 @@ const (
 	// GeocodeAccuracyApproximate restricts the results to those that are characterized as approximate.
 	GeocodeAccuracyApproximate = GeocodeAccuracy("APPROXIMATE")
 )
+
+// PlaceType TODO(brettmorgan)
+type PlaceType string
 
 // Place Types for the Places API
 const (
