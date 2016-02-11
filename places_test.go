@@ -145,6 +145,105 @@ func TestTextSearchPizzaInNewYork(t *testing.T) {
 	}
 }
 
+func TestNearbySearchMinimalRequestURL(t *testing.T) {
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&location=1%2C2"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &NearbySearchRequest{
+		Location: &LatLng{1.0, 2.0},
+	}
+
+	_, err := c.NearbySearch(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestNearbySearchMaximalRequestURL(t *testing.T) {
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&keyword=foo&language=es&location=1%2C2&maxprice=3&minprice=0&name=name&opennow=true&pagetoken=NextPageToken&radius=10000&rankby=prominence&type=airport"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &NearbySearchRequest{
+		Location:  &LatLng{1.0, 2.0},
+		Radius:    10000,
+		Keyword:   "foo",
+		Language:  "es",
+		MinPrice:  PriceLevelFree,
+		MaxPrice:  PriceLevelExpensive,
+		Name:      "name",
+		OpenNow:   true,
+		Rankby:    RankbyProminence,
+		Type:      PlaceTypeAirport,
+		PageToken: "NextPageToken",
+	}
+
+	_, err := c.NearbySearch(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestNearbySearchNoLocation(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &NearbySearchRequest{}
+	_, err := c.NearbySearch(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: Location and PageToken both missing")
+	}
+}
+
+func TestNearbySearchRankbyDistanceAndRadius(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &NearbySearchRequest{
+		Location: &LatLng{1.0, 2.0},
+		Radius:   1000,
+		Rankby:   RankbyDistance,
+	}
+	_, err := c.NearbySearch(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: Radius specified with RankbyDistance")
+	}
+}
+
+func TestNearbySearchRankbyDistanceAndNoKeywordNameAndType(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &NearbySearchRequest{
+		Location: &LatLng{1.0, 2.0},
+		Rankby:   RankbyDistance,
+	}
+	_, err := c.NearbySearch(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: Rankby=distance and Keyword, Name and Type are missing")
+	}
+
+	if err.Error() != "maps: Rankby=distance and Keyword, Name and Type are missing" {
+		t.Errorf("Incorrect error returned %v", err)
+	}
+}
+
 func TestTextSearchMinimalRequestURL(t *testing.T) {
 	expectedQuery := "key=AIzaNotReallyAnAPIKey&query=Pizza+in+New+York"
 
@@ -170,7 +269,7 @@ func TestTextSearchMinimalRequestURL(t *testing.T) {
 }
 
 func TestTextSearchAllTheThingsRequestURL(t *testing.T) {
-	expectedQuery := "key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&maxprice=2&minprice=0&opennow=true&pagetoken=NextPageToken&query=Pizza+in+New+York&radius=1000"
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&maxprice=2&minprice=0&opennow=true&pagetoken=NextPageToken&query=Pizza+in+New+York&radius=1000&type=airport"
 
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
@@ -186,6 +285,7 @@ func TestTextSearchAllTheThingsRequestURL(t *testing.T) {
 		MinPrice:  PriceLevelFree,
 		MaxPrice:  PriceLevelModerate,
 		OpenNow:   true,
+		Type:      PlaceTypeAirport,
 		PageToken: "NextPageToken",
 	}
 
@@ -197,6 +297,282 @@ func TestTextSearchAllTheThingsRequestURL(t *testing.T) {
 
 	if server.successful != 1 {
 		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestTextSearchMissingQuery(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &TextSearchRequest{}
+	_, err := c.TextSearch(context.Background(), r)
+
+	if "maps: Query and PageToken both missing" != err.Error() {
+		t.Errorf("Wrong error returned \"%v\"", err)
+	}
+}
+
+func TestTextSearchMissingRadius(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &TextSearchRequest{
+		Query:    "Foo",
+		Location: &LatLng{1, 2},
+	}
+
+	_, err := c.TextSearch(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: Radius missing, required with Location")
+	}
+
+	if "maps: Radius missing, required with Location" != err.Error() {
+		t.Errorf("Wrong error returned \"%v\"", err)
+	}
+}
+
+func TestQueryAutocompleteMinimalRequestURL(t *testing.T) {
+	expectedQuery := "input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &QueryAutocompleteRequest{
+		Input: "quay resteraunt sydney",
+	}
+
+	_, err := c.QueryAutocomplete(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestQueryAutocompleteMaximalRequestURL(t *testing.T) {
+	expectedQuery := "input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&offset=5&radius=10000"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &QueryAutocompleteRequest{
+		Input:    "quay resteraunt sydney",
+		Offset:   5,
+		Location: &LatLng{1.0, 2.0},
+		Radius:   10000,
+		Language: "es",
+	}
+
+	_, err := c.QueryAutocomplete(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestQueryAutocompleteMissingInput(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &QueryAutocompleteRequest{}
+
+	_, err := c.QueryAutocomplete(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: Input missing")
+	}
+
+	if "maps: Input missing" != err.Error() {
+		t.Errorf("Wrong error returned \"%v\"", err)
+	}
+}
+
+func TestPlaceAutocompleteMinimalRequestURL(t *testing.T) {
+	expectedQuery := "input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &PlaceAutocompleteRequest{
+		Input: "quay resteraunt sydney",
+	}
+
+	_, err := c.PlaceAutocomplete(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestPlaceAutocompleteMaximalRequestURL(t *testing.T) {
+	expectedQuery := "components=country%3AES&input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&offset=5&radius=10000&type=airport"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	placeType, err := ParsePlaceType("airport")
+	if err != nil {
+		t.Errorf("Unexpected error in parsing place type: %v", err)
+	}
+
+	r := &PlaceAutocompleteRequest{
+		Input:      "quay resteraunt sydney",
+		Offset:     5,
+		Location:   &LatLng{1.0, 2.0},
+		Radius:     10000,
+		Language:   "es",
+		Type:       placeType,
+		Components: map[Component]string{ComponentCountry: "ES"},
+	}
+
+	_, err = c.PlaceAutocomplete(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestPlaceAutocompleteMissingInput(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &PlaceAutocompleteRequest{}
+
+	_, err := c.PlaceAutocomplete(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: Input missing")
+	}
+
+	if "maps: Input missing" != err.Error() {
+		t.Errorf("Wrong error returned \"%v\"", err)
+	}
+}
+
+func TestRadarSearchMinimalRequestURL(t *testing.T) {
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&keyword=Pub&location=1%2C2&radius=5000"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &RadarSearchRequest{
+		Location: &LatLng{1, 2},
+		Radius:   5000,
+		Keyword:  "Pub",
+	}
+
+	_, err := c.RadarSearch(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestRadarSearchMaximalRequestURL(t *testing.T) {
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&keyword=Pub&location=1%2C2&maxprice=3&minprice=1&name=name&opennow=true&radius=5000&type=airport"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &RadarSearchRequest{
+		Location: &LatLng{1, 2},
+		Radius:   5000,
+		Keyword:  "Pub",
+		MinPrice: PriceLevelInexpensive,
+		MaxPrice: PriceLevelExpensive,
+		Name:     "name",
+		OpenNow:  true,
+		Type:     PlaceTypeAirport,
+	}
+
+	_, err := c.RadarSearch(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestRadarSearchMissingLocation(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &RadarSearchRequest{}
+
+	_, err := c.RadarSearch(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: Location is missing")
+	}
+
+	if "maps: Location is missing" != err.Error() {
+		t.Errorf("Wrong error returned \"%v\"", err)
+	}
+}
+
+func TestRadarSearchMissingRadius(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &RadarSearchRequest{
+		Location: &LatLng{1, 2},
+	}
+
+	_, err := c.RadarSearch(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: Radius is missing")
+	}
+
+	if "maps: Radius is missing" != err.Error() {
+		t.Errorf("Wrong error returned \"%v\"", err)
+	}
+}
+
+func TestRadarSearchMissingKeywordNameAndType(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &RadarSearchRequest{
+		Location: &LatLng{1, 2},
+		Radius:   1000,
+	}
+
+	_, err := c.RadarSearch(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: Keyword, Name and Type are missing")
+	}
+
+	if "maps: Keyword, Name and Type are missing" != err.Error() {
+		t.Errorf("Wrong error returned \"%v\"", err)
 	}
 }
 
@@ -366,12 +742,26 @@ func TestPlaceDetails(t *testing.T) {
 	if time != resp.Reviews[0].Time {
 		t.Errorf("expected %+v, was %+v", time, resp.Reviews[0].Time)
 	}
+}
 
+func TestPlaceDetailsMissingPlaceID(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &PlaceDetailsRequest{}
+
+	_, err := c.PlaceDetails(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: PlaceID missing")
+	}
+
+	if "maps: PlaceID missing" != err.Error() {
+		t.Errorf("Wrong error returned \"%v\"", err)
+	}
 }
 
 func TestPlacePhoto(t *testing.T) {
 	photoReference := "ThisIsNotAPhotoReference"
-	expectedQuery := "key=AIzaNotReallyAnAPIKey&maxheight=400&photoreference=ThisIsNotAPhotoReference"
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&maxheight=400&maxwidth=400&photoreference=ThisIsNotAPhotoReference"
 
 	server := mockServerForQuery(expectedQuery, 200, "An Image?")
 	defer server.s.Close()
@@ -382,6 +772,7 @@ func TestPlacePhoto(t *testing.T) {
 	r := &PlacePhotoRequest{
 		PhotoReference: photoReference,
 		MaxHeight:      400,
+		MaxWidth:       400,
 	}
 
 	_, err := c.PlacePhoto(context.Background(), r)
@@ -394,6 +785,39 @@ func TestPlacePhoto(t *testing.T) {
 		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 
+}
+
+func TestPlacePhotoMissingPhotoReference(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &PlacePhotoRequest{}
+
+	_, err := c.PlacePhoto(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: PhotoReference missing")
+	}
+
+	if "maps: PhotoReference missing" != err.Error() {
+		t.Errorf("Wrong error returned \"%v\"", err)
+	}
+}
+
+func TestPlacePhotoMissingWidthAndHeight(t *testing.T) {
+	photoReference := "ThisIsNotAPhotoReference"
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &PlacePhotoRequest{
+		PhotoReference: photoReference,
+	}
+
+	_, err := c.PlacePhoto(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: both MaxHeight & MaxWidth missing")
+	}
+
+	if "maps: both MaxHeight & MaxWidth missing" != err.Error() {
+		t.Errorf("Wrong error returned \"%v\"", err)
+	}
 }
 
 func TestTextSearchWithPermanentlyClosed(t *testing.T) {

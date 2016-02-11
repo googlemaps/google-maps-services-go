@@ -21,12 +21,129 @@ import (
 	"io"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"golang.org/x/net/context"
 
 	// Included for image/jpeg's decoder
 	_ "image/jpeg"
 )
+
+var placesNearbySearchAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/place/nearbysearch/json",
+	acceptsClientID: true,
+}
+
+// NearbySearch lets you search for places within a specified area. You can refine your search request by supplying keywords or specifying the type of place you are searching for.
+func (c *Client) NearbySearch(ctx context.Context, r *NearbySearchRequest) (PlacesSearchResponse, error) {
+
+	if r.PageToken == "" && r.Location == nil {
+		return PlacesSearchResponse{}, errors.New("maps: Location and PageToken both missing")
+	}
+
+	if r.PageToken == "" && r.Radius > 0 && r.Rankby == RankbyDistance {
+		return PlacesSearchResponse{}, errors.New("maps: Radius specified with RankbyDistance")
+	}
+
+	if r.Rankby == RankbyDistance && r.Keyword == "" && r.Name == "" && r.Type == "" {
+		return PlacesSearchResponse{}, errors.New("maps: Rankby=distance and Keyword, Name and Type are missing")
+	}
+
+	var response struct {
+		Results          []PlacesSearchResult `json:"results"`
+		HTMLAttributions []string             `json:"html_attributions"`
+		NextPageToken    string               `json:"next_page_token"`
+		commonResponse
+	}
+
+	if err := c.getJSON(ctx, placesNearbySearchAPI, r, &response); err != nil {
+		return PlacesSearchResponse{}, err
+	}
+
+	if err := response.StatusError(); err != nil {
+		return PlacesSearchResponse{}, err
+	}
+
+	return PlacesSearchResponse{response.Results, response.HTMLAttributions, response.NextPageToken}, nil
+
+}
+
+func (r *NearbySearchRequest) params() url.Values {
+	q := make(url.Values)
+
+	if r.Location != nil {
+		q.Set("location", r.Location.String())
+	}
+
+	if r.Radius != 0 {
+		q.Set("radius", fmt.Sprint(r.Radius))
+	}
+
+	if r.Keyword != "" {
+		q.Set("keyword", r.Keyword)
+	}
+
+	if r.Language != "" {
+		q.Set("language", r.Language)
+	}
+
+	if r.MinPrice != "" {
+		q.Set("minprice", string(r.MinPrice))
+	}
+
+	if r.MaxPrice != "" {
+		q.Set("maxprice", string(r.MaxPrice))
+	}
+
+	if r.Name != "" {
+		q.Set("name", r.Name)
+	}
+
+	if r.OpenNow {
+		q.Set("opennow", "true")
+	}
+
+	if r.Rankby != "" {
+		q.Set("rankby", string(r.Rankby))
+	}
+
+	if r.Type != "" {
+		q.Set("type", string(r.Type))
+	}
+
+	if r.PageToken != "" {
+		q.Set("pagetoken", r.PageToken)
+	}
+
+	return q
+}
+
+// NearbySearchRequest is the functional options struct for NearbySearch
+type NearbySearchRequest struct {
+	// Location is the latitude/longitude around which to retrieve place information. If you specify a location parameter, you must also specify a radius parameter.
+	Location *LatLng
+	// Radius defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters. Results inside of this region will be ranked higher than results outside of the search circle; however, prominent results from outside of the search radius may be included.
+	Radius uint
+	// Keyword is a term to be matched against all content that Google has indexed for this place, including but not limited to name, type, and address, as well as customer reviews and other third-party content.
+	Keyword string
+	// Language specifies the language in which to return results. Optional.
+	Language string
+	// MinPrice restricts results to only those places within the specified price level. Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
+	MinPrice PriceLevel
+	// MaxPrice restricts results to only those places within the specified price level. Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
+	MaxPrice PriceLevel
+	// Name is one or more terms to be matched against the names of places, separated with a space character.
+	Name string
+	// OpenNow returns only those places that are open for business at the time the query is sent. Places that do not specify opening hours in the Google Places database will not be returned if you include this parameter in your query.
+	OpenNow bool
+	// Rankby specifies the order in which results are listed.
+	Rankby
+	// Type TODO(brettmorgan)
+	Type PlaceType
+	// PageToken returns the next 20 results from a previously run search. Setting a PageToken parameter will execute a search with the same parameters used previously — all parameters other than PageToken will be ignored.
+	PageToken string
+}
 
 var placesTextSearchAPI = &apiConfig{
 	host:            "https://maps.googleapis.com",
@@ -92,6 +209,10 @@ func (r *TextSearchRequest) params() url.Values {
 		q.Set("opennow", "true")
 	}
 
+	if r.Type != "" {
+		q.Set("type", string(r.Type))
+	}
+
 	if r.PageToken != "" {
 		q.Set("pagetoken", r.PageToken)
 	}
@@ -115,8 +236,108 @@ type TextSearchRequest struct {
 	MaxPrice PriceLevel
 	// OpenNow returns only those places that are open for business at the time the query is sent. Places that do not specify opening hours in the Google Places database will not be returned if you include this parameter in your query.
 	OpenNow bool
+	// Type TODO(brettmorgan)
+	Type PlaceType
 	// PageToken returns the next 20 results from a previously run search. Setting a PageToken parameter will execute a search with the same parameters used previously — all parameters other than PageToken will be ignored.
 	PageToken string
+}
+
+var radarSearchAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/place/radarsearch/json",
+	acceptsClientID: true,
+}
+
+// RadarSearch lets you search for places within a specified area. You can refine your search request by supplying keywords or specifying the type of place you are searching for.
+func (c *Client) RadarSearch(ctx context.Context, r *RadarSearchRequest) (PlacesSearchResponse, error) {
+
+	if r.Location == nil {
+		return PlacesSearchResponse{}, errors.New("maps: Location is missing")
+	}
+
+	if r.Radius == 0 {
+		return PlacesSearchResponse{}, errors.New("maps: Radius is missing")
+	}
+
+	if r.Keyword == "" && r.Name == "" && r.Type == "" {
+		return PlacesSearchResponse{}, errors.New("maps: Keyword, Name and Type are missing")
+	}
+
+	var response struct {
+		Results          []PlacesSearchResult `json:"results"`
+		HTMLAttributions []string             `json:"html_attributions"`
+		NextPageToken    string               `json:"next_page_token"`
+		commonResponse
+	}
+
+	if err := c.getJSON(ctx, placesNearbySearchAPI, r, &response); err != nil {
+		return PlacesSearchResponse{}, err
+	}
+
+	if err := response.StatusError(); err != nil {
+		return PlacesSearchResponse{}, err
+	}
+
+	return PlacesSearchResponse{response.Results, response.HTMLAttributions, response.NextPageToken}, nil
+
+}
+
+func (r *RadarSearchRequest) params() url.Values {
+	q := make(url.Values)
+
+	if r.Location != nil {
+		q.Set("location", r.Location.String())
+	}
+
+	if r.Radius != 0 {
+		q.Set("radius", fmt.Sprint(r.Radius))
+	}
+
+	if r.Keyword != "" {
+		q.Set("keyword", r.Keyword)
+	}
+
+	if r.MinPrice != "" {
+		q.Set("minprice", string(r.MinPrice))
+	}
+
+	if r.MaxPrice != "" {
+		q.Set("maxprice", string(r.MaxPrice))
+	}
+
+	if r.Name != "" {
+		q.Set("name", r.Name)
+	}
+
+	if r.OpenNow {
+		q.Set("opennow", "true")
+	}
+
+	if r.Type != "" {
+		q.Set("type", string(r.Type))
+	}
+
+	return q
+}
+
+// RadarSearchRequest is the functional options struct for NearbySearch
+type RadarSearchRequest struct {
+	// Location is the latitude/longitude around which to retrieve place information. If you specify a location parameter, you must also specify a radius parameter.
+	Location *LatLng
+	// Radius defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters. Results inside of this region will be ranked higher than results outside of the search circle; however, prominent results from outside of the search radius may be included.
+	Radius uint
+	// Keyword is a term to be matched against all content that Google has indexed for this place, including but not limited to name, type, and address, as well as customer reviews and other third-party content.
+	Keyword string
+	// MinPrice restricts results to only those places within the specified price level. Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
+	MinPrice PriceLevel
+	// MaxPrice restricts results to only those places within the specified price level. Valid values are in the range from 0 (most affordable) to 4 (most expensive), inclusive.
+	MaxPrice PriceLevel
+	// Name is one or more terms to be matched against the names of places, separated with a space character.
+	Name string
+	// OpenNow returns only those places that are open for business at the time the query is sent. Places that do not specify opening hours in the Google Places database will not be returned if you include this parameter in your query.
+	OpenNow bool
+	// Type TODO(brettmorgan)
+	Type PlaceType
 }
 
 // PlacesSearchResponse is the response to a Places API Search request.
@@ -301,26 +522,26 @@ var placesQueryAutocompleteAPI = &apiConfig{
 }
 
 // QueryAutocomplete issues the Places API Query Autocomplete request and retrieves the response
-func (c *Client) QueryAutocomplete(ctx context.Context, r *QueryAutocompleteRequest) (QueryAutocompleteResponse, error) {
+func (c *Client) QueryAutocomplete(ctx context.Context, r *QueryAutocompleteRequest) (AutocompleteResponse, error) {
 
 	if r.Input == "" {
-		return QueryAutocompleteResponse{}, errors.New("maps: Input missing")
+		return AutocompleteResponse{}, errors.New("maps: Input missing")
 	}
 
 	var response struct {
-		Predictions []QueryAutocompletePrediction `json:"predictions"`
+		Predictions []AutocompletePrediction `json:"predictions"`
 		commonResponse
 	}
 
 	if err := c.getJSON(ctx, placesQueryAutocompleteAPI, r, &response); err != nil {
-		return QueryAutocompleteResponse{}, err
+		return AutocompleteResponse{}, err
 	}
 
 	if err := response.StatusError(); err != nil {
-		return QueryAutocompleteResponse{}, err
+		return AutocompleteResponse{}, err
 	}
 
-	return QueryAutocompleteResponse{response.Predictions}, nil
+	return AutocompleteResponse{response.Predictions}, nil
 }
 
 func (r *QueryAutocompleteRequest) params() url.Values {
@@ -361,13 +582,13 @@ type QueryAutocompleteRequest struct {
 	Language string
 }
 
-// QueryAutocompleteResponse is a response to a Query Autocomplete request.
-type QueryAutocompleteResponse struct {
-	Predictions []QueryAutocompletePrediction
+// AutocompleteResponse is a response to a Query Autocomplete request.
+type AutocompleteResponse struct {
+	Predictions []AutocompletePrediction
 }
 
-// QueryAutocompletePrediction represents a single Query Autocomplete result returned from the Google Places API Web Service.
-type QueryAutocompletePrediction struct {
+// AutocompletePrediction represents a single Query Autocomplete result returned from the Google Places API Web Service.
+type AutocompletePrediction struct {
 	// Description of the matched prediction.
 	Description string `json:"description"`
 	// PlaceID is the ID of the Place
@@ -375,25 +596,108 @@ type QueryAutocompletePrediction struct {
 	// Types is an array indicating the type of the address component.
 	Types []string `json:"types"`
 	// MatchedSubstring describes the location of the entered term in the prediction result text, so that the term can be highlighted if desired.
-	MatchedSubstrings []QueryAutocompleteMatchedSubstring `json:"matched_substrings"`
+	MatchedSubstrings []AutocompleteMatchedSubstring `json:"matched_substrings"`
 	// Terms contains an array of terms identifying each section of the returned description (a section of the description is generally terminated with a comma).
-	Terms []QueryAutocompleteTermOffset `json:"terms"`
+	Terms []AutocompleteTermOffset `json:"terms"`
 }
 
-// QueryAutocompleteMatchedSubstring describes the location of the entered term in the prediction result text, so that the term can be highlighted if desired.
-type QueryAutocompleteMatchedSubstring struct {
+// AutocompleteMatchedSubstring describes the location of the entered term in the prediction result text, so that the term can be highlighted if desired.
+type AutocompleteMatchedSubstring struct {
 	// Length describes the length of the matched substring.
 	Length int `json:"length"`
 	// Offset defines the start position of the matched substring.
 	Offset int `json:"offset"`
 }
 
-// QueryAutocompleteTermOffset identifies each section of the returned description (a section of the description is generally terminated with a comma).
-type QueryAutocompleteTermOffset struct {
+// AutocompleteTermOffset identifies each section of the returned description (a section of the description is generally terminated with a comma).
+type AutocompleteTermOffset struct {
 	// Value is the text of the matched term.
 	Value string `json:"value"`
 	// Offset defines the start position of this term in the description, measured in Unicode characters.
 	Offset int `json:"offset"`
+}
+
+var placesPlaceAutocompleteAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/place/autocomplete/json",
+	acceptsClientID: true,
+}
+
+// PlaceAutocomplete issues the Places API Place Autocomplete request and retrieves the response
+func (c *Client) PlaceAutocomplete(ctx context.Context, r *PlaceAutocompleteRequest) (AutocompleteResponse, error) {
+
+	if r.Input == "" {
+		return AutocompleteResponse{}, errors.New("maps: Input missing")
+	}
+
+	var response struct {
+		Predictions []AutocompletePrediction `json:"predictions"`
+		commonResponse
+	}
+
+	if err := c.getJSON(ctx, placesPlaceAutocompleteAPI, r, &response); err != nil {
+		return AutocompleteResponse{}, err
+	}
+
+	if err := response.StatusError(); err != nil {
+		return AutocompleteResponse{}, err
+	}
+
+	return AutocompleteResponse{response.Predictions}, nil
+}
+
+func (r *PlaceAutocompleteRequest) params() url.Values {
+	q := make(url.Values)
+
+	q.Set("input", r.Input)
+
+	if r.Offset > 0 {
+		q.Set("offset", strconv.FormatUint(uint64(r.Offset), 10))
+	}
+
+	if r.Location != nil {
+		q.Set("location", r.Location.String())
+	}
+
+	if r.Radius > 0 {
+		q.Set("radius", strconv.FormatUint(uint64(r.Radius), 10))
+	}
+
+	if r.Language != "" {
+		q.Set("language", r.Language)
+	}
+
+	if r.Type != "" {
+		q.Set("type", string(r.Type))
+	}
+
+	var cf []string
+	for c, f := range r.Components {
+		cf = append(cf, string(c)+":"+f)
+	}
+	if len(cf) > 0 {
+		q.Set("components", strings.Join(cf, "|"))
+	}
+
+	return q
+}
+
+// PlaceAutocompleteRequest is the functional options struct for Query Autocomplete
+type PlaceAutocompleteRequest struct {
+	// Input is the text string on which to search. The Places service will return candidate matches based on this string and order results based on their perceived relevance.
+	Input string
+	// Offset is the character position in the input term at which the service uses text for predictions. For example, if the input is 'Googl' and the completion point is 3, the service will match on 'Goo'. The offset should generally be set to the position of the text caret. If no offset is supplied, the service will use the entire term.
+	Offset uint
+	// Location is the point around which you wish to retrieve place information.
+	Location *LatLng
+	// Radius is the distance (in meters) within which to return place results. Note that setting a radius biases results to the indicated area, but may not fully restrict results to the specified area.
+	Radius uint
+	// Language is the language in which to return results.
+	Language string
+	// Type TODO(brettmorgan)
+	Type PlaceType
+	// Components is a grouping of places to which you would like to restrict your results. Currently, you can use components to filter by country.
+	Components map[Component]string
 }
 
 var placesPhotoAPI = &apiConfig{

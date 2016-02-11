@@ -112,17 +112,6 @@ const (
 // GeocodeAccuracy is the type of a location result from the Geocoding API.
 type GeocodeAccuracy string
 
-const (
-	// GeocodeAccuracyRooftop restricts the results to addresses for which Google has location information accurate down to street address precision
-	GeocodeAccuracyRooftop = GeocodeAccuracy("ROOFTOP")
-	// GeocodeAccuracyRangeInterpolated restricts the results to those that reflect an approximation interpolated between two precise points.
-	GeocodeAccuracyRangeInterpolated = GeocodeAccuracy("RANGE_INTERPOLATED")
-	// GeocodeAccuracyGeometricCenter restricts the results to geometric centers of a location such as a polyline or polygon.
-	GeocodeAccuracyGeometricCenter = GeocodeAccuracy("GEOMETRIC_CENTER")
-	// GeocodeAccuracyApproximate restricts the results to those that are characterized as approximate.
-	GeocodeAccuracyApproximate = GeocodeAccuracy("APPROXIMATE")
-)
-
 // GeocodingRequest is the request structure for Geocoding API
 type GeocodingRequest struct {
 	// Geocoding fields
