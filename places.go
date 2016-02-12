@@ -38,16 +38,24 @@ var placesNearbySearchAPI = &apiConfig{
 // NearbySearch lets you search for places within a specified area. You can refine your search request by supplying keywords or specifying the type of place you are searching for.
 func (c *Client) NearbySearch(ctx context.Context, r *NearbySearchRequest) (PlacesSearchResponse, error) {
 
-	if r.PageToken == "" && r.Location == nil {
-		return PlacesSearchResponse{}, errors.New("maps: Location and PageToken both missing")
-	}
+	if r.PageToken == "" {
+		if r.Location == nil {
+			return PlacesSearchResponse{}, errors.New("maps: Location and PageToken both missing")
+		}
 
-	if r.PageToken == "" && r.Radius > 0 && r.Rankby == RankbyDistance {
-		return PlacesSearchResponse{}, errors.New("maps: Radius specified with RankbyDistance")
-	}
+		// Radius is required, unless rank by distance, in which case it isn't allowed.
 
-	if r.Rankby == RankbyDistance && r.Keyword == "" && r.Name == "" && r.Type == "" {
-		return PlacesSearchResponse{}, errors.New("maps: Rankby=distance and Keyword, Name and Type are missing")
+		if r.Radius == 0 && r.RankBy != RankByDistance {
+			return PlacesSearchResponse{}, errors.New("maps: Radius and PageToken both missing")
+		}
+
+		if r.Radius > 0 && r.RankBy == RankByDistance {
+			return PlacesSearchResponse{}, errors.New("maps: Radius specified with RankByDistance")
+		}
+
+		if r.RankBy == RankByDistance && r.Keyword == "" && r.Name == "" && r.Type == "" {
+			return PlacesSearchResponse{}, errors.New("maps: RankBy=distance and Keyword, Name and Type are missing")
+		}
 	}
 
 	var response struct {
@@ -104,8 +112,8 @@ func (r *NearbySearchRequest) params() url.Values {
 		q.Set("opennow", "true")
 	}
 
-	if r.Rankby != "" {
-		q.Set("rankby", string(r.Rankby))
+	if r.RankBy != "" {
+		q.Set("rankby", string(r.RankBy))
 	}
 
 	if r.Type != "" {
@@ -137,8 +145,8 @@ type NearbySearchRequest struct {
 	Name string
 	// OpenNow returns only those places that are open for business at the time the query is sent. Places that do not specify opening hours in the Google Places database will not be returned if you include this parameter in your query.
 	OpenNow bool
-	// Rankby specifies the order in which results are listed.
-	Rankby
+	// RankBy specifies the order in which results are listed.
+	RankBy
 	// Type TODO(brettmorgan)
 	Type PlaceType
 	// PageToken returns the next 20 results from a previously run search. Setting a PageToken parameter will execute a search with the same parameters used previously — all parameters other than PageToken will be ignored.

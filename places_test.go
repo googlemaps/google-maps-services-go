@@ -146,7 +146,7 @@ func TestTextSearchPizzaInNewYork(t *testing.T) {
 }
 
 func TestNearbySearchMinimalRequestURL(t *testing.T) {
-	expectedQuery := "key=AIzaNotReallyAnAPIKey&location=1%2C2"
+	expectedQuery := "key=AIzaNotReallyAnAPIKey&location=1%2C2&radius=10000"
 
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
@@ -156,6 +156,7 @@ func TestNearbySearchMinimalRequestURL(t *testing.T) {
 
 	r := &NearbySearchRequest{
 		Location: &LatLng{1.0, 2.0},
+		Radius:   10000,
 	}
 
 	_, err := c.NearbySearch(context.Background(), r)
@@ -187,7 +188,7 @@ func TestNearbySearchMaximalRequestURL(t *testing.T) {
 		MaxPrice:  PriceLevelExpensive,
 		Name:      "name",
 		OpenNow:   true,
-		Rankby:    RankbyProminence,
+		RankBy:    RankByProminence,
 		Type:      PlaceTypeAirport,
 		PageToken: "NextPageToken",
 	}
@@ -205,42 +206,65 @@ func TestNearbySearchMaximalRequestURL(t *testing.T) {
 
 func TestNearbySearchNoLocation(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
-	r := &NearbySearchRequest{}
+	r := &NearbySearchRequest{
+		Radius: 1000,
+	}
 	_, err := c.NearbySearch(context.Background(), r)
 
 	if err == nil {
 		t.Errorf("Error expected: maps: Location and PageToken both missing")
 	}
+	if err.Error() != "maps: Location and PageToken both missing" {
+		t.Errorf("Incorrect error returned \"%v\"", err)
+	}
 }
 
-func TestNearbySearchRankbyDistanceAndRadius(t *testing.T) {
+func TestNearbySearchNoRadius(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &NearbySearchRequest{
+		Location: &LatLng{-33.865, 151.209},
+	}
+	_, err := c.NearbySearch(context.Background(), r)
+
+	if err == nil {
+		t.Errorf("Error expected: maps: Radius and PageToken both missing")
+	}
+	if err.Error() != "maps: Radius and PageToken both missing" {
+		t.Errorf("Incorrect error returned \"%v\"", err)
+	}
+}
+
+func TestNearbySearchRankByDistanceAndRadius(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &NearbySearchRequest{
 		Location: &LatLng{1.0, 2.0},
 		Radius:   1000,
-		Rankby:   RankbyDistance,
+		RankBy:   RankByDistance,
 	}
 	_, err := c.NearbySearch(context.Background(), r)
 
 	if err == nil {
-		t.Errorf("Error expected: maps: Radius specified with RankbyDistance")
+		t.Errorf("Error expected: maps: Radius specified with RankByDistance")
+	}
+	if err.Error() != "maps: Radius specified with RankByDistance" {
+		t.Errorf("Incorrect error returned \"%v\"", err)
 	}
 }
 
-func TestNearbySearchRankbyDistanceAndNoKeywordNameAndType(t *testing.T) {
+func TestNearbySearchRankByDistanceAndNoKeywordNameAndType(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &NearbySearchRequest{
 		Location: &LatLng{1.0, 2.0},
-		Rankby:   RankbyDistance,
+		RankBy:   RankByDistance,
 	}
 	_, err := c.NearbySearch(context.Background(), r)
 
 	if err == nil {
-		t.Errorf("Error expected: maps: Rankby=distance and Keyword, Name and Type are missing")
+		t.Errorf("Error expected: maps: RankBy=distance and Keyword, Name and Type are missing")
 	}
 
-	if err.Error() != "maps: Rankby=distance and Keyword, Name and Type are missing" {
-		t.Errorf("Incorrect error returned %v", err)
+	if err.Error() != "maps: RankBy=distance and Keyword, Name and Type are missing" {
+		t.Errorf("Incorrect error returned \"%v\"", err)
 	}
 }
 

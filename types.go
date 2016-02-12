@@ -163,13 +163,13 @@ const (
 	ComponentCountry = Component("country")
 )
 
-// Rankby specifies the order in which results are listed
-type Rankby string
+// RankBy specifies the order in which results are listed
+type RankBy string
 
-// Rankby options for Places Search
+// RankBy options for Places Search
 const (
-	RankbyProminence = Rankby("prominence")
-	RankbyDistance   = Rankby("distance")
+	RankByProminence = RankBy("prominence")
+	RankByDistance   = RankBy("distance")
 )
 
 // PlaceType TODO(brettmorgan)
