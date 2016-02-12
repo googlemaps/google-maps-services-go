@@ -175,6 +175,8 @@ const (
 // PlaceType TODO(brettmorgan)
 type PlaceType string
 
+// Warning: DO NOT EDIT PlaceType* - they are code generated.
+
 // Place Types for the Places API
 const (
 	PlaceTypeAccounting            = PlaceType("accounting")
@@ -274,6 +276,8 @@ const (
 	PlaceTypeVeterinaryCare        = PlaceType("veterinary_care")
 	PlaceTypeZoo                   = PlaceType("zoo")
 )
+
+// Warning: DO NOT EDIT ParsePlaceType() - it is generated code.
 
 // ParsePlaceType will parse a string representation of a PlaceType.
 func ParsePlaceType(placeType string) (PlaceType, error) {
