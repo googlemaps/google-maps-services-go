@@ -250,7 +250,7 @@ type TextSearchRequest struct {
 	PageToken string
 }
 
-var radarSearchAPI = &apiConfig{
+var placesRadarSearchAPI = &apiConfig{
 	host:            "https://maps.googleapis.com",
 	path:            "/maps/api/place/radarsearch/json",
 	acceptsClientID: true,
@@ -278,7 +278,7 @@ func (c *Client) RadarSearch(ctx context.Context, r *RadarSearchRequest) (Places
 		commonResponse
 	}
 
-	if err := c.getJSON(ctx, placesNearbySearchAPI, r, &response); err != nil {
+	if err := c.getJSON(ctx, placesRadarSearchAPI, r, &response); err != nil {
 		return PlacesSearchResponse{}, err
 	}
 
