@@ -20,6 +20,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 
 	"golang.org/x/net/context"
 )
@@ -56,6 +57,142 @@ func mockServerForQuery(query string, code int, body string) *countingServer {
 func mockServer(code int, body string) *httptest.Server {
 	serv := mockServerForQuery("", code, body)
 	return serv.s
+}
+
+func TestDirectionsTransit(t *testing.T) {
+	// Route from Google Sydney to Glebe Pt Rd. Steps and some polylines have
+	// been removed.
+	response := `{
+   "geocoded_waypoints" : [
+      {
+         "geocoder_status" : "OK",
+         "partial_match" : true,
+         "place_id" : "ChIJ8UadyjeuEmsRDt5QbiDg720",
+         "types" : [ "premise" ]
+      },
+      {
+         "geocoder_status" : "OK",
+         "place_id" : "ChIJl7hmVNOvEmsRcW-sYgALB78",
+         "types" : [ "route" ]
+      }
+   ],
+   "routes" : [
+      {
+         "bounds" : {
+            "northeast" : {
+               "lat" : -33.8668939,
+               "lng" : 151.1952284
+            },
+            "southwest" : {
+               "lat" : -33.8785317,
+               "lng" : 151.1856793
+            }
+         },
+         "copyrights" : "Map data ©2016 Google",
+         "legs" : [
+            {
+               "arrival_time" : {
+                  "text" : "4:09pm",
+                  "time_zone" : "Australia/Sydney",
+                  "value" : 1455512950
+               },
+               "departure_time" : {
+                  "text" : "4:00pm",
+                  "time_zone" : "Australia/Sydney",
+                  "value" : 1455512400
+               },
+               "distance" : {
+                  "text" : "2.2 km",
+                  "value" : 2241
+               },
+               "duration" : {
+                  "text" : "9 mins",
+                  "value" : 550
+               },
+               "end_address" : "Glebe Point Rd, Glebe NSW 2037, Australia",
+               "end_location" : {
+                  "lat" : -33.8785317,
+                  "lng" : 151.1859855
+               },
+               "start_address" : "Workplace 6, 48 Pirrama Rd, Pyrmont NSW 2009, Australia",
+               "start_location" : {
+                  "lat" : -33.8675125,
+                  "lng" : 151.1950229
+               },
+               "steps" : [
+               ],
+               "via_waypoint" : []
+            }
+         ],
+         "overview_polyline" : {
+            "points" : ""
+         },
+         "summary" : "",
+         "warnings" : [
+            "Walking directions are in beta.    Use caution – This route may be missing sidewalks or pedestrian paths."
+         ],
+         "waypoint_order" : []
+      }
+   ],
+   "status" : "OK"
+}`
+
+	server := mockServer(200, response)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
+	r := &DirectionsRequest{
+		Origin:      "Google Sydney",
+		Destination: "Glebe Pt Rd, Glebe",
+		Mode:        TravelModeTransit,
+	}
+
+	resp, _, err := c.Directions(context.Background(), r)
+
+	if len(resp) != 1 {
+		t.Errorf("Expected length of response is 1, was %+v", len(resp))
+	}
+	if err != nil {
+		t.Errorf("r.Get returned non nil error, was %+v", err)
+	}
+
+	tzSydney, err := time.LoadLocation("Australia/Sydney")
+	if err != nil {
+		t.Errorf("coudln't load expected timezone Australia/Sydney: %v", err)
+	}
+	arrivalTime := time.Date(2016, 2, 15, 16, 9, 10, 0, tzSydney)
+	departureTime := time.Date(2016, 2, 15, 16, 0, 0, 0, tzSydney)
+
+	var legs []*Leg
+	legs = append(legs, &Leg{
+		Steps:         make([]*Step, 0),
+		Distance:      Distance{HumanReadable: "2.2 km", Meters: 2241},
+		Duration:      time.Duration(550) * time.Second,
+		ArrivalTime:   arrivalTime,
+		DepartureTime: departureTime,
+		StartLocation: LatLng{Lat: -33.8675125, Lng: 151.1950229},
+		EndLocation:   LatLng{Lat: -33.8785317, Lng: 151.1859855},
+		StartAddress:  "Workplace 6, 48 Pirrama Rd, Pyrmont NSW 2009, Australia",
+		EndAddress:    "Glebe Point Rd, Glebe NSW 2037, Australia",
+	})
+
+	correctResponse := &Route{
+		OverviewPolyline: Polyline{},
+		Legs:             legs,
+		Bounds: LatLngBounds{
+			NorthEast: LatLng{Lat: -33.8668939, Lng: 151.1952284},
+			SouthWest: LatLng{Lat: -33.8785317, Lng: 151.1856793},
+		},
+		Copyrights: "Map data ©2016 Google",
+		Warnings: []string{
+			"Walking directions are in beta.    Use caution – This route may be missing sidewalks or pedestrian paths.",
+		},
+		WaypointOrder: make([]int, 0),
+	}
+
+	if actualResponse := &resp[0]; !reflect.DeepEqual(actualResponse, correctResponse) {
+		t.Errorf("expected %+v, was %+v", correctResponse, actualResponse)
+	}
 }
 
 func TestDirectionsSydneyToParramatta(t *testing.T) {
