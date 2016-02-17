@@ -37,7 +37,7 @@ var (
 	maxprice  = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
 	name      = flag.String("name", "", "One or more terms to be matched against the names of places, separated by a space character. Results will be restricted to those containing the passed name values.")
 	opennow   = flag.Bool("open_now", false, "Restricts results to only those places that are open for business at the time the query is sent.")
-	placeType = flag.String("type", "", "TODO(brettmorgan)")
+	placeType = flag.String("type", "", "Restricts the results to places matching the specified type.")
 )
 
 func usageAndExit(msg string) {

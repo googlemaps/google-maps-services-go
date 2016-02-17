@@ -172,7 +172,7 @@ const (
 	RankByDistance   = RankBy("distance")
 )
 
-// PlaceType TODO(brettmorgan)
+// PlaceType restricts Place API search to the results to places matching the specified type.
 type PlaceType string
 
 // Warning: DO NOT EDIT PlaceType* - they are code generated.

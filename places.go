@@ -147,7 +147,7 @@ type NearbySearchRequest struct {
 	OpenNow bool
 	// RankBy specifies the order in which results are listed.
 	RankBy
-	// Type TODO(brettmorgan)
+	// Type restricts the results to places matching the specified type.
 	Type PlaceType
 	// PageToken returns the next 20 results from a previously run search. Setting a PageToken parameter will execute a search with the same parameters used previously — all parameters other than PageToken will be ignored.
 	PageToken string
@@ -244,7 +244,7 @@ type TextSearchRequest struct {
 	MaxPrice PriceLevel
 	// OpenNow returns only those places that are open for business at the time the query is sent. Places that do not specify opening hours in the Google Places database will not be returned if you include this parameter in your query.
 	OpenNow bool
-	// Type TODO(brettmorgan)
+	// Type restricts the results to places matching the specified type.
 	Type PlaceType
 	// PageToken returns the next 20 results from a previously run search. Setting a PageToken parameter will execute a search with the same parameters used previously — all parameters other than PageToken will be ignored.
 	PageToken string
@@ -344,7 +344,7 @@ type RadarSearchRequest struct {
 	Name string
 	// OpenNow returns only those places that are open for business at the time the query is sent. Places that do not specify opening hours in the Google Places database will not be returned if you include this parameter in your query.
 	OpenNow bool
-	// Type TODO(brettmorgan)
+	// Type restricts the results to places matching the specified type.
 	Type PlaceType
 }
 
@@ -702,7 +702,7 @@ type PlaceAutocompleteRequest struct {
 	Radius uint
 	// Language is the language in which to return results.
 	Language string
-	// Type TODO(brettmorgan)
+	// Type restricts the results to places matching the specified type.
 	Type PlaceType
 	// Components is a grouping of places to which you would like to restrict your results. Currently, you can use components to filter by country.
 	Components map[Component]string

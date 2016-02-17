@@ -37,7 +37,7 @@ var (
 	offset     = flag.Uint("offset", 0, "The character position in the input term at which the service uses text for predictions.")
 	location   = flag.String("location", "", "The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.")
 	radius     = flag.Uint("radius", 0, "Defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters.")
-	placeType  = flag.String("type", "", "TODO(brettmorgan)")
+	placeType  = flag.String("type", "", "Restricts the results to places matching the specified type.")
 	components = flag.String("components", "", "A component filter for specifying which country to perform autocomplete inside of")
 )
 

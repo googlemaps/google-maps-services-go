@@ -40,7 +40,7 @@ var (
 	name      = flag.String("name", "", "One or more terms to be matched against the names of places, separated with a space character.")
 	openNow   = flag.Bool("open_now", false, "Restricts results to only those places that are open for business at the time the query is sent.")
 	rankBy    = flag.String("rankby", "", "Specifies the order in which results are listed. Valid values are prominence or distance.")
-	placeType = flag.String("type", "", "TODO(brettmorgan)")
+	placeType = flag.String("type", "", "Restricts the results to places matching the specified type.")
 	pageToken = flag.String("pagetoken", "", "Set to retrieve the next next page of results.")
 )
 

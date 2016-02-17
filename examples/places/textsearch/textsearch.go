@@ -38,6 +38,7 @@ var (
 	minprice  = flag.String("min_price", "", "Restricts results to only those places within the specified price level.")
 	maxprice  = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
 	opennow   = flag.Bool("open_now", false, "Restricts results to only those places that are open for business at the time the query is sent.")
+	placeType = flag.String("type", "", "Restricts the results to places matching the specified type.")
 )
 
 func usageAndExit(msg string) {
@@ -76,6 +77,7 @@ func main() {
 
 	parseLocation(*location, r)
 	parsePriceLevels(*minprice, *maxprice, r)
+	parsePlaceType(*placeType, r)
 
 	resp, err := client.TextSearch(context.Background(), r)
 	check(err)
@@ -116,5 +118,16 @@ func parsePriceLevels(minprice string, maxprice string, r *maps.TextSearchReques
 
 	if maxprice != "" {
 		r.MaxPrice = parsePriceLevel(minprice)
+	}
+}
+
+func parsePlaceType(placeType string, r *maps.TextSearchRequest) {
+	if placeType != "" {
+		t, err := maps.ParsePlaceType(placeType)
+		if err != nil {
+			usageAndExit(fmt.Sprintf("Unknown place type \"%v\"", placeType))
+		}
+
+		r.Type = t
 	}
 }
