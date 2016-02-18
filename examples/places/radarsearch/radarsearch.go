@@ -22,7 +22,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/kr/pretty"
 	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
 )
@@ -31,12 +30,12 @@ var (
 	apiKey    = flag.String("key", "", "API Key for using Google Maps API.")
 	clientID  = flag.String("client_id", "", "ClientID for Maps for Work API access.")
 	signature = flag.String("signature", "", "Signature for Maps for Work API access.")
-	query     = flag.String("query", "", "Text Search query to execute.")
-	language  = flag.String("language", "", "The language in which to return results.")
 	location  = flag.String("location", "", "The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.")
 	radius    = flag.Uint("radius", 0, "Defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters.")
+	keyword   = flag.String("keyword", "", "A term to be matched against all content that Google has indexed for this place, including but not limited to name, type, and address, as well as customer reviews and other third-party content.")
 	minprice  = flag.String("min_price", "", "Restricts results to only those places within the specified price level.")
 	maxprice  = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
+	name      = flag.String("name", "", "One or more terms to be matched against the names of places, separated by a space character. Results will be restricted to those containing the passed name values.")
 	opennow   = flag.Bool("open_now", false, "Restricts results to only those places that are open for business at the time the query is sent.")
 	placeType = flag.String("type", "", "Restricts the results to places matching the specified type.")
 )
@@ -68,24 +67,32 @@ func main() {
 	}
 	check(err)
 
-	r := &maps.TextSearchRequest{
-		Query:    *query,
-		Language: *language,
-		Radius:   *radius,
-		OpenNow:  *opennow,
+	r := &maps.RadarSearchRequest{
+		Radius:  *radius,
+		Keyword: *keyword,
+		Name:    *name,
+		OpenNow: *opennow,
 	}
 
 	parseLocation(*location, r)
 	parsePriceLevels(*minprice, *maxprice, r)
 	parsePlaceType(*placeType, r)
 
-	resp, err := client.TextSearch(context.Background(), r)
+	resp, err := client.RadarSearch(context.Background(), r)
 	check(err)
 
-	pretty.Println(resp)
+	for i, result := range resp.Results {
+		r2 := &maps.PlaceDetailsRequest{
+			PlaceID: result.PlaceID,
+		}
+		resp, err := client.PlaceDetails(context.Background(), r2)
+		check(err)
+
+		fmt.Printf("%d: %v at %v\n", i, resp.Name, resp.FormattedAddress)
+	}
 }
 
-func parseLocation(location string, r *maps.TextSearchRequest) {
+func parseLocation(location string, r *maps.RadarSearchRequest) {
 	if location != "" {
 		l, err := maps.ParseLatLng(location)
 		check(err)
@@ -111,7 +118,7 @@ func parsePriceLevel(priceLevel string) maps.PriceLevel {
 	return maps.PriceLevelFree
 }
 
-func parsePriceLevels(minprice string, maxprice string, r *maps.TextSearchRequest) {
+func parsePriceLevels(minprice string, maxprice string, r *maps.RadarSearchRequest) {
 	if minprice != "" {
 		r.MinPrice = parsePriceLevel(minprice)
 	}
@@ -121,13 +128,10 @@ func parsePriceLevels(minprice string, maxprice string, r *maps.TextSearchReques
 	}
 }
 
-func parsePlaceType(placeType string, r *maps.TextSearchRequest) {
+func parsePlaceType(placeType string, r *maps.RadarSearchRequest) {
 	if placeType != "" {
 		t, err := maps.ParsePlaceType(placeType)
-		if err != nil {
-			usageAndExit(fmt.Sprintf("Unknown place type \"%v\"", placeType))
-		}
-
+		check(err)
 		r.Type = t
 	}
 }
