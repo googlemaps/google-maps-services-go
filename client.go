@@ -67,7 +67,9 @@ func NewClient(options ...ClientOption) (*Client, error) {
 		c.rateLimiter <- 1
 	}
 	go func() {
-		// Refill rateLimiter continuously
+		// Wait a second for pre-filled quota to drain
+		time.Sleep(time.Second)
+		// Then, refill rateLimiter continuously
 		for _ = range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
 			c.rateLimiter <- 1
 		}
