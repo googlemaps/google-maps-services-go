@@ -50,6 +50,9 @@ func (c *Client) DistanceMatrix(ctx context.Context, r *DistanceMatrixRequest) (
 	if r.TransitRoutingPreference != "" && r.Mode != TravelModeTransit {
 		return nil, errors.New("maps: mode of transit '" + string(r.Mode) + "' invalid for TransitRoutingPreference")
 	}
+	if r.Mode == TravelModeTransit && r.TrafficModel != "" {
+		return nil, errors.New("maps: cannot specify transit mode and traffic model together")
+	}
 
 	var response struct {
 		commonResponse
@@ -93,6 +96,9 @@ func (r *DistanceMatrixRequest) params() url.Values {
 	if r.ArrivalTime != "" {
 		q.Set("arrival_time", r.ArrivalTime)
 	}
+	if r.TrafficModel != "" {
+		q.Set("traffic_model", string(r.TrafficModel))
+	}
 	if len(r.TransitMode) != 0 {
 		var transitMode []string
 		for _, t := range r.TransitMode {
@@ -127,6 +133,9 @@ type DistanceMatrixRequest struct {
 	// ArrivalTime specifies the desired time of arrival for transit requests, in seconds since midnight, January 1, 1970 UTC. You cannot
 	// specify both `DepartureTime` and `ArrivalTime`. Optional.
 	ArrivalTime string
+	// TrafficModel determines the type of model that will be used when determining travel time when using depature times in the future
+	// options are TrafficModelBestGuess, TrafficModelOptimistic or TrafficModelPessimistic. Optional. Default is TrafficModelBestGuess
+	TrafficModel TrafficModel
 	// TransitMode specifies one or more preferred modes of transit. This parameter may only be specified for requests where the mode is
 	// `transit`. Valid values are `TransitModeBus`, `TransitModeSubway`, `TransitModeTrain`, `TransitModeTram`, and `TransitModeRail`.
 	// Optional.
