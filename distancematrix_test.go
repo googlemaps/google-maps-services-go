@@ -216,8 +216,8 @@ func TestDistanceMatrixFailingServer(t *testing.T) {
 	}
 }
 
-func TestDistanceMatrixRequestURL(t *testing.T) {
-	expectedQuery := "avoid=t%7Co%7Cl%7Cl%7Cs&departure_time=now&destinations=Perth%7CParramatta&key=AIzaNotReallyAnAPIKey&language=en&mode=transit&origins=Sydney%7CPyrmont&transit_mode=rail&transit_routing_preference=less_walking&units=imperial&traffic_model=pessimistic"
+func TestDistanceMatrixTransitRequestURL(t *testing.T) {
+	expectedQuery := "avoid=t%7Co%7Cl%7Cl%7Cs&departure_time=now&destinations=Perth%7CParramatta&key=AIzaNotReallyAnAPIKey&language=en&mode=transit&origins=Sydney%7CPyrmont&transit_mode=rail&transit_routing_preference=less_walking&units=imperial"
 
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
@@ -235,7 +235,35 @@ func TestDistanceMatrixRequestURL(t *testing.T) {
 		DepartureTime:            "now",
 		TransitMode:              []TransitMode{TransitModeRail},
 		TransitRoutingPreference: TransitRoutingPreferenceLessWalking,
-		TrafficModel:             TrafficModelPessimistic,
+	}
+
+	_, err := c.DistanceMatrix(context.Background(), r)
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestDistanceMatrixTrafficRequestURL(t *testing.T) {
+	expectedQuery := "avoid=t%7Co%7Cl%7Cl%7Cs&departure_time=now&destinations=Perth%7CParramatta&key=AIzaNotReallyAnAPIKey&language=en&mode=driving&origins=Sydney%7CPyrmont&traffic_model=pessimistic&units=imperial"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+
+	r := &DistanceMatrixRequest{
+		Origins:       []string{"Sydney", "Pyrmont"},
+		Destinations:  []string{"Perth", "Parramatta"},
+		Avoid:         AvoidTolls,
+		Mode:          TravelModeDriving,
+		Language:      "en",
+		DepartureTime: "now",
+		TrafficModel:  TrafficModelPessimistic,
+		Units:         UnitsImperial,
 	}
 
 	_, err := c.DistanceMatrix(context.Background(), r)
