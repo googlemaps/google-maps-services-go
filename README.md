@@ -38,7 +38,7 @@ If you find a bug, or have a feature suggestion, please [log an issue][issues]. 
 contribute, please read [How to Contribute][contrib].
 
 ## Requirements
- - Go 1.x or later.
+ - Go 1.5 or later.
  - A Google Maps API key.
 
 ### API keys
