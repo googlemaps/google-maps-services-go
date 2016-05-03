@@ -166,6 +166,8 @@ type DistanceMatrixElement struct {
 	Status string `json:"status"`
 	// Duration is the length of time it takes to travel this route.
 	Duration time.Duration `json:"duration"`
+	// DurationInTraffic is the length of time it takes to travel this route considering traffic.
+	DurationInTraffic time.Duration `json:"duration_in_traffic"`
 	// Distance is the total distance of this route.
 	Distance Distance `json:"distance"`
 }
