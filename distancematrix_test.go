@@ -21,6 +21,70 @@ import (
 	"golang.org/x/net/context"
 )
 
+func TestDistanceMatrixWithCoordinatesAndTraffic(t *testing.T) {
+	// Distance Matrix response from 1.315125,103.76471334 to 1.280776, 103.8487 with most steps elided.
+	response := `{
+  "destination_addresses": ["3150 Commonwealth Ave W, Singapore 129580"],
+  "origin_addresses": ["105 Cecil St, Singapore 069534"],
+  "rows": [
+    {
+      "elements": [
+        {
+          "distance": {
+            "text": "12.5 km",
+            "value": 12535
+          },
+          "duration": {
+            "text": "18 mins",
+            "value": 1083
+          },
+          "duration_in_traffic": {
+            "text": "19 mins",
+            "value": 1134
+          },
+          "status": "OK"
+        }
+      ]
+    }
+  ],
+  "status": "OK"
+}`
+	server := mockServer(200, response)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
+	r := &DistanceMatrixRequest{
+		Origins:       []string{"1.315125,103.76471334"},
+		Destinations:  []string{"1.280776,103.8487"},
+		DepartureTime: `now`,
+		Units:         `UnitsMetric`,
+		Mode:          TravelModeDriving,
+	}
+	resp, err := c.DistanceMatrix(context.Background(), r)
+	if err != nil {
+		t.Errorf("r.Get returned non nil error, was %+v", err)
+	}
+	correctResponse := &DistanceMatrixResponse{
+		OriginAddresses:      []string{"105 Cecil St, Singapore 069534"},
+		DestinationAddresses: []string{"3150 Commonwealth Ave W, Singapore 129580"},
+		Rows: []DistanceMatrixElementsRow{
+			DistanceMatrixElementsRow{
+				Elements: []*DistanceMatrixElement{
+					&DistanceMatrixElement{
+						Status:            "OK",
+						Duration:          1083000000000,
+						DurationInTraffic: 1134000000000,
+						Distance:          Distance{HumanReadable: "12.5 km", Meters: 12535},
+					},
+				},
+			},
+		},
+	}
+	if !reflect.DeepEqual(resp, correctResponse) {
+		t.Errorf("expected %+v, was %+v", correctResponse, resp)
+	}
+}
+
 func TestDistanceMatrixSydPyrToPar(t *testing.T) {
 
 	// Distance Matrix from Sydney And Pyrmont to Parramatta with most steps elided.

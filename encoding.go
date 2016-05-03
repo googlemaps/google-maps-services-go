@@ -279,7 +279,8 @@ type safeDistanceMatrixElement DistanceMatrixElement
 // DistanceMatrixElement as per the Maps APIs.
 type encodedDistanceMatrixElement struct {
 	safeDistanceMatrixElement
-	EncDuration *internal.Duration `json:"duration"`
+	EncDuration          *internal.Duration `json:"duration"`
+	EncDurationInTraffic *internal.Duration `json:"duration_in_traffic"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler for DistanceMatrixElement. This
@@ -293,6 +294,7 @@ func (dme *DistanceMatrixElement) UnmarshalJSON(data []byte) error {
 	*dme = DistanceMatrixElement(x.safeDistanceMatrixElement)
 
 	dme.Duration = x.EncDuration.Duration()
+	dme.DurationInTraffic = x.EncDurationInTraffic.Duration()
 
 	return nil
 }
