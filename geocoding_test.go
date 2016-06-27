@@ -18,6 +18,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/kr/pretty"
 	"golang.org/x/net/context"
 )
 
@@ -284,7 +285,7 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 		LatLng: &LatLng{Lat: 40.714224, Lng: -73.961452},
 	}
 
-	resp, err := c.Geocode(context.Background(), r)
+	resp, err := c.ReverseGeocode(context.Background(), r)
 
 	if len(resp) != 1 {
 		t.Errorf("expected %+v, was %+v", 1, len(resp))
@@ -416,5 +417,165 @@ func TestGeocodingRequestURL(t *testing.T) {
 	}
 	if server.successful != 1 {
 		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestReverseGeocodingPlaceID(t *testing.T) {
+	response := `{
+    "results": [
+        {
+            "address_components": [
+                {
+                    "long_name": "1600",
+                    "short_name": "1600",
+                    "types": [
+                        "street_number"
+                    ]
+                },
+                {
+                    "long_name": "Amphitheatre Pkwy",
+                    "short_name": "Amphitheatre Pkwy",
+                    "types": [
+                        "route"
+                    ]
+                },
+                {
+                    "long_name": "Mountain View",
+                    "short_name": "Mountain View",
+                    "types": [
+                        "locality",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "Santa Clara County",
+                    "short_name": "Santa Clara County",
+                    "types": [
+                        "administrative_area_level_2",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "California",
+                    "short_name": "CA",
+                    "types": [
+                        "administrative_area_level_1",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "United States",
+                    "short_name": "US",
+                    "types": [
+                        "country",
+                        "political"
+                    ]
+                },
+                {
+                    "long_name": "94043",
+                    "short_name": "94043",
+                    "types": [
+                        "postal_code"
+                    ]
+                }
+            ],
+            "formatted_address": "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+            "geometry": {
+                "location": {
+                    "lat": 37.4224764,
+                    "lng": -122.0842499
+                },
+                "location_type": "ROOFTOP",
+                "viewport": {
+                    "northeast": {
+                        "lat": 37.4238253802915,
+                        "lng": -122.0829009197085
+                    },
+                    "southwest": {
+                        "lat": 37.4211274197085,
+                        "lng": -122.0855988802915
+                    }
+                }
+            },
+            "place_id": "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
+            "types": [
+                "street_address"
+            ]
+        }
+    ],
+    "status": "OK"
+}`
+
+	server := mockServer(200, response)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
+	r := &GeocodingRequest{
+		PlaceID: "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
+	}
+
+	resp, err := c.ReverseGeocode(context.Background(), r)
+	pretty.Println(resp)
+	if len(resp) != 1 {
+		t.Errorf("Expected length of response is 1, was %+v", len(resp))
+	}
+	if err != nil {
+		t.Errorf("r.Get returned non nil error: %v", err)
+	}
+
+	correctResponse := GeocodingResult{
+		AddressComponents: []AddressComponent{
+			AddressComponent{
+				LongName:  "1600",
+				ShortName: "1600",
+				Types:     []string{"street_number"},
+			},
+			AddressComponent{
+				LongName:  "Amphitheatre Pkwy",
+				ShortName: "Amphitheatre Pkwy",
+				Types:     []string{"route"},
+			},
+			AddressComponent{
+				LongName:  "Mountain View",
+				ShortName: "Mountain View",
+				Types:     []string{"locality", "political"},
+			},
+			AddressComponent{
+				LongName:  "Santa Clara County",
+				ShortName: "Santa Clara County",
+				Types:     []string{"administrative_area_level_2", "political"},
+			},
+			AddressComponent{
+				LongName:  "California",
+				ShortName: "CA",
+				Types:     []string{"administrative_area_level_1", "political"},
+			},
+			AddressComponent{
+				LongName:  "United States",
+				ShortName: "US",
+				Types:     []string{"country", "political"},
+			},
+			AddressComponent{
+				LongName:  "94043",
+				ShortName: "94043",
+				Types:     []string{"postal_code"},
+			},
+		},
+		FormattedAddress: "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+		Geometry: AddressGeometry{
+			Location:     LatLng{Lat: 37.4224764, Lng: -122.0842499},
+			LocationType: "ROOFTOP",
+			Viewport: LatLngBounds{
+				NorthEast: LatLng{Lat: 37.4238253802915, Lng: -122.0829009197085},
+				SouthWest: LatLng{Lat: 37.4211274197085, Lng: -122.0855988802915},
+			},
+			Types: nil,
+		},
+		PlaceID: "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
+		Types:   []string{"street_address"},
+	}
+
+	if !reflect.DeepEqual(resp[0], correctResponse) {
+		t.Errorf("expected %+v, was %+v", correctResponse, resp[0])
 	}
 }
