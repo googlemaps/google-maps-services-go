@@ -149,13 +149,13 @@ type GeocodingRequest struct {
 
 	// Reverse geocoding fields
 
-	// LatLng is the textual latitude/longitude value for which you wish to obtain the closest, human-readable address. Required for reverse geocoding
+	// LatLng is the textual latitude/longitude value for which you wish to obtain the closest, human-readable address. Either LatLng or PlaceID is required for Reverse Geocoding.
 	LatLng *LatLng
 	// ResultType is an array of one or more address types. Optional.
 	ResultType []string
 	// LocationType is an array of one or more geocoding accuracy types. Optional.
 	LocationType []GeocodeAccuracy
-	// PlaceID is a string which contains the place_id, which can be used for reverse geocoding requests
+	// PlaceID is a string which contains the place_id, which can be used for reverse geocoding requests. Either LatLng or PlaceID is required for Reverse Geocoding.
 	PlaceID string
 
 	// Language is the language in which to return results. Optional.

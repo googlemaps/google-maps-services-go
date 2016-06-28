@@ -18,7 +18,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kr/pretty"
 	"golang.org/x/net/context"
 )
 
@@ -515,7 +514,6 @@ func TestReverseGeocodingPlaceID(t *testing.T) {
 	}
 
 	resp, err := c.ReverseGeocode(context.Background(), r)
-	pretty.Println(resp)
 	if len(resp) != 1 {
 		t.Errorf("Expected length of response is 1, was %+v", len(resp))
 	}
