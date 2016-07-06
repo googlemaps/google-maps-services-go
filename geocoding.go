@@ -113,7 +113,8 @@ type GeocodingRequest struct {
 	// Address is the street address that you want to geocode, in the format used by the national postal service of the country concerned.
 	Address string
 	// Components is a component filter for which you wish to obtain a geocode. Either Address or Components is required in a geocoding request.
-	// For more detail on Component Filtering please see https://developers.google.com/maps/documentation/geocoding/#ComponentFiltering
+	// For more detail on Component Filtering please see
+	// https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering
 	Components map[Component]string
 	// Bounds is the bounding box of the viewport within which to bias geocode results more prominently. Optional.
 	Bounds *LatLngBounds
