@@ -43,15 +43,17 @@ contribute, please read [How to Contribute][contrib].
 
 ### API keys
 
-Each Google Maps Web Service requires an API key or Client ID. API keys are
-freely available with a Google Account at https://developers.google.com/console.
-To generate a server key for your project:
+Each Google Maps Web Service request requires an API key or client ID. API keys
+are freely available with a Google Account at
+https://developers.google.com/console. The type of API key you need is a 
+**Server key**. 
+
+To get an API key:
 
  1. Visit https://developers.google.com/console and log in with
     a Google Account.
- 1. Select an existing project, or create a new project.
- 1. Click **Enable an API**.
- 1. Browse for the API, and set its status to "On". The Golang Client for Google Maps Services
+ 1. Select one of your existing projects, or create a new project.
+ 1. Enable the API(s) you want to use. The Go Client for Google Maps Services
     accesses the following APIs:
     * Directions API
     * Distance Matrix API
@@ -60,14 +62,12 @@ To generate a server key for your project:
     * Places API
     * Roads API
     * Time Zone API
- 1. Once you've enabled the APIs, click **Credentials** from the left navigation of the Developer
-    Console.
- 1. In the "Public API access", click **Create new Key**.
- 1. Choose **Server Key**.
+ 1. Create a new **Server key**.
  1. If you'd like to restrict requests to a specific IP address, do so now.
- 1. Click **Create**.
-
-Your API key should be 40 characters long, and begin with `AIza`.
+ 
+For guided help, follow the instructions for the [Directions API][directions-key]. 
+You only need one API key, but remember to enable all the APIs you need.
+For even more information, see the guide to [API keys][apikey]. 
 
 **Important:** This key should be kept secret on your server.
 
@@ -130,10 +130,10 @@ Never sleep between requests again! By default, requests are sent at the expecte
 each web service, typically 10 queries per second for free users. If you want to speed up or slow
 down requests, you can do that too, using `maps.NewClient(maps.WithAPIKey(apiKey), maps.WithRateLimit(qps))`.
 
-### Keys *and* Client IDs
+### Client IDs
 
-Maps API for Work customers can use their [client ID and secret][clientid] to authenticate. Free
-customers can use their [API key][apikey], too.
+Google Maps APIs Premium Plan customers can use their [client ID and secret][clientid] to authenticate,
+instead of an API key.
 
 ### Native types
 
@@ -144,6 +144,7 @@ Native objects for each of the API responses.
 
 [Google Maps API Web Services]: https://developers.google.com/maps/documentation/webservices/
 [Directions API]: https://developers.google.com/maps/documentation/directions/
+[directions-key]: https://developers.google.com/maps/documentation/directions/get-api-key#key
 [Distance Matrix API]: https://developers.google.com/maps/documentation/distancematrix/
 [Elevation API]: https://developers.google.com/maps/documentation/elevation/
 [Geocoding API]: https://developers.google.com/maps/documentation/geocoding/
