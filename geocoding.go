@@ -53,6 +53,30 @@ func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingR
 	return response.Results, nil
 }
 
+// ReverseGeocode makes a Reverse Geocoding API request
+func (c *Client) ReverseGeocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
+	// Since Geocode() does not allow a nil LatLng, whereas it is allowed here
+	if r.LatLng == nil && r.PlaceID == "" {
+		return nil, errors.New("maps: LatLng and PlaceID are both missing")
+	}
+
+	var response struct {
+		Results []GeocodingResult `json:"results"`
+		commonResponse
+	}
+
+	if err := c.getJSON(ctx, geocodingAPI, r, &response); err != nil {
+		return nil, err
+	}
+
+	if err := response.StatusError(); err != nil {
+		return nil, err
+	}
+
+	return response.Results, nil
+
+}
+
 func (r *GeocodingRequest) params() url.Values {
 	q := make(url.Values)
 
@@ -84,6 +108,9 @@ func (r *GeocodingRequest) params() url.Values {
 			lt = append(lt, string(l))
 		}
 		q.Set("location_type", strings.Join(lt, "|"))
+	}
+	if r.PlaceID != "" {
+		q.Set("place_id", r.PlaceID)
 	}
 	if r.Language != "" {
 		q.Set("language", r.Language)
@@ -123,12 +150,14 @@ type GeocodingRequest struct {
 
 	// Reverse geocoding fields
 
-	// LatLng is the textual latitude/longitude value for which you wish to obtain the closest, human-readable address. Required for reverse geocoding.
+	// LatLng is the textual latitude/longitude value for which you wish to obtain the closest, human-readable address. Either LatLng or PlaceID is required for Reverse Geocoding.
 	LatLng *LatLng
 	// ResultType is an array of one or more address types. Optional.
 	ResultType []string
 	// LocationType is an array of one or more geocoding accuracy types. Optional.
 	LocationType []GeocodeAccuracy
+	// PlaceID is a string which contains the place_id, which can be used for reverse geocoding requests. Either LatLng or PlaceID is required for Reverse Geocoding.
+	PlaceID string
 
 	// Language is the language in which to return results. Optional.
 	Language string
