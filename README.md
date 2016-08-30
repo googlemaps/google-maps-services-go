@@ -91,7 +91,7 @@ https://developers.google.com/maps/ and https://developers.google.com/places/.
  - [Roads API]
 
 ## Usage
-Sample usage of the Directions API:
+Sample usage of the Directions API with an API key:
 
 ```go
 package main
@@ -122,6 +122,43 @@ func main() {
 }
 ```
 
+Below is the same example, using client ID and client secret (digital signature)
+for authentication. This code assumes you have previously loaded the `clientID`
+and `clientSecret` variables with appropriate values.
+
+For a guide on how to generate the `clientSecret` (digital signature), see the
+documentation for the API you're using. For example, see the guide for the
+[Directions API][directions-client-id].
+
+```go
+package main
+
+import (
+	"log"
+
+        "googlemaps.github.io/maps"
+        "github.com/kr/pretty"
+        "golang.org/x/net/context"
+)
+
+func main() {
+        c, err := maps.NewClient(maps.WithClientIDAndSignature(clientID, clientSecret))
+        if err != nil {
+            log.Fatalf("fatal error: %s", err)
+        }
+        r := &maps.DirectionsRequest{
+            Origin:      "Sydney",
+            Destination: "Perth",
+        }
+        resp, err := c.Directions(context.Background(), r)
+        if err != nil {
+            log.Fatalf("fatal error: %s", err)
+        }
+
+        pretty.Println(resp)
+}
+```
+
 ## Features
 
 ### Rate limiting
@@ -144,6 +181,7 @@ Native objects for each of the API responses.
 
 [Google Maps API Web Services]: https://developers.google.com/maps/documentation/webservices/
 [Directions API]: https://developers.google.com/maps/documentation/directions/
+[directions-client-id]: https://developers.google.com/maps/documentation/directions/get-api-key#client-id
 [directions-key]: https://developers.google.com/maps/documentation/directions/get-api-key#key
 [Distance Matrix API]: https://developers.google.com/maps/documentation/distancematrix/
 [Elevation API]: https://developers.google.com/maps/documentation/elevation/
