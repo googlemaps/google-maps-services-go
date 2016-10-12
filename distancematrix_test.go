@@ -281,7 +281,7 @@ func TestDistanceMatrixFailingServer(t *testing.T) {
 }
 
 func TestDistanceMatrixTransitRequestURL(t *testing.T) {
-	expectedQuery := "avoid=t%7Co%7Cl%7Cl%7Cs&departure_time=now&destinations=Perth%7CParramatta&key=AIzaNotReallyAnAPIKey&language=en&mode=transit&origins=Sydney%7CPyrmont&transit_mode=rail&transit_routing_preference=less_walking&units=imperial"
+	expectedQuery := "avoid=tolls&departure_time=now&destinations=Perth%7CParramatta&key=AIzaNotReallyAnAPIKey&language=en&mode=transit&origins=Sydney%7CPyrmont&transit_mode=rail&transit_routing_preference=less_walking&units=imperial"
 
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
@@ -311,7 +311,7 @@ func TestDistanceMatrixTransitRequestURL(t *testing.T) {
 }
 
 func TestDistanceMatrixTrafficRequestURL(t *testing.T) {
-	expectedQuery := "avoid=t%7Co%7Cl%7Cl%7Cs&departure_time=now&destinations=Perth%7CParramatta&key=AIzaNotReallyAnAPIKey&language=en&mode=driving&origins=Sydney%7CPyrmont&traffic_model=pessimistic&units=imperial"
+	expectedQuery := "avoid=tolls&departure_time=now&destinations=Perth%7CParramatta&key=AIzaNotReallyAnAPIKey&language=en&mode=driving&origins=Sydney%7CPyrmont&traffic_model=pessimistic&units=imperial"
 
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()

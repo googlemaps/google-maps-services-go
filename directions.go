@@ -190,6 +190,23 @@ type Route struct {
 	// Warnings contains an array of warnings to be displayed when showing these directions.
 	// You must handle and display these warnings yourself.
 	Warnings []string `json:"warnings"`
+
+	// Fare contains the total fare (that is, the total ticket costs) on this route. This property
+	// is only returned for transit requests and only for routes where fare information is available
+	// for all transit legs.
+	Fare Fare `json:"fare"`
+}
+
+// Fare represents the total fare for a route.
+type Fare struct {
+	// Currency is an ISO 4217 currency code indicating the currency that the amount is expressed in.
+	Currency string `json:"currency"`
+
+	// Value is the total fare amount, in the currency specified above.
+	Value float64 `json:"value"`
+
+	// Text is the total fare amount, formatted in the requested language.
+	Text string `json:"text"`
 }
 
 // Leg represents a single leg of a route.
