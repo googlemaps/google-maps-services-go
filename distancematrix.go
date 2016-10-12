@@ -80,12 +80,8 @@ func (r *DistanceMatrixRequest) params() url.Values {
 	if r.Language != "" {
 		q.Set("language", r.Language)
 	}
-	if len(r.Avoid) > 0 {
-		var avoid []string
-		for _, a := range r.Avoid {
-			avoid = append(avoid, string(a))
-		}
-		q.Set("avoid", strings.Join(avoid, "|"))
+	if r.Avoid != "" {
+		q.Set("avoid", string(r.Avoid))
 	}
 	if r.Units != "" {
 		q.Set("units", string(r.Units))
