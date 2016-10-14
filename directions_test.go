@@ -484,3 +484,206 @@ func TestTrafficModel(t *testing.T) {
 		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }
+
+func TestFare(t *testing.T) {
+	// Directions response, sans steps.
+	response := `{
+   "geocoded_waypoints" : [
+      {
+         "geocoder_status" : "OK",
+         "place_id" : "ChIJt4ABNBBfrIkRXFPZnsnIicw",
+         "types" : [ "street_address" ]
+      },
+      {
+         "geocoder_status" : "OK",
+         "place_id" : "EjExMDAxLTExOTkgSGlsbHNib3JvdWdoIFN0LCBSYWxlaWdoLCBOQyAyNzYwMywgVVNB",
+         "types" : [ "street_address" ]
+      }
+   ],
+   "routes" : [
+      {
+         "bounds" : {
+            "northeast" : {
+               "lat" : 35.782453,
+               "lng" : -78.625349
+            },
+            "southwest" : {
+               "lat" : 35.7766535,
+               "lng" : -78.6548689
+            }
+         },
+         "copyrights" : "Map data ©2016 Google",
+         "fare" : {
+            "currency" : "USD",
+            "text" : "$1.25",
+            "value" : 1.25
+         },
+         "legs" : [
+            {
+               "arrival_time" : {
+                  "text" : "8:23am",
+                  "time_zone" : "America/New_York",
+                  "value" : 1476620634
+               },
+               "departure_time" : {
+                  "text" : "8:01am",
+                  "time_zone" : "America/New_York",
+                  "value" : 1476619311
+               },
+               "distance" : {
+                  "text" : "2.1 mi",
+                  "value" : 3408
+               },
+               "duration" : {
+                  "text" : "22 mins",
+                  "value" : 1323
+               },
+               "end_address" : "1001-1199 Hillsborough St, Raleigh, NC 27603, USA",
+               "end_location" : {
+                  "lat" : 35.782453,
+                  "lng" : -78.6548689
+               },
+               "start_address" : "822 E Hargett St, Raleigh, NC 27601, USA",
+               "start_location" : {
+                  "lat" : 35.7777912,
+                  "lng" : -78.625349
+               },
+               "traffic_speed_entry" : [],
+               "via_waypoint" : []
+            }
+         ],
+         "summary" : "",
+         "warnings" : [
+            "Walking directions are in beta.    Use caution – This route may be missing sidewalks or pedestrian paths."
+         ],
+         "waypoint_order" : []
+      }
+   ],
+   "status" : "OK"
+}`
+
+	server := mockServer(200, response)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
+	r := &DirectionsRequest{
+		Origin:      "35.7777111, -78.625354",
+		Destination: "35.7826242, -78.6547025",
+		Mode:        TravelModeTransit,
+	}
+
+	resp, _, err := c.Directions(context.Background(), r)
+
+	if len(resp) != 1 {
+		t.Errorf("Expected length of response is 1, was %+v", len(resp))
+	}
+	if err != nil {
+		t.Errorf("r.Get returned non nil error, was %+v", err)
+	}
+
+	fare := &Fare{
+		Currency: "USD",
+		Text:     "$1.25",
+		Value:    1.25,
+	}
+
+	if !reflect.DeepEqual(resp[0].Fare, fare) {
+		t.Errorf("expected %+v, was %+v", fare, resp[0].Fare)
+	}
+}
+
+func TestNoFare(t *testing.T) {
+	// Directions response, sans steps.
+	response := `{
+   "geocoded_waypoints" : [
+      {
+         "geocoder_status" : "OK",
+         "place_id" : "ChIJt4ABNBBfrIkRXFPZnsnIicw",
+         "types" : [ "street_address" ]
+      },
+      {
+         "geocoder_status" : "OK",
+         "place_id" : "EjExMDAxLTExOTkgSGlsbHNib3JvdWdoIFN0LCBSYWxlaWdoLCBOQyAyNzYwMywgVVNB",
+         "types" : [ "street_address" ]
+      }
+   ],
+   "routes" : [
+      {
+         "bounds" : {
+            "northeast" : {
+               "lat" : 35.782453,
+               "lng" : -78.625349
+            },
+            "southwest" : {
+               "lat" : 35.7766535,
+               "lng" : -78.6548689
+            }
+         },
+         "copyrights" : "Map data ©2016 Google",
+         "legs" : [
+            {
+               "arrival_time" : {
+                  "text" : "8:23am",
+                  "time_zone" : "America/New_York",
+                  "value" : 1476620634
+               },
+               "departure_time" : {
+                  "text" : "8:01am",
+                  "time_zone" : "America/New_York",
+                  "value" : 1476619311
+               },
+               "distance" : {
+                  "text" : "2.1 mi",
+                  "value" : 3408
+               },
+               "duration" : {
+                  "text" : "22 mins",
+                  "value" : 1323
+               },
+               "end_address" : "1001-1199 Hillsborough St, Raleigh, NC 27603, USA",
+               "end_location" : {
+                  "lat" : 35.782453,
+                  "lng" : -78.6548689
+               },
+               "start_address" : "822 E Hargett St, Raleigh, NC 27601, USA",
+               "start_location" : {
+                  "lat" : 35.7777912,
+                  "lng" : -78.625349
+               },
+               "traffic_speed_entry" : [],
+               "via_waypoint" : []
+            }
+         ],
+         "summary" : "",
+         "warnings" : [
+            "Walking directions are in beta.    Use caution – This route may be missing sidewalks or pedestrian paths."
+         ],
+         "waypoint_order" : []
+      }
+   ],
+   "status" : "OK"
+}`
+
+	server := mockServer(200, response)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
+	r := &DirectionsRequest{
+		Origin:      "35.7777111, -78.625354",
+		Destination: "35.7826242, -78.6547025",
+		Mode:        TravelModeTransit,
+	}
+
+	resp, _, err := c.Directions(context.Background(), r)
+
+	if len(resp) != 1 {
+		t.Errorf("Expected length of response is 1, was %+v", len(resp))
+	}
+	if err != nil {
+		t.Errorf("r.Get returned non nil error, was %+v", err)
+	}
+
+	if resp[0].Fare != nil {
+		t.Errorf("expected %+v, was %+v", nil, resp[0].Fare)
+	}
+}
