@@ -194,7 +194,7 @@ type Route struct {
 	// Fare contains the total fare (that is, the total ticket costs) on this route. This property
 	// is only returned for transit requests and only for routes where fare information is available
 	// for all transit legs.
-	Fare Fare `json:"fare"`
+	*Fare `json:"fare"`
 }
 
 // Fare represents the total fare for a route.
