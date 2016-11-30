@@ -15,6 +15,7 @@
 package maps
 
 import (
+	"net/url"
 	"reflect"
 	"testing"
 
@@ -575,5 +576,30 @@ func TestReverseGeocodingPlaceID(t *testing.T) {
 
 	if !reflect.DeepEqual(resp[0], correctResponse) {
 		t.Errorf("expected %+v, was %+v", correctResponse, resp[0])
+	}
+}
+
+func TestCustomPassThroughGeocodingURL(t *testing.T) {
+	expectedQuery := "address=1600+Amphitheatre+Parkway%2C+Mountain+View%2C+CA&key=AIzaNotReallyAnAPIKey&new_forward_geocoder=true"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+	custom := make(url.Values)
+	custom["new_forward_geocoder"] = []string{"true"}
+
+	r := &GeocodingRequest{
+		Address: "1600 Amphitheatre Parkway, Mountain View, CA",
+		Custom:  custom,
+	}
+
+	_, err := c.Geocode(context.Background(), r)
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }
