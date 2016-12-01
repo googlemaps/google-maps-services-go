@@ -80,6 +80,10 @@ func (c *Client) ReverseGeocode(ctx context.Context, r *GeocodingRequest) ([]Geo
 func (r *GeocodingRequest) params() url.Values {
 	q := make(url.Values)
 
+	for k, v := range r.Custom {
+		q[k] = v
+	}
+
 	if r.Address != "" {
 		q.Set("address", r.Address)
 	}
@@ -161,6 +165,11 @@ type GeocodingRequest struct {
 
 	// Language is the language in which to return results. Optional.
 	Language string
+
+	// Custom allows passing through custom parameters to the Geocoding back end. Use with caution.
+	// For more detail on why this is required, please see
+	// https://googlegeodevelopers.blogspot.com/2016/11/address-geocoding-in-google-maps-apis.html
+	Custom url.Values
 }
 
 // GeocodingResult is a single geocoded address
