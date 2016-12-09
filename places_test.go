@@ -444,7 +444,7 @@ func TestPlaceAutocompleteMinimalRequestURL(t *testing.T) {
 }
 
 func TestPlaceAutocompleteMaximalRequestURL(t *testing.T) {
-	expectedQuery := "components=country%3AES&input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&offset=5&radius=10000&type=airport"
+	expectedQuery := "components=country%3AES&input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&offset=5&radius=10000&types=geocode"
 
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
@@ -452,7 +452,7 @@ func TestPlaceAutocompleteMaximalRequestURL(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	c.baseURL = server.s.URL
 
-	placeType, err := ParsePlaceType("airport")
+	placeType, err := ParseAutocompletePlaceType("geocode")
 	if err != nil {
 		t.Errorf("Unexpected error in parsing place type: %v", err)
 	}
@@ -463,7 +463,7 @@ func TestPlaceAutocompleteMaximalRequestURL(t *testing.T) {
 		Location:   &LatLng{1.0, 2.0},
 		Radius:     10000,
 		Language:   "es",
-		Type:       placeType,
+		Types:      placeType,
 		Components: map[Component]string{ComponentCountry: "ES"},
 	}
 

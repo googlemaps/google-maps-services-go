@@ -675,8 +675,8 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 		q.Set("language", r.Language)
 	}
 
-	if r.Type != "" {
-		q.Set("type", string(r.Type))
+	if r.Types != "" {
+		q.Set("types", string(r.Types))
 	}
 
 	var cf []string
@@ -703,7 +703,7 @@ type PlaceAutocompleteRequest struct {
 	// Language is the language in which to return results.
 	Language string
 	// Type restricts the results to places matching the specified type.
-	Type PlaceType
+	Types AutocompletePlaceType
 	// Components is a grouping of places to which you would like to restrict your results. Currently, you can use components to filter by country.
 	Components map[Component]string
 }
