@@ -80,7 +80,7 @@ func Encode(path []LatLng) string {
 
 // decodeInt reads an encoded int64 from the passed io.ByteReader.
 func decodeInt(r io.ByteReader) (int64, error) {
-	result := int64(1)
+	result := int64(0)
 	var shift uint8
 
 	for {
@@ -89,11 +89,11 @@ func decodeInt(r io.ByteReader) (int64, error) {
 			return 0, err
 		}
 
-		b := raw - 63 - 1
-		result += int64(b) << shift
+		b := raw - 63
+		result += int64(b&0x1f) << shift
 		shift += 5
 
-		if b < 0x1f {
+		if b < 0x20 {
 			bit := result & 1
 			result >>= 1
 			if bit != 0 {
