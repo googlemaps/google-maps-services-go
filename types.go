@@ -478,3 +478,32 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceType("Unknown PlaceType"), fmt.Errorf("Unknown PlaceType \"%v\"", placeType)
 	}
 }
+
+// AutocompletePlaceType restricts Place Autocomplete API to the results to places matching the specified type.
+type AutocompletePlaceType string
+
+// https://developers.google.com/places/web-service/autocomplete#place_types
+const (
+	AutocompletePlaceTypeGeocode       = AutocompletePlaceType("geocode")
+	AutocompletePlaceTypeAddress       = AutocompletePlaceType("address")
+	AutocompletePlaceTypeEstablishment = AutocompletePlaceType("establishment")
+	AutocompletePlaceTypeRegions       = AutocompletePlaceType("(regions)")
+	AutocompletePlaceTypeCities        = AutocompletePlaceType("(cities)")
+)
+
+func ParseAutocompletePlaceType(placeType string) (AutocompletePlaceType, error) {
+	switch strings.ToLower(placeType) {
+	case "geocode":
+		return AutocompletePlaceTypeGeocode, nil
+	case "address":
+		return AutocompletePlaceTypeAddress, nil
+	case "establishment":
+		return AutocompletePlaceTypeEstablishment, nil
+	case "(regions)":
+		return AutocompletePlaceTypeRegions, nil
+	case "(cities)":
+		return AutocompletePlaceTypeCities, nil
+	default:
+		return AutocompletePlaceType("Unknown AutocompletePlaceType"), fmt.Errorf("Unknown AutocompletePlaceType \"%v\"", placeType)
+	}
+}
