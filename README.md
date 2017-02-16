@@ -136,9 +136,9 @@ package main
 import (
 	"log"
 
-        "googlemaps.github.io/maps"
-        "github.com/kr/pretty"
-        "golang.org/x/net/context"
+	"googlemaps.github.io/maps"
+	"github.com/kr/pretty"
+	"golang.org/x/net/context"
 )
 
 func main() {
