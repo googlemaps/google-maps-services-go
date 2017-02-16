@@ -453,8 +453,10 @@ type PlaceDetailsRequest struct {
 type PlaceDetailsResult struct {
 	// AddressComponents is an array of separate address components used to compose a given address.
 	AddressComponents []AddressComponent `json:"address_components"`
-	// FormattedAddress is the human-readable address of this place
+	// FormattedAddress is the human-readable address of this place.
 	FormattedAddress string `json:"formatted_address"`
+	// AdrAddress is the address in the "adr" microformat.
+	AdrAddress string `json:"adr_address"`
 	// FormattedPhoneNumber contains the place's phone number in its local format. For example, the formatted_phone_number for Google's Sydney, Australia office is (02) 9374 4000.
 	FormattedPhoneNumber string `json:"formatted_phone_number"`
 	// InternationalPhoneNumber contains the place's phone number in international format. International format includes the country code, and is prefixed with the plus (+) sign. For example, the international_phone_number for Google's Sydney, Australia office is +61 2 9374 4000.
