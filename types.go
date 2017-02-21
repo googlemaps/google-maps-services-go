@@ -109,13 +109,13 @@ const (
 // OpeningHours describes the opening hours for a Place Details result.
 type OpeningHours struct {
 	// OpenNow is a boolean value indicating if the place is open at the current time. Please note, this field will be null if it isn't present in the response.
-	OpenNow *bool `json:"open_now"`
+	OpenNow *bool `json:"open_now,omitempty"`
 	// Periods is an array of opening periods covering seven days, starting from Sunday, in chronological order.
-	Periods []OpeningHoursPeriod `json:"periods"`
+	Periods []OpeningHoursPeriod `json:"periods,omitempty"`
 	// weekdayText is an array of seven strings representing the formatted opening hours for each day of the week, for example "Monday: 8:30 am – 5:30 pm".
-	WeekdayText []string `json:"weekday_text"`
+	WeekdayText []string `json:"weekday_text,omitempty"`
 	// PermanentlyClosed indicates that the place has permanently shut down. Please note, this field will be null if it isn't present in the response.
-	PermanentlyClosed *bool `json:"permanently_closed"`
+	PermanentlyClosed *bool `json:"permanently_closed,omitempty"`
 }
 
 // OpeningHoursPeriod is a single OpeningHours day describing when the place opens and closes.
