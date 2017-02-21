@@ -361,41 +361,41 @@ type PlacesSearchResponse struct {
 // PlacesSearchResult is an individual Places API search result
 type PlacesSearchResult struct {
 	// FormattedAddress is the human-readable address of this place
-	FormattedAddress string `json:"formatted_address"`
+	FormattedAddress string `json:"formatted_address,omitempty"`
 	// Geometry contains geometry information about the result, generally including the location (geocode) of the place and (optionally) the viewport identifying its general area of coverage.
-	Geometry AddressGeometry `json:"geometry"`
+	Geometry AddressGeometry `json:"geometry,omitempty"`
 	// Name contains the human-readable name for the returned result. For establishment results, this is usually the business name.
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 	// Icon contains the URL of a recommended icon which may be displayed to the user when indicating this result.
-	Icon string `json:"icon"`
+	Icon string `json:"icon,omitempty"`
 	// PlaceID is a textual identifier that uniquely identifies a place.
-	PlaceID string `json:"place_id"`
+	PlaceID string `json:"place_id,omitempty"`
 	// Scope indicates the scope of the PlaceID.
-	Scope string `json:"scope"`
+	Scope string `json:"scope,omitempty"`
 	// Rating contains the place's rating, from 1.0 to 5.0, based on aggregated user reviews.
-	Rating float32 `json:"rating"`
+	Rating float32 `json:"rating,omitempty"`
 	// Types contains an array of feature types describing the given result.
-	Types []string `json:"types"`
+	Types []string `json:"types,omitempty"`
 	// OpeningHours may contain whether the place is open now or not.
-	OpeningHours *OpeningHours `json:"opening_hours"`
+	OpeningHours *OpeningHours `json:"opening_hours,omitempty"`
 	// Photos is an array of photo objects, each containing a reference to an image.
-	Photos []Photo `json:"photos"`
+	Photos []Photo `json:"photos,omitempty"`
 	// AltIDs — An array of zero, one or more alternative place IDs for the place, with a scope related to each alternative ID.
-	AltIDs []AltID `json:"alt_ids"`
+	AltIDs []AltID `json:"alt_ids,omitempty"`
 	// PriceLevel is the price level of the place, on a scale of 0 to 4.
-	PriceLevel int `json:"price_level"`
+	PriceLevel int `json:"price_level,omitempty"`
 	// Vicinity contains a feature name of a nearby location.
-	Vicinity string `json:"vicinity"`
+	Vicinity string `json:"vicinity,omitempty"`
 	// PermanentlyClosed is a boolean flag indicating whether the place has permanently shut down.
-	PermanentlyClosed bool `json:"permanently_closed"`
+	PermanentlyClosed bool `json:"permanently_closed,omitempty"`
 }
 
 // AltID is the alternative place IDs for a place.
 type AltID struct {
 	// PlaceID is the APP scoped Place ID that you received when you initially created this Place, before it was given a Google wide Place ID.
-	PlaceID string `json:"place_id"`
+	PlaceID string `json:"place_id,omitempty"`
 	// Scope is the scope of this alternative place ID. It will always be APP, indicating that the alternative place ID is recognised by your application only.
-	Scope string `json:"scope"`
+	Scope string `json:"scope,omitempty"`
 }
 
 var placeDetailsAPI = &apiConfig{
