@@ -192,6 +192,7 @@ type AddressComponent struct {
 type AddressGeometry struct {
 	Location     LatLng       `json:"location"`
 	LocationType string       `json:"location_type"`
+	Bounds       LatLngBounds `json:"bounds"`
 	Viewport     LatLngBounds `json:"viewport"`
 	Types        []string     `json:"types"`
 }
