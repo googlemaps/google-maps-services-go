@@ -87,6 +87,16 @@ func TestGeocodingGoogleHQ(t *testing.T) {
                     "lat": 37.4224764,
                     "lng": -122.0842499
                 },
+                "bounds": {
+                    "northeast": {
+                        "lat": 37.4238253802915,
+                        "lng": -122.0829009197085
+                    },
+                    "southwest": {
+                        "lat": 37.4211274197085,
+                        "lng": -122.0855988802915
+                    }
+                },
                 "location_type": "ROOFTOP",
                 "viewport": {
                     "northeast": {
@@ -166,6 +176,10 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 		FormattedAddress: "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
 		Geometry: AddressGeometry{
 			Location:     LatLng{Lat: 37.4224764, Lng: -122.0842499},
+			Bounds: LatLngBounds{
+				NorthEast: LatLng{Lat: 37.4238253802915, Lng: -122.0829009197085},
+				SouthWest: LatLng{Lat: 37.4211274197085, Lng: -122.0855988802915},
+			},
 			LocationType: "ROOFTOP",
 			Viewport: LatLngBounds{
 				NorthEast: LatLng{Lat: 37.4238253802915, Lng: -122.0829009197085},
@@ -256,6 +270,16 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
                     "lat": 40.714232,
                     "lng": -73.9612889
                 },
+                "bounds": {
+                    "northeast": {
+                        "lat": 40.7155809802915,
+                        "lng": -73.9599399197085
+                    },
+                    "southwest": {
+                        "lat": 40.7128830197085,
+                        "lng": -73.96263788029151
+                    }
+                },
                 "location_type": "ROOFTOP",
                 "viewport": {
                     "northeast": {
@@ -340,6 +364,10 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 		FormattedAddress: "277 Bedford Avenue, Brooklyn, NY 11211, USA",
 		Geometry: AddressGeometry{
 			Location:     LatLng{Lat: 40.714232, Lng: -73.9612889},
+			Bounds: LatLngBounds{
+				NorthEast: LatLng{Lat: 40.7155809802915, Lng: -73.9599399197085},
+				SouthWest: LatLng{Lat: 40.7128830197085, Lng: -73.96263788029151},
+			},
 			LocationType: "ROOFTOP",
 			Viewport: LatLngBounds{
 				NorthEast: LatLng{Lat: 40.7155809802915, Lng: -73.9599399197085},
