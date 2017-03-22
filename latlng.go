@@ -57,7 +57,7 @@ func ParseLatLngList(locations string) ([]LatLng, error) {
 }
 
 func (l *LatLng) String() string {
-	return fmt.Sprintf("%g,%g", l.Lat, l.Lng)
+	return fmt.Sprintf("%f,%f", l.Lat, l.Lng)
 }
 
 // AlmostEqual returns whether this LatLng is almost equal (below epsilon) to
