@@ -15,7 +15,6 @@
 package maps
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 	"strings"
