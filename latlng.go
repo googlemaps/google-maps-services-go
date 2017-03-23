@@ -15,7 +15,6 @@
 package maps
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -57,7 +56,9 @@ func ParseLatLngList(locations string) ([]LatLng, error) {
 }
 
 func (l *LatLng) String() string {
-	return fmt.Sprintf("%g,%g", l.Lat, l.Lng)
+	return strconv.FormatFloat(l.Lat, 'f', -1, 64) +
+		"," +
+		strconv.FormatFloat(l.Lng, 'f', -1, 64)
 }
 
 // AlmostEqual returns whether this LatLng is almost equal (below epsilon) to
