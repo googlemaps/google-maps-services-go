@@ -15,6 +15,7 @@
 package maps
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -159,8 +160,49 @@ func (c *Client) get(ctx context.Context, config *apiConfig, apiReq apiRequest) 
 	return ctxhttp.Do(ctx, c.httpClient, req)
 }
 
+func (c *Client) post(ctx context.Context, config *apiConfig, apiReq interface{}) (*http.Response, error) {
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case <-c.rateLimiter:
+		// Execute request.
+	}
+
+	host := config.host
+	if c.baseURL != "" {
+		host = c.baseURL
+	}
+
+	body, err := json.Marshal(apiReq)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest("POST", host+config.path, bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	q, err := c.generateAuthQuery(config.path, url.Values{}, config.acceptsClientID)
+	if err != nil {
+		return nil, err
+	}
+
+	req.URL.RawQuery = q
+	return ctxhttp.Do(ctx, c.httpClient, req)
+}
+
 func (c *Client) getJSON(ctx context.Context, config *apiConfig, apiReq apiRequest, resp interface{}) error {
 	httpResp, err := c.get(ctx, config, apiReq)
+	if err != nil {
+		return err
+	}
+	defer httpResp.Body.Close()
+
+	return json.NewDecoder(httpResp.Body).Decode(resp)
+}
+
+func (c *Client) postJSON(ctx context.Context, config *apiConfig, apiReq interface{}, resp interface{}) error {
+	httpResp, err := c.post(ctx, config, apiReq)
 	if err != nil {
 		return err
 	}
