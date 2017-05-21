@@ -18,7 +18,7 @@
 package maps
 
 import (
-	"context"
+	"golang.org/x/net/context"
 	"reflect"
 	"testing"
 )
