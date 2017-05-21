@@ -110,11 +110,16 @@ type GeolocationResult struct {
 
 // GeolocationError is an error object reporting a request error
 type GeolocationError struct {
+	// Errors lists errors that occurred
 	Errors []struct {
-		Domain  string
-		Reason  string
+		Domain string
+		// Reason is an identifier for the error
+		Reason string
+		// Message is a short description of the error
 		Message string
 	}
-	Code    int
+	// Code is the error code (same as HTTP response)
+	Code int
+	// Message is a short description of the error
 	Message string
 }
