@@ -175,7 +175,7 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 		},
 		FormattedAddress: "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
 		Geometry: AddressGeometry{
-			Location:     LatLng{Lat: 37.4224764, Lng: -122.0842499},
+			Location: LatLng{Lat: 37.4224764, Lng: -122.0842499},
 			Bounds: LatLngBounds{
 				NorthEast: LatLng{Lat: 37.4238253802915, Lng: -122.0829009197085},
 				SouthWest: LatLng{Lat: 37.4211274197085, Lng: -122.0855988802915},
@@ -363,7 +363,7 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 		},
 		FormattedAddress: "277 Bedford Avenue, Brooklyn, NY 11211, USA",
 		Geometry: AddressGeometry{
-			Location:     LatLng{Lat: 40.714232, Lng: -73.9612889},
+			Location: LatLng{Lat: 40.714232, Lng: -73.9612889},
 			Bounds: LatLngBounds{
 				NorthEast: LatLng{Lat: 40.7155809802915, Lng: -73.9599399197085},
 				SouthWest: LatLng{Lat: 40.7128830197085, Lng: -73.96263788029151},
