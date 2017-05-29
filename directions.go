@@ -87,6 +87,9 @@ func (r *DirectionsRequest) params() url.Values {
 	if r.Alternatives {
 		q.Set("alternatives", "true")
 	}
+	if r.Optimize {
+		q.Set("optimize", "true")
+	}
 	if len(r.Avoid) > 0 {
 		var avoid []string
 		for _, a := range r.Avoid {
@@ -135,6 +138,8 @@ type DirectionsRequest struct {
 	Waypoints []string
 	// Alternatives specifies if Directions service may provide more than one route alternative in the response. Optional.
 	Alternatives bool
+	// Optimize allow the Directions service to optimize the provided route by rearranging the waypoints in a more efficient order. Optional.
+	Optimize bool
 	// Avoid indicates that the calculated route(s) should avoid the indicated features. Optional.
 	Avoid []Avoid
 	// Language specifies the language in which to return results. Optional.
