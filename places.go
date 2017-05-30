@@ -609,6 +609,8 @@ type AutocompletePrediction struct {
 	MatchedSubstrings []AutocompleteMatchedSubstring `json:"matched_substrings,omitempty"`
 	// Terms contains an array of terms identifying each section of the returned description (a section of the description is generally terminated with a comma).
 	Terms []AutocompleteTermOffset `json:"terms,omitempty"`
+	// StructuredFormatting contains the main and secondary text of a prediction
+	StructuredFormatting AutocompleteStructuredFormatting `json:"structured_formatting,omitempty"`
 }
 
 // AutocompleteMatchedSubstring describes the location of the entered term in the prediction result text, so that the term can be highlighted if desired.
@@ -625,6 +627,13 @@ type AutocompleteTermOffset struct {
 	Value string `json:"value,omitempty"`
 	// Offset defines the start position of this term in the description, measured in Unicode characters.
 	Offset int `json:"offset"`
+}
+
+// AutocompleteStructuredFormatting contains the main and secondary text of an autocomplete prediction
+type AutocompleteStructuredFormatting struct {
+	MainText string `json:"main_text,omitempty"`
+	MainTextMatchedSubstrings []AutocompleteMatchedSubstring `json:"main_text_matched_substrings,omitempty"`
+	SecondaryText string `json:"secondary_text,omitempty"`
 }
 
 var placesPlaceAutocompleteAPI = &apiConfig{
