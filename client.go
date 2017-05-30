@@ -60,21 +60,23 @@ func NewClient(options ...ClientOption) (*Client, error) {
 		return nil, errors.New("maps: API Key or Maps for Work credentials missing")
 	}
 
-	// Implement a bursty rate limiter.
-	// Allow up to 1 second worth of requests to be made at once.
-	c.rateLimiter = make(chan int, c.requestsPerSecond)
-	// Prefill rateLimiter with 1 seconds worth of requests.
-	for i := 0; i < c.requestsPerSecond; i++ {
-		c.rateLimiter <- 1
-	}
-	go func() {
-		// Wait a second for pre-filled quota to drain
-		time.Sleep(time.Second)
-		// Then, refill rateLimiter continuously
-		for _ = range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
+	if c.requestsPerSecond > 0 {
+		// Implement a bursty rate limiter.
+		// Allow up to 1 second worth of requests to be made at once.
+		c.rateLimiter = make(chan int, c.requestsPerSecond)
+		// Prefill rateLimiter with 1 seconds worth of requests.
+		for i := 0; i < c.requestsPerSecond; i++ {
 			c.rateLimiter <- 1
 		}
-	}()
+		go func() {
+			// Wait a second for pre-filled quota to drain
+			time.Sleep(time.Second)
+			// Then, refill rateLimiter continuously
+			for _ = range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
+				c.rateLimiter <- 1
+			}
+		}()
+	}
 
 	return c, nil
 }
@@ -117,8 +119,8 @@ func WithClientIDAndSignature(clientID, signature string) ClientOption {
 	}
 }
 
-// WithRateLimit configures the rate limit for back end requests.
-// Default is to limit to 10 requests per second.
+// WithRateLimit configures the rate limit for back end requests. Default is to
+// limit to 10 requests per second. A value of zero disables rate limiting.
 func WithRateLimit(requestsPerSecond int) ClientOption {
 	return func(c *Client) error {
 		c.requestsPerSecond = requestsPerSecond
@@ -136,12 +138,22 @@ type apiRequest interface {
 	params() url.Values
 }
 
-func (c *Client) get(ctx context.Context, config *apiConfig, apiReq apiRequest) (*http.Response, error) {
+func (c *Client) awaitRateLimiter(ctx context.Context) error {
+	if c.rateLimiter == nil {
+		return nil
+	}
 	select {
 	case <-ctx.Done():
-		return nil, ctx.Err()
+		return ctx.Err()
 	case <-c.rateLimiter:
 		// Execute request.
+		return nil
+	}
+}
+
+func (c *Client) get(ctx context.Context, config *apiConfig, apiReq apiRequest) (*http.Response, error) {
+	if err := c.awaitRateLimiter(ctx); err != nil {
+		return nil, err
 	}
 
 	host := config.host
@@ -161,11 +173,8 @@ func (c *Client) get(ctx context.Context, config *apiConfig, apiReq apiRequest) 
 }
 
 func (c *Client) post(ctx context.Context, config *apiConfig, apiReq interface{}) (*http.Response, error) {
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	case <-c.rateLimiter:
-		// Execute request.
+	if err := c.awaitRateLimiter(ctx); err != nil {
+		return nil, err
 	}
 
 	host := config.host
