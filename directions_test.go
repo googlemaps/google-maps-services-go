@@ -431,7 +431,7 @@ func TestDirectionsFailingServer(t *testing.T) {
 }
 
 func TestDirectionsRequestURL(t *testing.T) {
-	expectedQuery := "alternatives=true&avoid=tolls%7Cferries&destination=Parramatta&key=AIzaNotReallyAnAPIKey&language=es&mode=transit&origin=Sydney&region=es&transit_mode=rail&transit_routing_preference=fewer_transfers&units=imperial&waypoints=Charlestown%2CMA%7Cvia%3ALexington"
+	expectedQuery := "alternatives=true&avoid=tolls%7Cferries&destination=Parramatta&key=AIzaNotReallyAnAPIKey&language=es&mode=transit&optimize=true&origin=Sydney&region=es&transit_mode=rail&transit_routing_preference=fewer_transfers&units=imperial&waypoints=Charlestown%2CMA%7Cvia%3ALexington"
 
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
@@ -446,6 +446,7 @@ func TestDirectionsRequestURL(t *testing.T) {
 		TransitMode:  []TransitMode{TransitModeRail},
 		Waypoints:    []string{"Charlestown,MA", "via:Lexington"},
 		Alternatives: true,
+		Optimize:     true,
 		Avoid:        []Avoid{AvoidTolls, AvoidFerries},
 		Language:     "es",
 		Region:       "es",
