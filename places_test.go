@@ -493,6 +493,93 @@ func TestPlaceAutocompleteMissingInput(t *testing.T) {
 	}
 }
 
+func TestPlaceAutocompleteWithStructuredFormatting(t *testing.T) {
+	response := `
+{
+  "predictions": [
+    {
+      "description": "Theater de Meervaart, Meer en Vaart, Amsterdam, Netherlands",
+      "id": "2d13bd84619a4cc5f9bf0b20f093b841a1403fcd",
+      "matched_substrings": [
+        {
+          "length": 20,
+          "offset": 0
+        }
+      ],
+      "place_id": "ChIJVwucBNLjxUcRXzGhUau_gBw",
+      "reference": "ClRJAAAAq5qHSaGPrUhUH3LyKrLYmg280v2TYXUCD5h7_m0YGw3Y8Mj1h1bffMyG7CBFlAN17V8kKkzeXwXO94v5513ErtXHVYKnJ9pNg4S7HtGUqEwSECL5WbMbXSbeRs_H2B91qHcaFEbgpLF1aftugYKgJTIupUwYsEbl",
+      "structured_formatting": {
+        "main_text": "Theater de Meervaart",
+        "main_text_matched_substrings": [
+          {
+            "length": 20,
+            "offset": 0
+          }
+        ],
+        "secondary_text": "Meer en Vaart, Amsterdam, Netherlands"
+      },
+      "terms": [
+        {
+          "offset": 0,
+          "value": "Theater de Meervaart"
+        },
+        {
+          "offset": 22,
+          "value": "Meer en Vaart"
+        },
+        {
+          "offset": 37,
+          "value": "Amsterdam"
+        },
+        {
+          "offset": 48,
+          "value": "Netherlands"
+        }
+      ],
+      "types": [
+        "establishment"
+      ]
+    }
+  ],
+  "status": "OK"
+}`
+	server := mockServer(200, response)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
+	r := &PlaceAutocompleteRequest{
+		Input: "Theater de Meervaart",
+		Types: AutocompletePlaceType("establishment"),
+	}
+
+	resp, err := c.PlaceAutocomplete(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("r.Get returned non nil error: %v", err)
+		return
+	}
+
+	mainText := "Theater de Meervaart"
+	if mainText != resp.Predictions[0].StructuredFormatting.MainText {
+		t.Errorf("expected %+v, was %+v", mainText, resp.Predictions[0].StructuredFormatting.MainText)
+	}
+
+	secondaryText := "Meer en Vaart, Amsterdam, Netherlands"
+	if secondaryText != resp.Predictions[0].StructuredFormatting.SecondaryText {
+		t.Errorf("expected %+v, was %+v", mainText, resp.Predictions[0].StructuredFormatting.SecondaryText)
+	}
+
+	mainTextSubstringLength := 20
+	if mainTextSubstringLength != resp.Predictions[0].StructuredFormatting.MainTextMatchedSubstrings[0].Length {
+		t.Errorf("expected %+v, was %+v", mainTextSubstringLength, resp.Predictions[0].StructuredFormatting.MainTextMatchedSubstrings[0].Length)
+	}
+
+	mainTextSubstringOffset := 0
+	if mainTextSubstringOffset != resp.Predictions[0].StructuredFormatting.MainTextMatchedSubstrings[0].Offset {
+		t.Errorf("expected %+v, was %+v", mainTextSubstringLength, resp.Predictions[0].StructuredFormatting.MainTextMatchedSubstrings[0].Offset)
+	}
+}
+
 func TestRadarSearchMinimalRequestURL(t *testing.T) {
 	expectedQuery := "key=AIzaNotReallyAnAPIKey&keyword=Pub&location=1%2C2&radius=5000"
 
