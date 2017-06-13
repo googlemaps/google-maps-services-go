@@ -115,7 +115,7 @@ func TestCellTowerAndWiFiRequest(t *testing.T) {
 
 	failResponse := func(reason string, w http.ResponseWriter, r *http.Request) {
 		server.failed = append(server.failed, r.URL.RawQuery)
-		s := fmt.Sprintf("{\"status\":\"fail\", \"message\": \"%s\"}", reason)
+		s := fmt.Sprintf(`{"status":"fail", "message": "%s"}`, reason)
 		http.Error(w, s, 999)
 	}
 
@@ -127,20 +127,20 @@ func TestCellTowerAndWiFiRequest(t *testing.T) {
 			return
 		}
 		body := string(b)
-		expected := "{\"homeMobileCountryCode\":310," +
-			"\"homeMobileNetworkCode\":410," +
-			"\"radioType\":\"gsm\"," +
-			"\"carrier\":\"Vodafone\"," +
-			"\"considerIp\":true," +
-			"\"cellTowers\":[{\"cellId\":42," +
-			"\"locationAreaCode\":415," +
-			"\"mobileCountryCode\":310," +
-			"\"mobileNetworkCode\":410," +
-			"\"signalStrength\":-60," +
-			"\"timingAdvance\":15}]," +
-			"\"wifiAccessPoints\":[{\"macAddress\":\"00:25:9c:cf:1c:ac\"," +
-			"\"signalStrength\":-43," +
-			"\"channel\":11}]}"
+		expected := `{"homeMobileCountryCode":310,` +
+			`"homeMobileNetworkCode":410,` +
+			`"radioType":"gsm",` +
+			`"carrier":"Vodafone",` +
+			`"considerIp":true,` +
+			`"cellTowers":[{"cellId":42,` +
+			`"locationAreaCode":415,` +
+			`"mobileCountryCode":310,` +
+			`"mobileNetworkCode":410,` +
+			`"signalStrength":-60,` +
+			`"timingAdvance":15}],` +
+			`"wifiAccessPoints":[{"macAddress":"00:25:9c:cf:1c:ac",` +
+			`"signalStrength":-43,` +
+			`"channel":11}]}`
 		if body != expected {
 			pretty.Errorf("Body is incorrect: %v", body)
 			failResponse("failed to parse body", w, r)
