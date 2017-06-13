@@ -631,9 +631,9 @@ type AutocompleteTermOffset struct {
 
 // AutocompleteStructuredFormatting contains the main and secondary text of an autocomplete prediction
 type AutocompleteStructuredFormatting struct {
-	MainText string `json:"main_text,omitempty"`
+	MainText                  string                         `json:"main_text,omitempty"`
 	MainTextMatchedSubstrings []AutocompleteMatchedSubstring `json:"main_text_matched_substrings,omitempty"`
-	SecondaryText string `json:"secondary_text,omitempty"`
+	SecondaryText             string                         `json:"secondary_text,omitempty"`
 }
 
 var placesPlaceAutocompleteAPI = &apiConfig{
