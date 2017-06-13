@@ -19,6 +19,7 @@ package maps
 
 import (
 	"fmt"
+
 	"golang.org/x/net/context"
 )
 
@@ -58,13 +59,19 @@ const (
 // CellTower is a cell tower object for localisation requests
 type CellTower struct {
 	// CellID Unique identifier of the cell
-	CellID string `json:"cellId,omitempty"`
+	CellID int `json:"cellId,omitempty"`
 	// LocationAreaCode is the Location Area Code (LAC) for GSM and WCDMAnetworks. The Network ID (NID) for CDMA networks.
-	LocationAreaCode string `json:"locatonAreaCode,omitempty"`
+	LocationAreaCode int `json:"locationAreaCode,omitempty"`
 	// MobileCountryCode is the cell tower's Mobile Country Code (MCC).
-	MobileCountryCode string `json:"mobileCountryCode,omitempty"`
+	MobileCountryCode int `json:"mobileCountryCode,omitempty"`
 	// MobileNetworkCode is the cell tower's Mobile Network Code. This is the MNC for GSM and WCDMA; CDMA uses the System ID (SID).
-	MobileNetworkCode string `json:"mobileNetworkCode,omitempty"`
+	MobileNetworkCode int `json:"mobileNetworkCode,omitempty"`
+	// Age is the number of milliseconds since this cell was primary. If age is 0, the cellId represents a current measurement.
+	Age int `json:"age,omitempty"`
+	// SignalStrength is the radio signal strength measured in dBm.
+	SignalStrength int `json:"signalStrength,omitempty"`
+	// TimingAdvance is the timing advance value. Please see https://en.wikipedia.org/wiki/Timing_advance for more detail.
+	TimingAdvance int `json:"timingAdvance,omitempty"`
 }
 
 // WiFiAccessPoint is a WiFi access point object for localisation requests
@@ -85,9 +92,9 @@ type WiFiAccessPoint struct {
 // All fields are optional
 type GeolocationRequest struct {
 	// HomeMobileCountryCode is the mobile country code (MCC) for the device's home network.
-	HomeMobileCountryCode string `json:"homeMobileCountryCode,omitempty"`
+	HomeMobileCountryCode int `json:"homeMobileCountryCode,omitempty"`
 	// HomeMobileNetworkCode is the mobile network code (MNC) for the device's home network.
-	HomeMobileNetworkCode string `json:"homeMobileNetworkCode,omitempty"`
+	HomeMobileNetworkCode int `json:"homeMobileNetworkCode,omitempty"`
 	// RadioType is the mobile radio type, this is optional but should be included if available
 	RadioType RadioType `json:"radioType,omitempty"`
 	// Carrier is the carrier name

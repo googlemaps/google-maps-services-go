@@ -18,14 +18,20 @@
 package maps
 
 import (
-	"golang.org/x/net/context"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"github.com/kr/pretty"
+	"golang.org/x/net/context"
 )
 
 func TestGeolocation(t *testing.T) {
 
-	// Elevation of Denver, the mile high city
+	// Denver, the mile high city
 	response := `{
 		"location" : {
 			"lat" : 39.73915360,
@@ -60,7 +66,7 @@ func TestGeolocation(t *testing.T) {
 
 func TestGeolocationError(t *testing.T) {
 
-	// Elevation of Denver, the mile high city
+	// An error response
 	response := `{
 		"error": {
 			"errors": [
@@ -92,5 +98,103 @@ func TestGeolocationError(t *testing.T) {
 
 	if !reflect.DeepEqual(err.Error(), correctResponse) {
 		t.Errorf("expected %+v, was %+v", correctResponse, err)
+	}
+}
+
+func TestCellTowerAndWiFiRequest(t *testing.T) {
+	// Denver, the mile high city
+	response := `{
+		"location" : {
+			"lat" : 39.73915360,
+			"lng" : -104.98470340
+		},
+		"accuracy" : 4.771975994110107
+	}`
+
+	server := &countingServer{}
+
+	failResponse := func(reason string, w http.ResponseWriter, r *http.Request) {
+		server.failed = append(server.failed, r.URL.RawQuery)
+		s := fmt.Sprintf("{\"status\":\"fail\", \"message\": \"%s\"}", reason)
+		http.Error(w, s, 999)
+	}
+
+	server.s = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			failResponse("failed to read body", w, r)
+			return
+		}
+		body := string(b)
+		expected := "{\"homeMobileCountryCode\":310," +
+			"\"homeMobileNetworkCode\":410," +
+			"\"radioType\":\"gsm\"," +
+			"\"carrier\":\"Vodafone\"," +
+			"\"considerIp\":true," +
+			"\"cellTowers\":[{\"cellId\":42," +
+			"\"locationAreaCode\":415," +
+			"\"mobileCountryCode\":310," +
+			"\"mobileNetworkCode\":410," +
+			"\"signalStrength\":-60," +
+			"\"timingAdvance\":15}]," +
+			"\"wifiAccessPoints\":[{\"macAddress\":\"00:25:9c:cf:1c:ac\"," +
+			"\"signalStrength\":-43," +
+			"\"channel\":11}]}"
+		if body != expected {
+			pretty.Errorf("Body is incorrect: %v", body)
+			failResponse("failed to parse body", w, r)
+			return
+		}
+
+		server.successful++
+
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		fmt.Fprintln(w, response)
+	}))
+
+	defer server.s.Close()
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.s.URL
+	r := &GeolocationRequest{
+		HomeMobileCountryCode: 310,
+		HomeMobileNetworkCode: 410,
+		RadioType:             RadioTypeGSM,
+		Carrier:               "Vodafone",
+		ConsiderIP:            true,
+		CellTowers: []CellTower{CellTower{
+			CellID:            42,
+			LocationAreaCode:  415,
+			MobileCountryCode: 310,
+			MobileNetworkCode: 410,
+			Age:               0,
+			SignalStrength:    -60,
+			TimingAdvance:     15,
+		}},
+		WiFiAccessPoints: []WiFiAccessPoint{WiFiAccessPoint{
+			MACAddress:         "00:25:9c:cf:1c:ac",
+			SignalStrength:     -43,
+			Age:                0,
+			Channel:            11,
+			SignalToNoiseRatio: 0,
+		}},
+	}
+
+	resp, err := c.Geolocate(context.Background(), r)
+	if err != nil {
+		t.Errorf("r.Get returned non nil error, was %+v", err)
+	}
+
+	correctResponse := GeolocationResult{
+		Location: LatLng{
+			Lat: 39.73915360,
+			Lng: -104.98470340,
+		},
+		Accuracy: 4.771975994110107,
+	}
+
+	if !reflect.DeepEqual(*resp, correctResponse) {
+		t.Errorf("expected %+v, was %+v", correctResponse, resp)
 	}
 }
