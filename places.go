@@ -257,6 +257,8 @@ var placesRadarSearchAPI = &apiConfig{
 }
 
 // RadarSearch lets you search for places within a specified area. You can refine your search request by supplying keywords or specifying the type of place you are searching for.
+//
+// Deprecated: This functionality is deprecated and will stop working on June 30, 2018. See https://maps-apis.googleblog.com/2017/06/announcing-deprecation-of-place-add.html for more detail.
 func (c *Client) RadarSearch(ctx context.Context, r *RadarSearchRequest) (PlacesSearchResponse, error) {
 
 	if r.Location == nil {
@@ -328,7 +330,7 @@ func (r *RadarSearchRequest) params() url.Values {
 	return q
 }
 
-// RadarSearchRequest is the functional options struct for NearbySearch
+// RadarSearchRequest is the functional options struct for RadarSearch
 type RadarSearchRequest struct {
 	// Location is the latitude/longitude around which to retrieve place information. If you specify a location parameter, you must also specify a radius parameter.
 	Location *LatLng
