@@ -39,6 +39,7 @@ type Client struct {
 	signature         []byte
 	requestsPerSecond int
 	rateLimiter       chan int
+	channel           string
 }
 
 // ClientOption is the type of constructor options for NewClient(...).
@@ -101,6 +102,14 @@ func WithHTTPClient(c *http.Client) ClientOption {
 func WithAPIKey(apiKey string) ClientOption {
 	return func(c *Client) error {
 		c.apiKey = apiKey
+		return nil
+	}
+}
+
+// WithChannel configures a Maps API client with a Channel
+func WithChannel(channel string) ClientOption {
+	return func(c *Client) error {
+		c.channel = channel
 		return nil
 	}
 }
@@ -236,6 +245,9 @@ func (c *Client) getBinary(ctx context.Context, config *apiConfig, apiReq apiReq
 }
 
 func (c *Client) generateAuthQuery(path string, q url.Values, acceptClientID bool) (string, error) {
+	if c.channel != "" {
+		q.Set("channel", c.channel)
+	}
 	if c.apiKey != "" {
 		q.Set("key", c.apiKey)
 		return q.Encode(), nil
