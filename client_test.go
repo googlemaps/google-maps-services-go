@@ -15,13 +15,12 @@
 package maps
 
 import (
-	"net/http"
 	"testing"
 )
 
 func TestClientChannelIsConfigured(t *testing.T) {
 	_, err := NewClient(WithAPIKey("AIza-Maps-API-Key"), WithChannel("Test-Channel"))
-	if err {
+	if err != nil {
 		t.Errorf("Unable to create client with channel")
 	}
 }
