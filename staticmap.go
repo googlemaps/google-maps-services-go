@@ -1,13 +1,31 @@
+// Copyright 2017 Google Inc. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package maps
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
+	"image"
+	"io/ioutil"
 	"net/url"
 	"strconv"
 	"strings"
+
+	_ "image/jpeg" // Loaded for image decoder
+	_ "image/png"  // Loaded for image decoder
 )
 
 var staticMapAPI = &apiConfig{
@@ -174,6 +192,7 @@ func (p Path) String() string {
 
 //MapStyle defines a custom style to alter the presentation of a specific feature (roads, parks, and other features) of the map.
 type MapStyle struct {
+	// TODO(brettmorgan): Implement this.
 }
 
 //StaticMapRequest is the functional options struct for staticMap.Get
@@ -256,12 +275,29 @@ func (r *StaticMapRequest) params() url.Values {
 }
 
 //StaticMap make a StaticMap API request
-func (c *Client) StaticMap(ctx context.Context, r *StaticMapRequest) (*http.Response, error) {
+func (c *Client) StaticMap(ctx context.Context, r *StaticMapRequest) (image.Image, error) {
 	if len(r.Markers) == 0 && r.Center == "" && r.Zoom == 0 {
 		return nil, errors.New("maps: Center & Zoom required if Markers empty")
 	}
 	if r.Size == "" {
 		return nil, errors.New("maps: Size empty")
 	}
-	return c.get(ctx, staticMapAPI, r)
+
+	resp, err := c.get(ctx, staticMapAPI, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		if b, err := ioutil.ReadAll(resp.Body); err == nil {
+			return nil, fmt.Errorf("Static Map API returned: %s", string(b))
+		}
+		return nil, err
+	}
+
+	img, _, err := image.Decode(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return img, nil
 }
