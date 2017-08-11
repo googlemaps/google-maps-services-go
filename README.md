@@ -120,12 +120,12 @@ func main() {
 		Origin:      "Sydney",
 		Destination: "Perth",
 	}
-	resp, _, err := c.Directions(context.Background(), r)
+	route, _, err := c.Directions(context.Background(), r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
 
-	pretty.Println(resp)
+	pretty.Println(route)
 }
 ```
 
