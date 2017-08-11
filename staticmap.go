@@ -290,7 +290,7 @@ func (c *Client) StaticMap(ctx context.Context, r *StaticMapRequest) (image.Imag
 
 	if resp.StatusCode != 200 {
 		if b, err := ioutil.ReadAll(resp.Body); err == nil {
-			return nil, fmt.Errorf("Static Map API returned %d: %s", resp.StatusCode, string(b))
+			return nil, fmt.Errorf("Static Map API returned Status Code %d: %s", resp.StatusCode, string(b))
 		}
 		return nil, err
 	}
