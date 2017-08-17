@@ -15,7 +15,6 @@
 package maps
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"image"
@@ -26,6 +25,8 @@ import (
 
 	_ "image/jpeg" // Loaded for image decoder
 	_ "image/png"  // Loaded for image decoder
+
+	"golang.org/x/net/context"
 )
 
 var staticMapAPI = &apiConfig{
