@@ -65,7 +65,6 @@ func TestStaticMode(t *testing.T) {
 	}
 
 	resp, err := c.StaticMap(context.Background(), r)
-
 	if err != nil {
 		t.Errorf("r.StaticMap returned non nil error: %+v", err)
 	}
