@@ -30,8 +30,9 @@ import (
 )
 
 var staticMapAPI = &apiConfig{
-	host: "https://maps.googleapis.com",
-	path: "/maps/api/staticmap",
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/staticmap",
+	acceptsClientID: true,
 }
 
 //MapType (optional) defines the type of map to construct. There are several possible maptype values, including roadmap, satellite, hybrid, and terrain
