@@ -44,7 +44,7 @@ func TestElevationDenver(t *testing.T) {
 	c.baseURL = server.URL
 	r := &ElevationRequest{
 		Locations: []LatLng{
-			LatLng{
+			{
 				Lat: 39.73915360,
 				Lng: -104.9847034,
 			},
@@ -112,8 +112,8 @@ func TestElevationSampledPath(t *testing.T) {
 	c.baseURL = server.URL
 	r := &ElevationRequest{
 		Path: []LatLng{
-			LatLng{Lat: 36.578581, Lng: -118.291994},
-			LatLng{Lat: 36.23998, Lng: -116.83171},
+			{Lat: 36.578581, Lng: -118.291994},
+			{Lat: 36.23998, Lng: -116.83171},
 		},
 		Samples: 3,
 	}
@@ -154,8 +154,8 @@ func TestElevationPathWithNoSamples(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &ElevationRequest{
 		Path: []LatLng{
-			LatLng{Lat: 36.578581, Lng: -118.291994},
-			LatLng{Lat: 36.23998, Lng: -116.83171},
+			{Lat: 36.578581, Lng: -118.291994},
+			{Lat: 36.23998, Lng: -116.83171},
 		},
 	}
 
@@ -171,8 +171,8 @@ func TestElevationFailingServer(t *testing.T) {
 	c.baseURL = server.URL
 	r := &ElevationRequest{
 		Path: []LatLng{
-			LatLng{Lat: 36.578581, Lng: -118.291994},
-			LatLng{Lat: 36.23998, Lng: -116.83171},
+			{Lat: 36.578581, Lng: -118.291994},
+			{Lat: 36.23998, Lng: -116.83171},
 		},
 		Samples: 3,
 	}
@@ -186,8 +186,8 @@ func TestElevationCancelledContext(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &ElevationRequest{
 		Path: []LatLng{
-			LatLng{Lat: 36.578581, Lng: -118.291994},
-			LatLng{Lat: 36.23998, Lng: -116.83171},
+			{Lat: 36.578581, Lng: -118.291994},
+			{Lat: 36.23998, Lng: -116.83171},
 		},
 		Samples: 3,
 	}
@@ -208,8 +208,8 @@ func TestElevationRequestURL(t *testing.T) {
 	c.baseURL = server.s.URL
 
 	r := &ElevationRequest{
-		Locations: []LatLng{LatLng{1, 2}, LatLng{3, 4}},
-		Path:      []LatLng{LatLng{5, 6}, LatLng{7, 8}},
+		Locations: []LatLng{{1, 2}, {3, 4}},
+		Path:      []LatLng{{5, 6}, {7, 8}},
 		Samples:   10,
 	}
 
