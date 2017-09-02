@@ -137,37 +137,37 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 
 	correctResponse := GeocodingResult{
 		AddressComponents: []AddressComponent{
-			AddressComponent{
+			{
 				LongName:  "1600",
 				ShortName: "1600",
 				Types:     []string{"street_number"},
 			},
-			AddressComponent{
+			{
 				LongName:  "Amphitheatre Pkwy",
 				ShortName: "Amphitheatre Pkwy",
 				Types:     []string{"route"},
 			},
-			AddressComponent{
+			{
 				LongName:  "Mountain View",
 				ShortName: "Mountain View",
 				Types:     []string{"locality", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "Santa Clara County",
 				ShortName: "Santa Clara County",
 				Types:     []string{"administrative_area_level_2", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "California",
 				ShortName: "CA",
 				Types:     []string{"administrative_area_level_1", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "United States",
 				ShortName: "US",
 				Types:     []string{"country", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "94043",
 				ShortName: "94043",
 				Types:     []string{"postal_code"},
@@ -320,42 +320,42 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 
 	correctResponse := GeocodingResult{
 		AddressComponents: []AddressComponent{
-			AddressComponent{
+			{
 				LongName:  "277",
 				ShortName: "277",
 				Types:     []string{"street_number"},
 			},
-			AddressComponent{
+			{
 				LongName:  "Bedford Avenue",
 				ShortName: "Bedford Ave",
 				Types:     []string{"route"},
 			},
-			AddressComponent{
+			{
 				LongName:  "Williamsburg",
 				ShortName: "Williamsburg",
 				Types:     []string{"neighborhood", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "Brooklyn",
 				ShortName: "Brooklyn",
 				Types:     []string{"sublocality", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "Kings",
 				ShortName: "Kings",
 				Types:     []string{"administrative_area_level_2", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "New York",
 				ShortName: "NY",
 				Types:     []string{"administrative_area_level_1", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "United States",
 				ShortName: "US",
 				Types:     []string{"country", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "11211",
 				ShortName: "11211",
 				Types:     []string{"postal_code"},
@@ -552,37 +552,37 @@ func TestReverseGeocodingPlaceID(t *testing.T) {
 
 	correctResponse := GeocodingResult{
 		AddressComponents: []AddressComponent{
-			AddressComponent{
+			{
 				LongName:  "1600",
 				ShortName: "1600",
 				Types:     []string{"street_number"},
 			},
-			AddressComponent{
+			{
 				LongName:  "Amphitheatre Pkwy",
 				ShortName: "Amphitheatre Pkwy",
 				Types:     []string{"route"},
 			},
-			AddressComponent{
+			{
 				LongName:  "Mountain View",
 				ShortName: "Mountain View",
 				Types:     []string{"locality", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "Santa Clara County",
 				ShortName: "Santa Clara County",
 				Types:     []string{"administrative_area_level_2", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "California",
 				ShortName: "CA",
 				Types:     []string{"administrative_area_level_1", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "United States",
 				ShortName: "US",
 				Types:     []string{"country", "political"},
 			},
-			AddressComponent{
+			{
 				LongName:  "94043",
 				ShortName: "94043",
 				Types:     []string{"postal_code"},

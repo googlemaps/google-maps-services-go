@@ -136,14 +136,14 @@ func TestSnapToRoad(t *testing.T) {
 	c.baseURL = server.URL
 	r := &SnapToRoadRequest{
 		Path: []LatLng{
-			LatLng{Lat: -35.27801, Lng: 149.12958},
-			LatLng{Lat: -35.28032, Lng: 149.12907},
-			LatLng{Lat: -35.28099, Lng: 149.12929},
-			LatLng{Lat: -35.28144, Lng: 149.12984},
-			LatLng{Lat: -35.28194, Lng: 149.13003},
-			LatLng{Lat: -35.28282, Lng: 149.12956},
-			LatLng{Lat: -35.28302, Lng: 149.12881},
-			LatLng{Lat: -35.28473, Lng: 149.12836},
+			{Lat: -35.27801, Lng: 149.12958},
+			{Lat: -35.28032, Lng: 149.12907},
+			{Lat: -35.28099, Lng: 149.12929},
+			{Lat: -35.28144, Lng: 149.12984},
+			{Lat: -35.28194, Lng: 149.13003},
+			{Lat: -35.28282, Lng: 149.12956},
+			{Lat: -35.28302, Lng: 149.12881},
+			{Lat: -35.28473, Lng: 149.12836},
 		},
 	}
 
@@ -161,72 +161,72 @@ func TestSnapToRoad(t *testing.T) {
 
 	correctResponse := &SnapToRoadResponse{
 		SnappedPoints: []SnappedPoint{
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.2784167, Lng: 149.1294692},
 				OriginalIndex: &index0,
 				PlaceID:       "ChIJoR7CemhNFmsRQB9QbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.28032169384013, Lng: 149.1290827488019},
 				OriginalIndex: &index1,
 				PlaceID:       "ChIJiy6YT2hNFmsRkHZAbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.2803415, Lng: 149.1290788},
 				OriginalIndex: (*int)(nil),
 				PlaceID:       "ChIJiy6YT2hNFmsRkHZAbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.2803415, Lng: 149.1290788},
 				OriginalIndex: (*int)(nil),
 				PlaceID:       "ChIJI2FUTGhNFmsRcHpAbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.28045149999999, Lng: 149.1290784},
 				OriginalIndex: (*int)(nil),
 				PlaceID:       "ChIJI2FUTGhNFmsRcHpAbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.2805167, Lng: 149.1290879},
 				OriginalIndex: (*int)(nil),
 				PlaceID:       "ChIJI2FUTGhNFmsRcHpAbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.2805901, Lng: 149.1291104},
 				OriginalIndex: (*int)(nil),
 				PlaceID:       "ChIJI2FUTGhNFmsRcHpAbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.2805901, Lng: 149.1291104},
 				OriginalIndex: (*int)(nil),
 				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.280734599999995, Lng: 149.1291517},
 				OriginalIndex: (*int)(nil),
 				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.2807852, Lng: 149.1291716},
 				OriginalIndex: (*int)(nil),
 				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.2808499, Lng: 149.1292099},
 				OriginalIndex: (*int)(nil),
 				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.280923099999995, Lng: 149.129278},
 				OriginalIndex: (*int)(nil),
 				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.28096089721082, Lng: 149.1293250692261},
 				OriginalIndex: &index2,
 				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
 			},
-			SnappedPoint{
+			{
 				Location:      LatLng{Lat: -35.284728724835304, Lng: 149.12835061713685},
 				OriginalIndex: &index7,
 				PlaceID:       "ChIJW5JAZmpNFmsRegG0-Jc80sM",
@@ -252,14 +252,14 @@ func TestSnapToRoadWithCancelledContext(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey))
 	r := &SnapToRoadRequest{
 		Path: []LatLng{
-			LatLng{Lat: -35.27801, Lng: 149.12958},
-			LatLng{Lat: -35.28032, Lng: 149.12907},
-			LatLng{Lat: -35.28099, Lng: 149.12929},
-			LatLng{Lat: -35.28144, Lng: 149.12984},
-			LatLng{Lat: -35.28194, Lng: 149.13003},
-			LatLng{Lat: -35.28282, Lng: 149.12956},
-			LatLng{Lat: -35.28302, Lng: 149.12881},
-			LatLng{Lat: -35.28473, Lng: 149.12836},
+			{Lat: -35.27801, Lng: 149.12958},
+			{Lat: -35.28032, Lng: 149.12907},
+			{Lat: -35.28099, Lng: 149.12929},
+			{Lat: -35.28144, Lng: 149.12984},
+			{Lat: -35.28194, Lng: 149.13003},
+			{Lat: -35.28282, Lng: 149.12956},
+			{Lat: -35.28302, Lng: 149.12881},
+			{Lat: -35.28473, Lng: 149.12836},
 		},
 	}
 
@@ -370,19 +370,19 @@ func TestSpeedLimit(t *testing.T) {
 
 	correctResponse := &SpeedLimitsResponse{
 		SpeedLimits: []SpeedLimit{
-			SpeedLimit{PlaceID: "ChIJ1Wi6I2pNFmsRQL9GbW7qABM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJ58xCoGlNFmsRUEZUbW7qABM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJ9RhaiGlNFmsR0IxAbW7qABM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJabjuhGlNFmsREIxAbW7qABM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJcSAlFWpNFmsRMHlUbW7qABM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJI2FUTGhNFmsRcHpAbW7qABM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJiy6YT2hNFmsRkHZAbW7qABM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJoR7CemhNFmsRQB9QbW7qABM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJP2m_FWpNFmsRIHlUbW7qABM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJtV7La2pNFmsRAGpHbW7qABM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJW5JAZmpNFmsRegG0-Jc80sM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJW9R7smlNFmsRMH1AbW7qABM", SpeedLimit: 60, Units: "KPH"},
-			SpeedLimit{PlaceID: "ChIJy8c0r2lNFmsRQEZUbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJ1Wi6I2pNFmsRQL9GbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJ58xCoGlNFmsRUEZUbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJ9RhaiGlNFmsR0IxAbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJabjuhGlNFmsREIxAbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJcSAlFWpNFmsRMHlUbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJI2FUTGhNFmsRcHpAbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJiy6YT2hNFmsRkHZAbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJoR7CemhNFmsRQB9QbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJP2m_FWpNFmsRIHlUbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJtV7La2pNFmsRAGpHbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJW5JAZmpNFmsRegG0-Jc80sM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJW9R7smlNFmsRMH1AbW7qABM", SpeedLimit: 60, Units: "KPH"},
+			{PlaceID: "ChIJy8c0r2lNFmsRQEZUbW7qABM", SpeedLimit: 60, Units: "KPH"},
 		},
 		SnappedPoints: nil,
 	}
@@ -438,7 +438,7 @@ func TestSnapToRoadRequestURL(t *testing.T) {
 	c.baseURL = server.s.URL
 
 	r := &SnapToRoadRequest{
-		Path:        []LatLng{LatLng{1, 2}, LatLng{3, 4}},
+		Path:        []LatLng{{1, 2}, {3, 4}},
 		Interpolate: true,
 	}
 
@@ -462,8 +462,8 @@ func TestSpeedLimitsRequestURL(t *testing.T) {
 
 	r := &SpeedLimitsRequest{
 		Path: []LatLng{
-			LatLng{Lat: -35.27801, Lng: 149.12958},
-			LatLng{Lat: -35.28032, Lng: 149.12907},
+			{Lat: -35.27801, Lng: 149.12958},
+			{Lat: -35.28032, Lng: 149.12907},
 		},
 		PlaceID: []string{
 			"ChIJ1Wi6I2pNFmsRQL9GbW7qABM",

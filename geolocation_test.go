@@ -163,7 +163,7 @@ func TestCellTowerAndWiFiRequest(t *testing.T) {
 		RadioType:             RadioTypeGSM,
 		Carrier:               "Vodafone",
 		ConsiderIP:            true,
-		CellTowers: []CellTower{CellTower{
+		CellTowers: []CellTower{{
 			CellID:            42,
 			LocationAreaCode:  415,
 			MobileCountryCode: 310,
@@ -172,7 +172,7 @@ func TestCellTowerAndWiFiRequest(t *testing.T) {
 			SignalStrength:    -60,
 			TimingAdvance:     15,
 		}},
-		WiFiAccessPoints: []WiFiAccessPoint{WiFiAccessPoint{
+		WiFiAccessPoints: []WiFiAccessPoint{{
 			MACAddress:         "00:25:9c:cf:1c:ac",
 			SignalStrength:     -43,
 			Age:                0,
