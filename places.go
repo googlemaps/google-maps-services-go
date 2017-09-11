@@ -596,7 +596,7 @@ type QueryAutocompleteRequest struct {
 
 // AutocompleteResponse is a response to a Query Autocomplete request.
 type AutocompleteResponse struct {
-	Predictions []AutocompletePrediction
+	Predictions []AutocompletePrediction `json:"predictions"`
 }
 
 // AutocompletePrediction represents a single Query Autocomplete result returned from the Google Places API Web Service.
