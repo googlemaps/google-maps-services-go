@@ -15,6 +15,8 @@
 package maps
 
 import (
+	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -996,4 +998,89 @@ func TestTextSearchWithPermanentlyClosed(t *testing.T) {
 	if placeID != result.PlaceID {
 		t.Errorf("expected %+v, was %+v", placeID, result.PlaceID)
 	}
+}
+
+func TestPlaceAutocompleteJsonMarshalLowerCase(t *testing.T) {
+	response := `
+{
+  "predictions": [
+    {
+      "description": "Theater de Meervaart, Meer en Vaart, Amsterdam, Netherlands",
+      "id": "2d13bd84619a4cc5f9bf0b20f093b841a1403fcd",
+      "matched_substrings": [
+        {
+          "length": 20,
+          "offset": 0
+        }
+      ],
+      "place_id": "ChIJVwucBNLjxUcRXzGhUau_gBw",
+      "reference": "ClRJAAAAq5qHSaGPrUhUH3LyKrLYmg280v2TYXUCD5h7_m0YGw3Y8Mj1h1bffMyG7CBFlAN17V8kKkzeXwXO94v5513ErtXHVYKnJ9pNg4S7HtGUqEwSECL5WbMbXSbeRs_H2B91qHcaFEbgpLF1aftugYKgJTIupUwYsEbl",
+      "structured_formatting": {
+        "main_text": "Theater de Meervaart",
+        "main_text_matched_substrings": [
+          {
+            "length": 20,
+            "offset": 0
+          }
+        ],
+        "secondary_text": "Meer en Vaart, Amsterdam, Netherlands"
+      },
+      "terms": [
+        {
+          "offset": 0,
+          "value": "Theater de Meervaart"
+        },
+        {
+          "offset": 22,
+          "value": "Meer en Vaart"
+        },
+        {
+          "offset": 37,
+          "value": "Amsterdam"
+        },
+        {
+          "offset": 48,
+          "value": "Netherlands"
+        }
+      ],
+      "types": [
+        "establishment"
+      ]
+    }
+  ],
+  "status": "OK"
+}`
+	server := mockServer(200, response)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey))
+	c.baseURL = server.URL
+	r := &PlaceAutocompleteRequest{
+		Input: "Theater de Meervaart",
+		Types: AutocompletePlaceType("establishment"),
+	}
+
+	resp, err := c.PlaceAutocomplete(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("r.Get returned non nil error: %v", err)
+		return
+	}
+
+	json, err := json.Marshal(&resp)
+
+	if err != nil {
+		t.Errorf("json.Marshal error: %v", err)
+		return
+	}
+
+	if strings.Contains(string(json), `"Predictions"`) {
+		t.Error("AutocompleteResponse json.Marshal result \"prediction\" key is uppercase")
+		return
+	}
+
+	if strings.Contains(string(json), `"predictions"`) {
+		return
+	}
+
+	t.Error("TestPlaceAutocompleteJsonMarshalLowerCase error!")
 }
