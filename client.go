@@ -106,6 +106,14 @@ func WithAPIKey(apiKey string) ClientOption {
 	}
 }
 
+// WithBaseURL configures a Maps API client with a custom base url
+func WithBaseURL(baseURL string) ClientOption {
+	return func(c *Client) error {
+		c.baseURL = baseURL
+		return nil
+	}
+}
+
 // WithChannel configures a Maps API client with a Channel
 func WithChannel(channel string) ClientOption {
 	return func(c *Client) error {
