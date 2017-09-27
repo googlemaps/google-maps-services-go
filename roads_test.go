@@ -132,8 +132,7 @@ func TestSnapToRoad(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &SnapToRoadRequest{
 		Path: []LatLng{
 			{Lat: -35.27801, Lng: 149.12958},
@@ -342,8 +341,7 @@ func TestSpeedLimit(t *testing.T) {
 }`
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &SpeedLimitsRequest{
 		PlaceID: []string{
 			"ChIJ1Wi6I2pNFmsRQL9GbW7qABM",
@@ -434,8 +432,7 @@ func TestSnapToRoadRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &SnapToRoadRequest{
 		Path:        []LatLng{{1, 2}, {3, 4}},
@@ -457,8 +454,7 @@ func TestSpeedLimitsRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &SpeedLimitsRequest{
 		Path: []LatLng{

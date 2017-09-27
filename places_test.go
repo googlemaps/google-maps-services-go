@@ -63,8 +63,7 @@ func TestTextSearchPizzaInNewYork(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &TextSearchRequest{
 		Query: "Pizza in New York",
 	}
@@ -153,8 +152,7 @@ func TestNearbySearchMinimalRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &NearbySearchRequest{
 		Location: &LatLng{1.0, 2.0},
@@ -178,8 +176,7 @@ func TestNearbySearchMaximalRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &NearbySearchRequest{
 		Location:  &LatLng{1.0, 2.0},
@@ -276,8 +273,7 @@ func TestTextSearchMinimalRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &TextSearchRequest{
 		Query: "Pizza in New York",
@@ -300,8 +296,7 @@ func TestTextSearchAllTheThingsRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &TextSearchRequest{
 		Query:     "Pizza in New York",
@@ -360,8 +355,7 @@ func TestQueryAutocompleteMinimalRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &QueryAutocompleteRequest{
 		Input: "quay resteraunt sydney",
@@ -384,8 +378,7 @@ func TestQueryAutocompleteMaximalRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &QueryAutocompleteRequest{
 		Input:    "quay resteraunt sydney",
@@ -427,8 +420,7 @@ func TestPlaceAutocompleteMinimalRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &PlaceAutocompleteRequest{
 		Input: "quay resteraunt sydney",
@@ -451,8 +443,7 @@ func TestPlaceAutocompleteMaximalRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	placeType, err := ParseAutocompletePlaceType("geocode")
 	if err != nil {
@@ -547,8 +538,7 @@ func TestPlaceAutocompleteWithStructuredFormatting(t *testing.T) {
 }`
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &PlaceAutocompleteRequest{
 		Input: "Theater de Meervaart",
 		Types: AutocompletePlaceType("establishment"),
@@ -588,8 +578,7 @@ func TestRadarSearchMinimalRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &RadarSearchRequest{
 		Location: &LatLng{1, 2},
@@ -614,8 +603,7 @@ func TestRadarSearchMaximalRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &RadarSearchRequest{
 		Location: &LatLng{1, 2},
@@ -766,8 +754,7 @@ func TestPlaceDetails(t *testing.T) {
 `
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	placeID := "ChIJ02qnq0KuEmsRHUJF4zo1x4I"
 	r := &PlaceDetailsRequest{
 		PlaceID: placeID,
@@ -879,8 +866,7 @@ func TestPlacePhoto(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, "An Image?")
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &PlacePhotoRequest{
 		PhotoReference: photoReference,
@@ -959,8 +945,7 @@ func TestTextSearchWithPermanentlyClosed(t *testing.T) {
   }`
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &TextSearchRequest{
 		Query: "ABC Learning Centres in australia",
 	}
@@ -1052,8 +1037,7 @@ func TestPlaceAutocompleteJsonMarshalLowerCase(t *testing.T) {
 }`
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &PlaceAutocompleteRequest{
 		Input: "Theater de Meervaart",
 		Types: AutocompletePlaceType("establishment"),

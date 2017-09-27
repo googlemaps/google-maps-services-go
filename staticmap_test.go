@@ -51,8 +51,7 @@ func TestStaticMode(t *testing.T) {
 
 	server := mockServerForQueryWithImage("center=Brooklyn%2BBridge%252CNew%2BYork%252CNY&format=PNG&key=AIzaNotReallyAnAPIKey&language=EN-us&maptype=roadmap&region=US&scale=2&size=600x300&zoom=13", 200, response)
 	defer server.s.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 	r := &StaticMapRequest{
 		Center:   "Brooklyn Bridge,New York,NY",
 		Size:     "600x300",

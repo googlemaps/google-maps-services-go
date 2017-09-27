@@ -40,8 +40,7 @@ func TestElevationDenver(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &ElevationRequest{
 		Locations: []LatLng{
 			{
@@ -108,8 +107,7 @@ func TestElevationSampledPath(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &ElevationRequest{
 		Path: []LatLng{
 			{Lat: 36.578581, Lng: -118.291994},
@@ -167,8 +165,7 @@ func TestElevationPathWithNoSamples(t *testing.T) {
 func TestElevationFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &ElevationRequest{
 		Path: []LatLng{
 			{Lat: 36.578581, Lng: -118.291994},
@@ -204,8 +201,7 @@ func TestElevationRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &ElevationRequest{
 		Locations: []LatLng{{1, 2}, {3, 4}},

@@ -42,8 +42,7 @@ func TestGeolocation(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &GeolocationRequest{}
 
 	resp, err := c.Geolocate(context.Background(), r)
@@ -85,8 +84,7 @@ func TestGeolocationError(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &GeolocationRequest{}
 
 	_, err := c.Geolocate(context.Background(), r)
@@ -155,8 +153,7 @@ func TestCellTowerAndWiFiRequest(t *testing.T) {
 	}))
 
 	defer server.s.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 	r := &GeolocationRequest{
 		HomeMobileCountryCode: 310,
 		HomeMobileNetworkCode: 410,

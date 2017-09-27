@@ -139,8 +139,7 @@ func TestDirectionsTransit(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &DirectionsRequest{
 		Origin:      "Google Sydney",
 		Destination: "Glebe Pt Rd, Glebe",
@@ -268,8 +267,7 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
@@ -418,8 +416,7 @@ func TestDirectionsWithCancelledContext(t *testing.T) {
 func TestDirectionsFailingServer(t *testing.T) {
 	server := mockServer(500, `{"status" : "ERROR"}`)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &DirectionsRequest{
 		Origin:      "Sydney",
 		Destination: "Parramatta",
@@ -436,8 +433,7 @@ func TestDirectionsRequestURL(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &DirectionsRequest{
 		Origin:       "Sydney",
@@ -467,8 +463,7 @@ func TestTrafficModel(t *testing.T) {
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.s.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &DirectionsRequest{
 		Origin:        "Sydney Town Hall",
@@ -565,8 +560,7 @@ func TestFare(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &DirectionsRequest{
 		Origin:      "35.7777111, -78.625354",
 		Destination: "35.7826242, -78.6547025",
@@ -667,8 +661,7 @@ func TestNoFare(t *testing.T) {
 
 	server := mockServer(200, response)
 	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey))
-	c.baseURL = server.URL
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &DirectionsRequest{
 		Origin:      "35.7777111, -78.625354",
 		Destination: "35.7826242, -78.6547025",
