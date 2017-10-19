@@ -46,6 +46,10 @@ func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingR
 		return nil, err
 	}
 
+	if response.Status == "ZERO_RESULTS" {
+		return []GeocodingResult{}, nil
+	}
+
 	if err := response.StatusError(); err != nil {
 		return nil, err
 	}
