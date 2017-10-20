@@ -625,3 +625,26 @@ func TestCustomPassThroughGeocodingURL(t *testing.T) {
 		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }
+
+func TestGeocodingZeroResults(t *testing.T) {
+	server := mockServer(200, `{"status" : "ZERO_RESULTS"}`)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+	r := &GeocodingRequest{
+		Address: "Sydney Town Hall",
+	}
+
+	response, err := c.Geocode(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error for ZERO_RESULTS status")
+	}
+
+	if response == nil {
+		t.Errorf("Unexpected nil response for ZERO_RESULTS status")
+	}
+
+	if len(response) != 0 {
+		t.Errorf("Unexpected response for ZERO_RESULTS status")
+	}
+}
