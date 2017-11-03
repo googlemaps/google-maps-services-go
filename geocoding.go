@@ -18,11 +18,10 @@
 package maps
 
 import (
+	"context"
 	"errors"
 	"net/url"
 	"strings"
-
-	"golang.org/x/net/context"
 )
 
 var geocodingAPI = &apiConfig{

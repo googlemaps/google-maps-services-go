@@ -18,12 +18,11 @@
 package maps
 
 import (
+	"context"
 	"errors"
 	"net/url"
 	"strconv"
 	"time"
-
-	"golang.org/x/net/context"
 )
 
 var timezoneAPI = &apiConfig{

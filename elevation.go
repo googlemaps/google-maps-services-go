@@ -18,11 +18,10 @@
 package maps
 
 import (
+	"context"
 	"errors"
 	"net/url"
 	"strconv"
-
-	"golang.org/x/net/context"
 )
 
 var elevationAPI = &apiConfig{

@@ -15,14 +15,13 @@
 package maps
 
 import (
+	"context"
 	"fmt"
 	"image"
 	"image/png"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"golang.org/x/net/context"
 )
 
 // mockServerForQueryWithImage returns a mock server that only responds to a particular query string, and responds with an encoded Image.

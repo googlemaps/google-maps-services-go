@@ -15,12 +15,11 @@
 package maps
 
 import (
+	"context"
 	"encoding/json"
 	"strings"
 	"testing"
 	"time"
-
-	"golang.org/x/net/context"
 )
 
 func TestTextSearchPizzaInNewYork(t *testing.T) {

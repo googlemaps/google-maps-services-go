@@ -15,11 +15,10 @@
 package maps
 
 import (
+	"context"
 	"net/url"
 	"reflect"
 	"testing"
-
-	"golang.org/x/net/context"
 )
 
 func TestGeocodingGoogleHQ(t *testing.T) {

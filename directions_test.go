@@ -15,14 +15,13 @@
 package maps
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 	"time"
-
-	"golang.org/x/net/context"
 )
 
 const apiKey = "AIzaNotReallyAnAPIKey"
