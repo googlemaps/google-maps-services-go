@@ -18,12 +18,11 @@
 package maps
 
 import (
+	"context"
 	"errors"
 	"net/url"
 	"strings"
 	"time"
-
-	"golang.org/x/net/context"
 )
 
 var distanceMatrixAPI = &apiConfig{

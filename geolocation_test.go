@@ -18,6 +18,7 @@
 package maps
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -26,7 +27,6 @@ import (
 	"testing"
 
 	"github.com/kr/pretty"
-	"golang.org/x/net/context"
 )
 
 func TestGeolocation(t *testing.T) {
