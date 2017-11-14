@@ -692,6 +692,10 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 		q.Set("types", string(r.Types))
 	}
 
+	if r.StrictBounds {
+		q.Set("strictbounds", "true")
+	}
+
 	var cf []string
 	for c, f := range r.Components {
 		cf = append(cf, string(c)+":"+f)
@@ -719,6 +723,8 @@ type PlaceAutocompleteRequest struct {
 	Types AutocompletePlaceType
 	// Components is a grouping of places to which you would like to restrict your results. Currently, you can use components to filter by country.
 	Components map[Component]string
+	// StrictBounds return only those places that are strictly within the region defined by location and radius.
+	StrictBounds bool
 }
 
 var placesPhotoAPI = &apiConfig{
