@@ -29,16 +29,17 @@ import (
 )
 
 var (
-	apiKey     = flag.String("key", "", "API Key for using Google Maps API.")
-	clientID   = flag.String("client_id", "", "ClientID for Maps for Work API access.")
-	signature  = flag.String("signature", "", "Signature for Maps for Work API access.")
-	input      = flag.String("input", "", "Text string on which to search.")
-	language   = flag.String("language", "", "The language in which to return results.")
-	offset     = flag.Uint("offset", 0, "The character position in the input term at which the service uses text for predictions.")
-	location   = flag.String("location", "", "The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.")
-	radius     = flag.Uint("radius", 0, "Defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters.")
-	placeType  = flag.String("types", "", "Restricts the results to places matching the specified type.")
-	components = flag.String("components", "", "A component filter for specifying which country to perform autocomplete inside of")
+	apiKey       = flag.String("key", "", "API Key for using Google Maps API.")
+	clientID     = flag.String("client_id", "", "ClientID for Maps for Work API access.")
+	signature    = flag.String("signature", "", "Signature for Maps for Work API access.")
+	input        = flag.String("input", "", "Text string on which to search.")
+	language     = flag.String("language", "", "The language in which to return results.")
+	offset       = flag.Uint("offset", 0, "The character position in the input term at which the service uses text for predictions.")
+	location     = flag.String("location", "", "The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.")
+	radius       = flag.Uint("radius", 0, "Defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters.")
+	placeType    = flag.String("types", "", "Restricts the results to places matching the specified type.")
+	components   = flag.String("components", "", "A component filter for specifying which country to perform autocomplete inside of")
+	strictbounds = flag.Bool("strictbounds", false, "Whether to strictly enforce bounds.")
 )
 
 func usageAndExit(msg string) {
@@ -69,10 +70,11 @@ func main() {
 	check(err)
 
 	r := &maps.PlaceAutocompleteRequest{
-		Input:    *input,
-		Language: *language,
-		Offset:   *offset,
-		Radius:   *radius,
+		Input:        *input,
+		Language:     *language,
+		Offset:       *offset,
+		Radius:       *radius,
+		StrictBounds: *strictbounds,
 	}
 
 	parseLocation(*location, r)

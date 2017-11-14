@@ -414,6 +414,33 @@ func TestQueryAutocompleteMissingInput(t *testing.T) {
 	}
 }
 
+func TestPlaceAutocompleteWithStrictbounds(t *testing.T) {
+	expectedQuery := "input=Amoeba&key=AIzaNotReallyAnAPIKey&location=37.76999%2C-122.44696&radius=500&strictbounds=true&types=establishment"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
+
+	r := &PlaceAutocompleteRequest{
+		Input:        "Amoeba",
+		Types:        AutocompletePlaceType("establishment"),
+		Location:     &LatLng{37.76999, -122.44696},
+		Radius:       500,
+		StrictBounds: true,
+	}
+
+	_, err := c.PlaceAutocomplete(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	}
+
+	if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
 func TestPlaceAutocompleteMinimalRequestURL(t *testing.T) {
 	expectedQuery := "input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey"
 
