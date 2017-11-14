@@ -422,8 +422,6 @@ func TestPlaceAutocompleteWithStrictbounds(t *testing.T) {
 
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
-	// input=Amoeba&types=establishment&location=37.76999,-122.44696&radius=500&strictbounds
-
 	r := &PlaceAutocompleteRequest{
 		Input:        "Amoeba",
 		Types:        AutocompletePlaceType("establishment"),
