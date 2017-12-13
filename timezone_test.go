@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kr/pretty"
 	"golang.org/x/net/context"
 )
 
@@ -59,8 +58,8 @@ func TestTimezoneNevada(t *testing.T) {
 
 	if !reflect.DeepEqual(resp, correctResponse) {
 		t.Errorf("expected %+v, was %+v", correctResponse, resp)
-		pretty.Println(resp)
-		pretty.Println(correctResponse)
+		println(resp)
+		println(correctResponse)
 	}
 }
 

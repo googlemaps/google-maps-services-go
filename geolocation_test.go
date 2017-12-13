@@ -25,7 +25,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kr/pretty"
 	"golang.org/x/net/context"
 )
 
@@ -140,7 +139,7 @@ func TestCellTowerAndWiFiRequest(t *testing.T) {
 			`"signalStrength":-43,` +
 			`"channel":11}]}`
 		if body != expected {
-			pretty.Errorf("Body is incorrect: %v", body)
+			fmt.Errorf("Body is incorrect: %v", body)
 			failResponse("failed to parse body", w, r)
 			return
 		}
