@@ -31,6 +31,12 @@ var snapToRoadsAPI = &apiConfig{
 	acceptsClientID: false,
 }
 
+var nearestRoadsAPI = &apiConfig{
+	host:            "https://roads.googleapis.com",
+	path:            "/v1/nearestRoads",
+	acceptsClientID: false,
+}
+
 var speedLimitsAPI = &apiConfig{
 	host:            "https://roads.googleapis.com",
 	path:            "/v1/speedLimits",
@@ -92,6 +98,45 @@ type SnappedPoint struct {
 
 	// PlaceID is a unique identifier for a place.
 	PlaceID string `json:"placeId"`
+}
+
+// NearestRoads makes a Nearest Roads API request
+func (c *Client) NearestRoads(ctx context.Context, r *NearestRoadsRequest) (*NearestRoadsResponse, error) {
+
+	if len(r.Points) == 0 {
+		return nil, errors.New("maps: Points empty")
+	}
+
+	response := &NearestRoadsResponse{}
+
+	if err := c.getJSON(ctx, nearestRoadsAPI, r, response); err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (r *NearestRoadsRequest) params() url.Values {
+	q := make(url.Values)
+	var p []string
+	for _, e := range r.Points {
+		p = append(p, e.String())
+	}
+
+	q.Set("points", strings.Join(p, "|"))
+
+	return q
+}
+
+// NearestRoadsRequest is the request structure for the Nearest Roads API.
+type NearestRoadsRequest struct {
+	// Points is the list of points to be snapped.
+	Points []LatLng
+}
+
+// NearestRoadsResponse is an array of snapped points.
+type NearestRoadsResponse struct {
+	SnappedPoints []SnappedPoint `json:"snappedPoints"`
 }
 
 // SpeedLimits makes a Speed Limits API request

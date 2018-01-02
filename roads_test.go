@@ -269,6 +269,254 @@ func TestSnapToRoadWithCancelledContext(t *testing.T) {
 	}
 }
 
+func TestNearestRoads(t *testing.T) {
+
+	response := `{
+  "snappedPoints": [
+    {
+      "location": {
+        "latitude": -35.2784167,
+        "longitude": 149.1294692
+      },
+      "originalIndex": 0,
+      "placeId": "ChIJoR7CemhNFmsRQB9QbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.280321693840129,
+        "longitude": 149.12908274880189
+      },
+      "originalIndex": 1,
+      "placeId": "ChIJiy6YT2hNFmsRkHZAbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.2803415,
+        "longitude": 149.1290788
+      },
+      "placeId": "ChIJiy6YT2hNFmsRkHZAbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.2803415,
+        "longitude": 149.1290788
+      },
+      "placeId": "ChIJI2FUTGhNFmsRcHpAbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.280451499999991,
+        "longitude": 149.1290784
+      },
+      "placeId": "ChIJI2FUTGhNFmsRcHpAbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.2805167,
+        "longitude": 149.1290879
+      },
+      "placeId": "ChIJI2FUTGhNFmsRcHpAbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.2805901,
+        "longitude": 149.1291104
+      },
+      "placeId": "ChIJI2FUTGhNFmsRcHpAbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.2805901,
+        "longitude": 149.1291104
+      },
+      "placeId": "ChIJW9R7smlNFmsRMH1AbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.280734599999995,
+        "longitude": 149.1291517
+      },
+      "placeId": "ChIJW9R7smlNFmsRMH1AbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.2807852,
+        "longitude": 149.1291716
+      },
+      "placeId": "ChIJW9R7smlNFmsRMH1AbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.2808499,
+        "longitude": 149.1292099
+      },
+      "placeId": "ChIJW9R7smlNFmsRMH1AbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.280923099999995,
+        "longitude": 149.129278
+      },
+      "placeId": "ChIJW9R7smlNFmsRMH1AbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.280960897210818,
+        "longitude": 149.1293250692261
+      },
+      "originalIndex": 2,
+      "placeId": "ChIJW9R7smlNFmsRMH1AbW7qABM"
+    },
+    {
+      "location": {
+        "latitude": -35.284728724835304,
+        "longitude": 149.12835061713685
+      },
+      "originalIndex": 7,
+      "placeId": "ChIJW5JAZmpNFmsRegG0-Jc80sM"
+    }
+  ]
+}`
+
+	server := mockServer(200, response)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+	r := &NearestRoadsRequest{
+		Points: []LatLng{
+			{Lat: -35.27801, Lng: 149.12958},
+			{Lat: -35.28032, Lng: 149.12907},
+			{Lat: -35.28099, Lng: 149.12929},
+			{Lat: -35.28144, Lng: 149.12984},
+			{Lat: -35.28194, Lng: 149.13003},
+			{Lat: -35.28282, Lng: 149.12956},
+			{Lat: -35.28302, Lng: 149.12881},
+			{Lat: -35.28473, Lng: 149.12836},
+		},
+	}
+
+	resp, err := c.NearestRoads(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("r.Get returned non nil error: %v", err)
+	}
+
+	// Required because we can't do &2 in the data structure below.
+	index0 := 0
+	index1 := 1
+	index2 := 2
+	index7 := 7
+
+	correctResponse := &NearestRoadsResponse{
+		SnappedPoints: []SnappedPoint{
+			{
+				Location:      LatLng{Lat: -35.2784167, Lng: 149.1294692},
+				OriginalIndex: &index0,
+				PlaceID:       "ChIJoR7CemhNFmsRQB9QbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.28032169384013, Lng: 149.1290827488019},
+				OriginalIndex: &index1,
+				PlaceID:       "ChIJiy6YT2hNFmsRkHZAbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.2803415, Lng: 149.1290788},
+				OriginalIndex: (*int)(nil),
+				PlaceID:       "ChIJiy6YT2hNFmsRkHZAbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.2803415, Lng: 149.1290788},
+				OriginalIndex: (*int)(nil),
+				PlaceID:       "ChIJI2FUTGhNFmsRcHpAbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.28045149999999, Lng: 149.1290784},
+				OriginalIndex: (*int)(nil),
+				PlaceID:       "ChIJI2FUTGhNFmsRcHpAbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.2805167, Lng: 149.1290879},
+				OriginalIndex: (*int)(nil),
+				PlaceID:       "ChIJI2FUTGhNFmsRcHpAbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.2805901, Lng: 149.1291104},
+				OriginalIndex: (*int)(nil),
+				PlaceID:       "ChIJI2FUTGhNFmsRcHpAbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.2805901, Lng: 149.1291104},
+				OriginalIndex: (*int)(nil),
+				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.280734599999995, Lng: 149.1291517},
+				OriginalIndex: (*int)(nil),
+				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.2807852, Lng: 149.1291716},
+				OriginalIndex: (*int)(nil),
+				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.2808499, Lng: 149.1292099},
+				OriginalIndex: (*int)(nil),
+				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.280923099999995, Lng: 149.129278},
+				OriginalIndex: (*int)(nil),
+				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.28096089721082, Lng: 149.1293250692261},
+				OriginalIndex: &index2,
+				PlaceID:       "ChIJW9R7smlNFmsRMH1AbW7qABM",
+			},
+			{
+				Location:      LatLng{Lat: -35.284728724835304, Lng: 149.12835061713685},
+				OriginalIndex: &index7,
+				PlaceID:       "ChIJW5JAZmpNFmsRegG0-Jc80sM",
+			},
+		},
+	}
+
+	if !reflect.DeepEqual(resp, correctResponse) {
+		t.Errorf("expected %+v, was %+v", correctResponse, resp)
+	}
+}
+
+func TestNearestRoadsNoPath(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &NearestRoadsRequest{}
+
+	if _, err := c.NearestRoads(context.Background(), r); err == nil {
+		t.Errorf("Empty points should return error")
+	}
+}
+
+func TestNearestRoadsWithCancelledContext(t *testing.T) {
+	c, _ := NewClient(WithAPIKey(apiKey))
+	r := &NearestRoadsRequest{
+		Points: []LatLng{
+			{Lat: -35.27801, Lng: 149.12958},
+			{Lat: -35.28032, Lng: 149.12907},
+			{Lat: -35.28099, Lng: 149.12929},
+			{Lat: -35.28144, Lng: 149.12984},
+			{Lat: -35.28194, Lng: 149.13003},
+			{Lat: -35.28282, Lng: 149.12956},
+			{Lat: -35.28302, Lng: 149.12881},
+			{Lat: -35.28473, Lng: 149.12836},
+		},
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := c.NearestRoads(ctx, r); err == nil {
+		t.Errorf("Cancelled context should return non-nil err")
+	}
+}
+
 func TestSpeedLimit(t *testing.T) {
 	response := `{
   "speedLimits": [
