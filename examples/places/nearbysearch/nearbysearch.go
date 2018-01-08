@@ -41,7 +41,7 @@ var (
 	openNow   = flag.Bool("open_now", false, "Restricts results to only those places that are open for business at the time the query is sent.")
 	rankBy    = flag.String("rankby", "", "Specifies the order in which results are listed. Valid values are prominence or distance.")
 	placeType = flag.String("type", "", "Restricts the results to places matching the specified type.")
-	pageToken = flag.String("pagetoken", "", "Set to retrieve the next next page of results.")
+	pageToken = flag.String("pagetoken", "", "Set to retrieve the next page of results.")
 )
 
 func usageAndExit(msg string) {
