@@ -171,7 +171,7 @@ func main() {
 ### Rate limiting
 
 Never sleep between requests again! By default, requests are sent at the expected rate limits for
-each web service, typically 10 queries per second for free users. If you want to speed up or slow
+each web service, typically 50 queries per second for free users. If you want to speed up or slow
 down requests, you can do that too, using `maps.NewClient(maps.WithAPIKey(apiKey), maps.WithRateLimit(qps))`.
 
 ### Client IDs

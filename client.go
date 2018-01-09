@@ -45,7 +45,7 @@ type Client struct {
 // ClientOption is the type of constructor options for NewClient(...).
 type ClientOption func(*Client) error
 
-var defaultRequestsPerSecond = 10
+var defaultRequestsPerSecond = 50
 
 // NewClient constructs a new Client which can make requests to the Google Maps WebService APIs.
 func NewClient(options ...ClientOption) (*Client, error) {
@@ -137,7 +137,7 @@ func WithClientIDAndSignature(clientID, signature string) ClientOption {
 }
 
 // WithRateLimit configures the rate limit for back end requests. Default is to
-// limit to 10 requests per second. A value of zero disables rate limiting.
+// limit to 50 requests per second. A value of zero disables rate limiting.
 func WithRateLimit(requestsPerSecond int) ClientOption {
 	return func(c *Client) error {
 		c.requestsPerSecond = requestsPerSecond
