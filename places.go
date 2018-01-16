@@ -707,7 +707,7 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 	return q
 }
 
-// PlaceAutocompleteRequest is the functional options struct for Query Autocomplete
+// PlaceAutocompleteRequest is the functional options struct for Place Autocomplete
 type PlaceAutocompleteRequest struct {
 	// Input is the text string on which to search. The Places service will return candidate matches based on this string and order results based on their perceived relevance.
 	Input string
