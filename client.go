@@ -61,24 +61,6 @@ func NewClient(options ...ClientOption) (*Client, error) {
 		return nil, errors.New("maps: API Key or Maps for Work credentials missing")
 	}
 
-	if c.requestsPerSecond > 0 {
-		// Implement a bursty rate limiter.
-		// Allow up to 1 second worth of requests to be made at once.
-		c.rateLimiter = make(chan int, c.requestsPerSecond)
-		// Prefill rateLimiter with 1 seconds worth of requests.
-		for i := 0; i < c.requestsPerSecond; i++ {
-			c.rateLimiter <- 1
-		}
-		go func() {
-			// Wait a second for pre-filled quota to drain
-			time.Sleep(time.Second)
-			// Then, refill rateLimiter continuously
-			for range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
-				c.rateLimiter <- 1
-			}
-		}()
-	}
-
 	return c, nil
 }
 
