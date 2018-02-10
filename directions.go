@@ -251,6 +251,7 @@ type Leg struct {
 	// reflecting the end location of this leg.
 	EndAddress string `json:"end_address"`
 
+	// ViaWaypoint contains info about points through which the route was laid
 	ViaWaypoint []*ViaWaypoint `json:"via_waypoint"`
 }
 
