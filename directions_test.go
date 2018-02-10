@@ -173,6 +173,7 @@ func TestDirectionsTransit(t *testing.T) {
 		EndLocation:   LatLng{Lat: -33.8785317, Lng: 151.1859855},
 		StartAddress:  "Workplace 6, 48 Pirrama Rd, Pyrmont NSW 2009, Australia",
 		EndAddress:    "Glebe Point Rd, Glebe NSW 2037, Australia",
+		ViaWaypoint:   make([]*ViaWaypoint, 0),
 	})
 
 	correctResponse := &Route{
@@ -304,6 +305,7 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 		EndLocation:   LatLng{Lat: -33.8150985, Lng: 151.0031658},
 		StartAddress:  "Sydney NSW, Australia",
 		EndAddress:    "Parramatta NSW, Australia",
+		ViaWaypoint:  make([]*ViaWaypoint,0),
 	})
 
 	correctResponse := &Route{
