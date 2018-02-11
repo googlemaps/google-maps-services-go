@@ -250,6 +250,15 @@ type Leg struct {
 	// EndAddress contains the human-readable address (typically a street address)
 	// reflecting the end location of this leg.
 	EndAddress string `json:"end_address"`
+
+	// ViaWaypoint contains info about points through which the route was laid
+	ViaWaypoint []*ViaWaypoint `json:"via_waypoint"`
+}
+
+type ViaWaypoint struct {
+	Location 			LatLng 	`json:"location"`
+	StepIndex 			int 	`json:"step_index"`
+	StepInterpolation   float64 `json:"step_interpolation"`
 }
 
 // Step represents a single step of a leg.
