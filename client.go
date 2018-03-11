@@ -39,6 +39,7 @@ type Client struct {
 	signature         []byte
 	requestsPerSecond int
 	rateLimiter       chan int
+	quit              chan struct{}
 	channel           string
 }
 
@@ -65,6 +66,8 @@ func NewClient(options ...ClientOption) (*Client, error) {
 		// Implement a bursty rate limiter.
 		// Allow up to 1 second worth of requests to be made at once.
 		c.rateLimiter = make(chan int, c.requestsPerSecond)
+		// allow releasing rate limit goroutine
+		c.quit = make(chan struct{}, 1)
 		// Prefill rateLimiter with 1 seconds worth of requests.
 		for i := 0; i < c.requestsPerSecond; i++ {
 			c.rateLimiter <- 1
@@ -73,7 +76,10 @@ func NewClient(options ...ClientOption) (*Client, error) {
 			// Wait a second for pre-filled quota to drain
 			time.Sleep(time.Second)
 			// Then, refill rateLimiter continuously
-			for range time.Tick(time.Second / time.Duration(c.requestsPerSecond)) {
+			select {
+			case <-c.quit:
+				return
+			case <-time.Tick(time.Second / time.Duration(c.requestsPerSecond)):
 				c.rateLimiter <- 1
 			}
 		}()
@@ -153,6 +159,13 @@ type apiConfig struct {
 
 type apiRequest interface {
 	params() url.Values
+}
+
+func (c *Client) Close() {
+	select {
+	case c.quit <- struct{}{}:
+	default:
+	}
 }
 
 func (c *Client) awaitRateLimiter(ctx context.Context) error {
