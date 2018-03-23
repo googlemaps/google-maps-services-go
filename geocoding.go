@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// More information about Google Distance Matrix API is available on
-// https://developers.google.com/maps/documentation/distancematrix/
+// More information about Google Geocoding API is available on
+// https://developers.google.com/maps/documentation/geocoding
 
 package maps
 
@@ -183,6 +183,7 @@ type GeocodingResult struct {
 	Geometry          AddressGeometry    `json:"geometry"`
 	Types             []string           `json:"types"`
 	PlaceID           string             `json:"place_id"`
+	Name              string             `json:"name"`
 }
 
 // AddressComponent is a part of an address
