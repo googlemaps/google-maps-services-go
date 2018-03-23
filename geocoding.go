@@ -183,6 +183,7 @@ type GeocodingResult struct {
 	Geometry          AddressGeometry    `json:"geometry"`
 	Types             []string           `json:"types"`
 	PlaceID           string             `json:"place_id"`
+	Name              string             `json:"name"`
 }
 
 // AddressComponent is a part of an address
