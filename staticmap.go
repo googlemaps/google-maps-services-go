@@ -227,7 +227,7 @@ func (r *StaticMapRequest) params() url.Values {
 	q := make(url.Values)
 
 	if r.Center != "" {
-		q.Set("center", url.QueryEscape(r.Center))
+		q.Set("center", r.Center)
 	}
 
 	if r.Zoom > 0 {
