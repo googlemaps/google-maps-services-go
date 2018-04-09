@@ -139,7 +139,6 @@ func TestCellTowerAndWiFiRequest(t *testing.T) {
 			`"signalStrength":-43,` +
 			`"channel":11}]}`
 		if body != expected {
-			fmt.Errorf("Body is incorrect: %v", body)
 			failResponse("failed to parse body", w, r)
 			return
 		}

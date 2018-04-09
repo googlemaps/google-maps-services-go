@@ -49,7 +49,7 @@ func TestStaticMode(t *testing.T) {
 
 	response := image.NewRGBA(image.Rect(0, 0, 640, 400))
 
-	server := mockServerForQueryWithImage("center=Brooklyn%2BBridge%252CNew%2BYork%252CNY&format=PNG&key=AIzaNotReallyAnAPIKey&language=EN-us&maptype=roadmap&region=US&scale=2&size=600x300&zoom=13", 200, response)
+	server := mockServerForQueryWithImage("center=Brooklyn+Bridge%2CNew+York%2CNY&format=PNG&key=AIzaNotReallyAnAPIKey&language=EN-us&maptype=roadmap&region=US&scale=2&size=600x300&zoom=13", 200, response)
 	defer server.s.Close()
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 	r := &StaticMapRequest{
