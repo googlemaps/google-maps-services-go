@@ -491,6 +491,7 @@ const (
 	AutocompletePlaceTypeCities        = AutocompletePlaceType("(cities)")
 )
 
+// ParseAutocompletePlaceType will parse a string representation of a AutocompletePlaceTypes.
 func ParseAutocompletePlaceType(placeType string) (AutocompletePlaceType, error) {
 	switch strings.ToLower(placeType) {
 	case "geocode":

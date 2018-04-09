@@ -255,10 +255,11 @@ type Leg struct {
 	ViaWaypoint []*ViaWaypoint `json:"via_waypoint"`
 }
 
+// ViaWaypoint handles waypoints.
 type ViaWaypoint struct {
-	Location 			LatLng 	`json:"location"`
-	StepIndex 			int 	`json:"step_index"`
-	StepInterpolation   float64 `json:"step_interpolation"`
+	Location          LatLng  `json:"location"`
+	StepIndex         int     `json:"step_index"`
+	StepInterpolation float64 `json:"step_interpolation"`
 }
 
 // Step represents a single step of a leg.
