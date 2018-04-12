@@ -33,7 +33,7 @@ var (
 	signature = flag.String("signature", "", "Signature for Maps for Work API access.")
 	location  = flag.String("location", "", "The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.")
 	radius    = flag.Uint("radius", 0, "Defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters.")
-	keyword   = flag.String("keyword", "", "Specifies the language in which to return results. Optional.")
+	keyword   = flag.String("keyword", "", "A term to be matched against all content that Google has indexed for this place, including but not limited to name, type, and address, as well as customer reviews and other third-party content.")
 	language  = flag.String("language", "", "The language in which to return results.")
 	minPrice  = flag.String("minprice", "", "Restricts results to only those places within the specified price level.")
 	maxPrice  = flag.String("maxprice", "", "Restricts results to only those places within the specified price level.")
