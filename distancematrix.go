@@ -110,33 +110,44 @@ func (r *DistanceMatrixRequest) params() url.Values {
 
 // DistanceMatrixRequest is the request struct for Distance Matrix APi
 type DistanceMatrixRequest struct {
-	// Origins is a list of addresses and/or textual latitude/longitude values from which to calculate distance and time. Required.
+	// Origins is a list of addresses and/or textual latitude/longitude values
+	// from which to calculate distance and time. Required.
 	Origins []string
-	// Destinations is a list of addresses and/or textual latitude/longitude values to which to calculate distance and time. Required.
+	// Destinations is a list of addresses and/or textual latitude/longitude values
+	// to which to calculate distance and time. Required.
 	Destinations []string
-	// Mode specifies the mode of transport to use when calculating distance. Valid values are `ModeDriving`, `ModeWalking`, `ModeBicycling`
+	// Mode specifies the mode of transport to use when calculating distance.
+	// Valid values are `ModeDriving`, `ModeWalking`, `ModeBicycling`
 	// and `ModeTransit`. Optional.
 	Mode Mode
 	// Language in which to return results. Optional.
 	Language string
-	// Avoid introduces restrictions to the route. Valid values are `AvoidTolls`, `AvoidHighways` and `AvoidFerries`. Optional.
+	// Avoid introduces restrictions to the route. Valid values are `AvoidTolls`,
+	// `AvoidHighways` and `AvoidFerries`. Optional.
 	Avoid Avoid
-	// Units Specifies the unit system to use when expressing distance as text. Valid values are `UnitsMetric` and `UnitsImperial`. Optional.
+	// Units Specifies the unit system to use when expressing distance as text.
+	// Valid values are `UnitsMetric` and `UnitsImperial`. Optional.
 	Units Units
-	// DepartureTime is the desired time of departure. You can specify the time as an integer in seconds since midnight, January 1, 1970 UTC.
-	// Alternatively, you can specify a value of `"now"``. Optional.
+	// DepartureTime is the desired time of departure. You can specify the time as
+	// an integer in seconds since midnight, January 1, 1970 UTC. Alternatively,
+	// you can specify a value of `"now"``. Optional.
 	DepartureTime string
-	// ArrivalTime specifies the desired time of arrival for transit requests, in seconds since midnight, January 1, 1970 UTC. You cannot
-	// specify both `DepartureTime` and `ArrivalTime`. Optional.
+	// ArrivalTime specifies the desired time of arrival for transit requests,
+	// in seconds since midnight, January 1, 1970 UTC. You cannot specify
+	// both `DepartureTime` and `ArrivalTime`. Optional.
 	ArrivalTime string
-	// TrafficModel determines the type of model that will be used when determining travel time when using depature times in the future
-	// options are TrafficModelBestGuess, TrafficModelOptimistic or TrafficModelPessimistic. Optional. Default is TrafficModelBestGuess
+	// TrafficModel determines the type of model that will be used when determining
+	// travel time when using depature times in the future. Options are
+	// `TrafficModelBestGuess`, `TrafficModelOptimistic`` or `TrafficModelPessimistic`.
+	// Optional. Default is `TrafficModelBestGuess``
 	TrafficModel TrafficModel
-	// TransitMode specifies one or more preferred modes of transit. This parameter may only be specified for requests where the mode is
-	// `transit`. Valid values are `TransitModeBus`, `TransitModeSubway`, `TransitModeTrain`, `TransitModeTram`, and `TransitModeRail`.
-	// Optional.
+	// TransitMode specifies one or more preferred modes of transit. This parameter
+	// may only be specified for requests where the mode is `transit`. Valid values
+	// are `TransitModeBus`, `TransitModeSubway`, `TransitModeTrain`, `TransitModeTram`,
+	// and `TransitModeRail`. Optional.
 	TransitMode []TransitMode
-	// TransitRoutingPreference Specifies preferences for transit requests. Valid values are `TransitRoutingPreferenceLessWalking` and
+	// TransitRoutingPreference Specifies preferences for transit requests. Valid
+	// values are `TransitRoutingPreferenceLessWalking` and 
 	// `TransitRoutingPreferenceFewerTransfers`. Optional.
 	TransitRoutingPreference TransitRoutingPreference
 }
@@ -144,9 +155,11 @@ type DistanceMatrixRequest struct {
 // DistanceMatrixResponse represents a Distance Matrix API response.
 type DistanceMatrixResponse struct {
 
-	// OriginAddresses contains an array of addresses as returned by the API from your original request.
+	// OriginAddresses contains an array of addresses as returned by the API from
+	// your original request.
 	OriginAddresses []string `json:"origin_addresses"`
-	// DestinationAddresses contains an array of addresses as returned by the API from your original request.
+	// DestinationAddresses contains an array of addresses as returned by the API
+	// from your original request.
 	DestinationAddresses []string `json:"destination_addresses"`
 	// Rows contains an array of elements.
 	Rows []DistanceMatrixElementsRow `json:"rows"`
@@ -157,12 +170,14 @@ type DistanceMatrixElementsRow struct {
 	Elements []*DistanceMatrixElement `json:"elements"`
 }
 
-// DistanceMatrixElement is the travel distance and time for a pair of origin and destination.
+// DistanceMatrixElement is the travel distance and time for a pair of origin 
+// and destination.
 type DistanceMatrixElement struct {
 	Status string `json:"status"`
 	// Duration is the length of time it takes to travel this route.
 	Duration time.Duration `json:"duration"`
-	// DurationInTraffic is the length of time it takes to travel this route considering traffic.
+	// DurationInTraffic is the length of time it takes to travel this route
+	// considering traffic.
 	DurationInTraffic time.Duration `json:"duration_in_traffic"`
 	// Distance is the total distance of this route.
 	Distance Distance `json:"distance"`
