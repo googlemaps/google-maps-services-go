@@ -42,7 +42,10 @@ const (
 var expectedWith0b = []LatLng{{Lat: 39.87709, Lng: 32.74713}, {Lat: 39.87709, Lng: 32.74787}, {Lat: 39.87653, Lng: 32.74746}}
 
 func TestPolylineDecode(t *testing.T) {
-	decoded := DecodePolyline(routeSydMel)
+	decoded, err := DecodePolyline(routeSydMel)
+	if err != nil {
+		t.Error("Didn't decode correctly", err)
+	}
 	l := len(decoded)
 
 	if expected, actual := (&LatLng{-33.86746, 151.207090}), decoded[0]; !expected.AlmostEqual(&actual, epsilon) {
@@ -52,7 +55,10 @@ func TestPolylineDecode(t *testing.T) {
 		t.Errorf("last point was %v, expected %v", decoded[l-1], expected)
 	}
 
-	decoded = DecodePolyline(routeWith0b)
+	decoded, err = DecodePolyline(routeWith0b)
+	if err != nil {
+		t.Error("Didn't decode correctly", err)
+	}
 	if len(decoded) != len(expectedWith0b) {
 		t.Errorf("expected equal encoding for 0 change in one direction length mismatch, was len %v, expected len %v", len(decoded), len(expectedWith0b))
 	}
@@ -65,14 +71,20 @@ func TestPolylineDecode(t *testing.T) {
 }
 
 func TestPolylineEncode(t *testing.T) {
-	decoded := DecodePolyline(routeSydMel)
+	decoded, err := DecodePolyline(routeSydMel)
+	if err != nil {
+		t.Error("Didn't decode correctly", err)
+	}
 
 	encoded := Encode(decoded)
 	if !reflect.DeepEqual(encoded, routeSydMel) {
 		t.Errorf("expected equal encoding, was len %v, expected len %v", len(routeSydMel), len(encoded))
 	}
 
-	decoded2 := DecodePolyline(routeWith0b)
+	decoded2, err := DecodePolyline(routeWith0b)
+	if err != nil {
+		t.Error("Didn't decode correctly", err)
+	}
 
 	encoded2 := Encode(decoded2)
 	if !reflect.DeepEqual(encoded2, routeWith0b) {
