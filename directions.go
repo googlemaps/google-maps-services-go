@@ -124,47 +124,64 @@ func (r *DirectionsRequest) params() url.Values {
 
 // DirectionsRequest is the functional options struct for directions.Get
 type DirectionsRequest struct {
-	// Origin is the address or textual latitude/longitude value from which you wish to calculate directions. Required.
+	// Origin is the address or textual latitude/longitude value from which you wish to
+	// calculate directions. Required.
 	Origin string
-	// Destination is the address or textual latitude/longitude value from which you wish to calculate directions. Required.
+	// Destination is the address or textual latitude/longitude value from which you
+	// wish to calculate directions. Required.
 	Destination string
-	// Mode specifies the mode of transport to use when calculating directions. Optional.
+	// Mode specifies the mode of transport to use when calculating directions.
+	// Optional.
 	Mode Mode
-	// DepartureTime specifies the desired time of departure. You can specify the time as an integer in seconds since midnight, January 1, 1970 UTC. Alternatively, you can specify a value of `"now"`. Optional.
+	// DepartureTime specifies the desired time of departure. You can specify the time
+	// as an integer in seconds since midnight, January 1, 1970 UTC. Alternatively, you
+	// can specify a value of `"now"`. Optional.
 	DepartureTime string
-	// ArrivalTime specifies the desired time of arrival for transit directions, in seconds since midnight, January 1, 1970 UTC. Optional. You cannot specify both `DepartureTime` and `ArrivalTime`.
+	// ArrivalTime specifies the desired time of arrival for transit directions, in
+	// seconds since midnight, January 1, 1970 UTC. Optional. You cannot specify both
+	// `DepartureTime` and `ArrivalTime`.
 	ArrivalTime string
 	// Waypoints specifies an array of points to add to a route. Optional.
 	Waypoints []string
-	// Alternatives specifies if Directions service may provide more than one route alternative in the response. Optional.
+	// Alternatives specifies if Directions service may provide more than one route
+	// alternative in the response. Optional.
 	Alternatives bool
-	// Optimize allow the Directions service to optimize the provided route by rearranging the waypoints in a more efficient order. Optional.
+	// Optimize allow the Directions service to optimize the provided route by
+	// rearranging the waypoints in a more efficient order. Optional.
 	Optimize bool
-	// Avoid indicates that the calculated route(s) should avoid the indicated features. Optional.
+	// Avoid indicates that the calculated route(s) should avoid the indicated
+	// features. Optional.
 	Avoid []Avoid
 	// Language specifies the language in which to return results. Optional.
 	Language string
 	// Units specifies the unit system to use when displaying results. Optional.
 	Units Units
-	// Region specifies the region code, specified as a ccTLD two-character value. Optional.
+	// Region specifies the region code, specified as a ccTLD two-character value.
+	// Optional.
 	Region string
-	// TransitMode specifies one or more preferred modes of transit. This parameter may only be specified for transit directions. Optional.
+	// TransitMode specifies one or more preferred modes of transit. This parameter
+	// may only be specified for transit directions. Optional.
 	TransitMode []TransitMode
 	// TransitRoutingPreference specifies preferences for transit routes. Optional.
 	TransitRoutingPreference TransitRoutingPreference
-	// TrafficModel specifies traffic prediction model when requesting future directions. Optional.
+	// TrafficModel specifies traffic prediction model when requesting future
+	// directions. Optional.
 	TrafficModel TrafficModel
 }
 
-// GeocodedWaypoint represents the geocoded point for origin, supplied waypoints, or destination for a requested direction request.
+// GeocodedWaypoint represents the geocoded point for origin, supplied waypoints, or
+// destination for a requested direction request.
 type GeocodedWaypoint struct {
-	// GeocoderStatus indicates the status code resulting from the geocoding operation. This field may contain the following values.
+	// GeocoderStatus indicates the status code resulting from the geocoding operation.
+	// This field may contain the following values.
 	GeocoderStatus string `json:"geocoder_status"`
-	// PartialMatch indicates that the geocoder did not return an exact match for the original request, though it was able to match part of the requested address.
+	// PartialMatch indicates that the geocoder did not return an exact match for the
+	// original request, though it was able to match part of the requested address.
 	PartialMatch bool `json:"partial_match"`
 	// PlaceID is a unique identifier that can be used with other Google APIs.
 	PlaceID string `json:"place_id"`
-	// Types indicates the address type of the geocoding result used for calculating directions.
+	// Types indicates the address type of the geocoding result used for calculating
+	// directions.
 	Types []string `json:"types"`
 }
 
@@ -174,37 +191,41 @@ type Route struct {
 	// naming and disambiguating the route from alternatives.
 	Summary string `json:"summary"`
 
-	// Legs contains information about a leg of the route, between two locations within the
-	// given route. A separate leg will be present for each waypoint or destination specified.
-	// (A route with no waypoints will contain exactly one leg within the legs array.)
+	// Legs contains information about a leg of the route, between two locations within
+	// the given route. A separate leg will be present for each waypoint or destination
+	// specified. A route with no waypoints will contain exactly one leg within the legs
+	// array.
 	Legs []*Leg `json:"legs"`
 
-	// WaypointOrder contains an array indicating the order of any waypoints in the calculated route.
+	// WaypointOrder contains an array indicating the order of any waypoints in the
+	// calculated route.
 	WaypointOrder []int `json:"waypoint_order"`
 
-	// OverviewPolyline contains an approximate (smoothed) path of the resulting directions.
+	// OverviewPolyline contains an approximate (smoothed) path of the resulting
+	// directions.
 	OverviewPolyline Polyline `json:"overview_polyline"`
 
 	// Bounds contains the viewport bounding box of the overview polyline.
 	Bounds LatLngBounds `json:"bounds"`
 
-	// Copyrights contains the copyrights text to be displayed for this route. You must handle
-	// and display this information yourself.
+	// Copyrights contains the copyrights text to be displayed for this route. You
+	// must handle and display this information yourself.
 	Copyrights string `json:"copyrights"`
 
-	// Warnings contains an array of warnings to be displayed when showing these directions.
-	// You must handle and display these warnings yourself.
+	// Warnings contains an array of warnings to be displayed when showing these
+	// directions. You must handle and display these warnings yourself.
 	Warnings []string `json:"warnings"`
 
-	// Fare contains the total fare (that is, the total ticket costs) on this route. This property
-	// is only returned for transit requests and only for routes where fare information is available
-	// for all transit legs.
+	// Fare contains the total fare (that is, the total ticket costs) on this route.
+	// This property is only returned for transit requests and only for routes where
+	// fare information is available for all transit legs.
 	*Fare `json:"fare"`
 }
 
 // Fare represents the total fare for a route.
 type Fare struct {
-	// Currency is an ISO 4217 currency code indicating the currency that the amount is expressed in.
+	// Currency is an ISO 4217 currency code indicating the currency that the amount
+	// is expressed in.
 	Currency string `json:"currency"`
 
 	// Value is the total fare amount, in the currency specified above.
@@ -216,8 +237,8 @@ type Fare struct {
 
 // Leg represents a single leg of a route.
 type Leg struct {
-	// Steps contains an array of steps denoting information about each separate step of the
-	// leg of the journey.
+	// Steps contains an array of steps denoting information about each separate step
+	// of the leg of the journey.
 	Steps []*Step `json:"steps"`
 
 	// Distance indicates the total distance covered by this leg.
@@ -226,21 +247,25 @@ type Leg struct {
 	// Duration indicates total time required for this leg.
 	Duration time.Duration `json:"duration"`
 
-	// DurationInTraffic indicates the total duration of this leg. This value is an estimate of the time in traffic based on current and historical traffic conditions.
+	// DurationInTraffic indicates the total duration of this leg. This value is an
+	// estimate of the time in traffic based on current and historical traffic
+	// conditions.
 	DurationInTraffic time.Duration `json:"duration_in_traffic"`
 
-	// ArrivalTime contains the estimated time of arrival for this leg. This property is only
-	// returned for transit directions.
+	// ArrivalTime contains the estimated time of arrival for this leg. This property
+	// is only returned for transit directions.
 	ArrivalTime time.Time `json:"arrival_time"`
 
-	// DepartureTime contains the estimated time of departure for this leg. This property is
-	// only returned for transit directions.
+	// DepartureTime contains the estimated time of departure for this leg. This
+	// property is only returned for transit directions.
 	DepartureTime time.Time `json:"departure_time"`
 
-	// StartLocation contains the latitude/longitude coordinates of the origin of this leg.
+	// StartLocation contains the latitude/longitude coordinates of the origin of this
+	// leg.
 	StartLocation LatLng `json:"start_location"`
 
-	// EndLocation contains the latitude/longitude coordinates of the destination of this leg.
+	// EndLocation contains the latitude/longitude coordinates of the destination of
+	// this leg.
 	EndLocation LatLng `json:"end_location"`
 
 	// StartAddress contains the human-readable address (typically a street address)
@@ -251,7 +276,7 @@ type Leg struct {
 	// reflecting the end location of this leg.
 	EndAddress string `json:"end_address"`
 
-	// ViaWaypoint contains info about points through which the route was laid
+	// ViaWaypoint contains info about points through which the route was laid.
 	ViaWaypoint []*ViaWaypoint `json:"via_waypoint"`
 }
 
@@ -264,57 +289,66 @@ type ViaWaypoint struct {
 
 // Step represents a single step of a leg.
 type Step struct {
-	// HTMLInstructions contains formatted instructions for this step, presented as an HTML text string.
+	// HTMLInstructions contains formatted instructions for this step, presented as an
+	// HTML text string.
 	HTMLInstructions string `json:"html_instructions"`
 
 	// Distance contains the distance covered by this step until the next step.
 	Distance `json:"distance"`
 
-	// Duration contains the typical time required to perform the step, until the next step.
+	// Duration contains the typical time required to perform the step, until the next
+	// step.
 	time.Duration `json:"duration"`
 
-	// StartLocation contains the location of the starting point of this step, as a single set of lat
-	// and lng fields.
+	// StartLocation contains the location of the starting point of this step, as a
+	// single set of lat and lng fields.
 	StartLocation LatLng `json:"start_location"`
 
-	// EndLocation contains the location of the last point of this step, as a single set of lat and
-	// lng fields.
+	// EndLocation contains the location of the last point of this step, as a single
+	// set of lat and lng fields.
 	EndLocation LatLng `json:"end_location"`
 
-	// Polyline contains a single points object that holds an encoded polyline representation of the
-	// step. This polyline is an approximate (smoothed) path of the step.
+	// Polyline contains a single points object that holds an encoded polyline
+	// representation of the step. This polyline is an approximate (smoothed) path of
+	// the step.
 	Polyline `json:"polyline"`
 
-	// Steps contains detailed directions for walking or driving steps in transit directions. Substeps
-	// are only available when travel_mode is set to "transit". The inner steps array is of the same
-	// type as steps.
+	// Steps contains detailed directions for walking or driving steps in transit
+	// directions. Substeps are only available when travel_mode is set to "transit".
+	// The inner steps array is of the same type as steps.
 	Steps []*Step `json:"steps"`
 
-	// TransitDetails contains transit specific information. This field is only returned with travel
-	// mode is set to "transit".
+	// TransitDetails contains transit specific information. This field is only
+	// returned with travel mode is set to "transit".
 	TransitDetails *TransitDetails `json:"transit_details"`
 
 	// TravelMode indicates the travel mode of this step.
 	TravelMode string `json:"travel_mode"`
 }
 
-// TransitDetails contains additional information about the transit stop, transit line and transit agency.
+// TransitDetails contains additional information about the transit stop, transit
+// line and transit agency.
 type TransitDetails struct {
-	// ArrivalStop contains information about the stop/station for this part of the trip.
+	// ArrivalStop contains information about the stop/station for this part of the
+	// trip.
 	ArrivalStop TransitStop `json:"arrival_stop"`
-	// DepartureStop contains information about the stop/station for this part of the trip.
+	// DepartureStop contains information about the stop/station for this part of the
+	// trip.
 	DepartureStop TransitStop `json:"departure_stop"`
-	// ArrivalTime contains the arrival time for this leg of the journey
+	// ArrivalTime contains the arrival time for this leg of the journey.
 	ArrivalTime time.Time `json:"arrival_time"`
-	// DepartureTime contains the departure time for this leg of the journey
+	// DepartureTime contains the departure time for this leg of the journey.
 	DepartureTime time.Time `json:"departure_time"`
-	// Headsign specifies the direction in which to travel on this line, as it is marked on the vehicle or at the departure stop.
+	// Headsign specifies the direction in which to travel on this line, as it is
+	// marked on the vehicle or at the departure stop.
 	Headsign string `json:"headsign"`
-	// Headway specifies the expected number of seconds between departures from the same stop at this time
+	// Headway specifies the expected number of seconds between departures from the
+	// same stop at this time
 	Headway time.Duration `json:"headway"`
-	// NumStops contains the number of stops in this step, counting the arrival stop, but not the departure stop
+	// NumStops contains the number of stops in this step, counting the arrival stop,
+	// but not the departure stop
 	NumStops uint `json:"num_stops"`
-	// Line contains information about the transit line used in this step
+	// Line contains information about the transit line used in this step.
 	Line TransitLine `json:"line"`
 }
 

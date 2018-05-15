@@ -79,7 +79,8 @@ type SnapToRoadRequest struct {
 	// Path is the path to be snapped.
 	Path []LatLng
 
-	// Interpolate is whether to interpolate a path to include all points forming the full road-geometry.
+	// Interpolate is whether to interpolate a path to include all points forming the
+	// full road-geometry.
 	Interpolate bool
 }
 
@@ -93,7 +94,8 @@ type SnappedPoint struct {
 	// Location of the snapped point.
 	Location LatLng `json:"location"`
 
-	// OriginalIndex is an integer that indicates the corresponding value in the original request. Not present on interpolated points.
+	// OriginalIndex is an integer that indicates the corresponding value in the
+	// original request. Not present on interpolated points.
 	OriginalIndex *int `json:"originalIndex"`
 
 	// PlaceID is a unique identifier for a place.
@@ -193,7 +195,8 @@ type SpeedLimitsRequest struct {
 	// PlaceID is the PlaceIDs to request speed limits for.
 	PlaceID []string
 
-	// Units is whether to return speed limits in `SpeedLimitKPH` or `SpeedLimitMPH`. Optional, default behavior is to return results in KPH.
+	// Units is whether to return speed limits in `SpeedLimitKPH` or `SpeedLimitMPH`.
+	// Optional, default behavior is to return results in KPH.
 	Units speedLimitUnit
 }
 

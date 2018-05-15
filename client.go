@@ -47,7 +47,8 @@ type ClientOption func(*Client) error
 
 var defaultRequestsPerSecond = 50
 
-// NewClient constructs a new Client which can make requests to the Google Maps WebService APIs.
+// NewClient constructs a new Client which can make requests to the Google Maps
+// WebService APIs.
 func NewClient(options ...ClientOption) (*Client, error) {
 	c := &Client{requestsPerSecond: defaultRequestsPerSecond}
 	WithHTTPClient(&http.Client{})(c)
@@ -68,7 +69,8 @@ func NewClient(options ...ClientOption) (*Client, error) {
 	return c, nil
 }
 
-// WithHTTPClient configures a Maps API client with a http.Client to make requests over.
+// WithHTTPClient configures a Maps API client with a http.Client to make requests
+// over.
 func WithHTTPClient(c *http.Client) ClientOption {
 	return func(client *Client) error {
 		if _, ok := c.Transport.(*transport); !ok {
@@ -108,8 +110,8 @@ func WithChannel(channel string) ClientOption {
 	}
 }
 
-// WithClientIDAndSignature configures a Maps API client for a Maps for Work application
-// The signature is assumed to be URL modified Base64 encoded
+// WithClientIDAndSignature configures a Maps API client for a Maps for Work
+// application. The signature is assumed to be URL modified Base64 encoded.
 func WithClientIDAndSignature(clientID, signature string) ClientOption {
 	return func(c *Client) error {
 		c.clientID = clientID
