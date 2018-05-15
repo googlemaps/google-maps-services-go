@@ -147,7 +147,7 @@ type DistanceMatrixRequest struct {
 	// and `TransitModeRail`. Optional.
 	TransitMode []TransitMode
 	// TransitRoutingPreference Specifies preferences for transit requests. Valid
-	// values are `TransitRoutingPreferenceLessWalking` and 
+	// values are `TransitRoutingPreferenceLessWalking` and
 	// `TransitRoutingPreferenceFewerTransfers`. Optional.
 	TransitRoutingPreference TransitRoutingPreference
 }
@@ -170,7 +170,7 @@ type DistanceMatrixElementsRow struct {
 	Elements []*DistanceMatrixElement `json:"elements"`
 }
 
-// DistanceMatrixElement is the travel distance and time for a pair of origin 
+// DistanceMatrixElement is the travel distance and time for a pair of origin
 // and destination.
 type DistanceMatrixElement struct {
 	Status string `json:"status"`
