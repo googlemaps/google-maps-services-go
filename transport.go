@@ -21,12 +21,14 @@ import (
 
 const userAgent = "GoogleGeoApiClientGo/0.1"
 
-// transport is an http.RoundTripper that replaces or appends userAgent the request's User-Agent header.
+// transport is an http.RoundTripper that replaces or appends userAgent the request's
+// User-Agent header.
 type transport struct {
 	Base http.RoundTripper
 }
 
-// RoundTrip appends userAgent existing User-Agent header and performs the request via t.Base.
+// RoundTrip appends userAgent existing User-Agent header and performs the request
+// via t.Base.
 func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req = cloneRequest(req)
 	ua := req.Header.Get("User-Agent")

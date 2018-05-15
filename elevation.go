@@ -74,13 +74,16 @@ func (r *ElevationRequest) params() url.Values {
 	return q
 }
 
-// ElevationRequest is the request structure for Elevation API. Either Locations or Path must be set.
+// ElevationRequest is the request structure for Elevation API. Either Locations or
+// Path must be set.
 type ElevationRequest struct {
-	// Locations defines the location(s) on the earth from which to return elevation data.
+	// Locations defines the location(s) on the earth from which to return elevation
+	// data.
 	Locations []LatLng
 	// Path defines a path on the earth for which to return elevation data.
 	Path []LatLng
-	// Samples specifies the number of sample points along a path for which to return elevation data. Required if Path is supplied.
+	// Samples specifies the number of sample points along a path for which to return
+	// elevation data. Required if Path is supplied.
 	Samples int
 }
 
@@ -90,6 +93,7 @@ type ElevationResult struct {
 	Location *LatLng `json:"location"`
 	// Elevation indicates the elevation of the location in meters
 	Elevation float64 `json:"elevation"`
-	// Resolution indicates the maximum distance between data points from which the elevation was interpolated, in meters
+	// Resolution indicates the maximum distance between data points from which the
+	// elevation was interpolated, in meters.
 	Resolution float64 `json:"resolution"`
 }

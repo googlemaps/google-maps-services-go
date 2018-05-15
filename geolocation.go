@@ -60,17 +60,21 @@ const (
 type CellTower struct {
 	// CellID Unique identifier of the cell
 	CellID int `json:"cellId,omitempty"`
-	// LocationAreaCode is the Location Area Code (LAC) for GSM and WCDMAnetworks. The Network ID (NID) for CDMA networks.
+	// LocationAreaCode is the Location Area Code (LAC) for GSM and WCDMAnetworks. The
+	// Network ID (NID) for CDMA networks.
 	LocationAreaCode int `json:"locationAreaCode,omitempty"`
 	// MobileCountryCode is the cell tower's Mobile Country Code (MCC).
 	MobileCountryCode int `json:"mobileCountryCode,omitempty"`
-	// MobileNetworkCode is the cell tower's Mobile Network Code. This is the MNC for GSM and WCDMA; CDMA uses the System ID (SID).
+	// MobileNetworkCode is the cell tower's Mobile Network Code. This is the MNC for
+	// GSM and WCDMA; CDMA uses the System ID (SID).
 	MobileNetworkCode int `json:"mobileNetworkCode,omitempty"`
-	// Age is the number of milliseconds since this cell was primary. If age is 0, the cellId represents a current measurement.
+	// Age is the number of milliseconds since this cell was primary. If age is 0, the
+	// cellId represents a current measurement.
 	Age int `json:"age,omitempty"`
 	// SignalStrength is the radio signal strength measured in dBm.
 	SignalStrength int `json:"signalStrength,omitempty"`
-	// TimingAdvance is the timing advance value. Please see https://en.wikipedia.org/wiki/Timing_advance for more detail.
+	// TimingAdvance is the timing advance value. Please see
+	// https://en.wikipedia.org/wiki/Timing_advance for more detail.
 	TimingAdvance int `json:"timingAdvance,omitempty"`
 }
 
@@ -82,7 +86,8 @@ type WiFiAccessPoint struct {
 	SignalStrength float64 `json:"signalStrength,omitempty"`
 	// Age is the number of milliseconds since this access point was detected.
 	Age uint64 `json:"age,omitempty"`
-	// Channel is the channel over which the client is communicating with the access point.
+	// Channel is the channel over which the client is communicating with the access
+	// point.
 	Channel int `json:"channel,omitempty"`
 	// SignalToNoiseRatio is the current signal to noise ratio measured in dB.
 	SignalToNoiseRatio float64 `json:"signalToNoiseRatio,omitempty"`
@@ -91,15 +96,19 @@ type WiFiAccessPoint struct {
 // GeolocationRequest is the request structure for Geolocation API
 // All fields are optional
 type GeolocationRequest struct {
-	// HomeMobileCountryCode is the mobile country code (MCC) for the device's home network.
+	// HomeMobileCountryCode is the mobile country code (MCC) for the device's home
+	// network.
 	HomeMobileCountryCode int `json:"homeMobileCountryCode,omitempty"`
-	// HomeMobileNetworkCode is the mobile network code (MNC) for the device's home network.
+	// HomeMobileNetworkCode is the mobile network code (MNC) for the device's home
+	// network.
 	HomeMobileNetworkCode int `json:"homeMobileNetworkCode,omitempty"`
-	// RadioType is the mobile radio type, this is optional but should be included if available
+	// RadioType is the mobile radio type, this is optional but should be included if
+	// available
 	RadioType RadioType `json:"radioType,omitempty"`
 	// Carrier is the carrier name
 	Carrier string `json:"carrier,omitempty"`
-	// ConsiderIP Specifies whether to fall back to IP geolocation if wifi and cell tower signals are not available.
+	// ConsiderIP Specifies whether to fall back to IP geolocation if wifi and cell
+	// tower signals are not available.
 	ConsiderIP bool `json:"considerIp"`
 	// CellTowers is an array of CellTower objects.
 	CellTowers []CellTower `json:"cellTowers,omitempty"`

@@ -305,7 +305,7 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 		EndLocation:   LatLng{Lat: -33.8150985, Lng: 151.0031658},
 		StartAddress:  "Sydney NSW, Australia",
 		EndAddress:    "Parramatta NSW, Australia",
-		ViaWaypoint:  make([]*ViaWaypoint,0),
+		ViaWaypoint:   make([]*ViaWaypoint, 0),
 	})
 
 	correctResponse := &Route{

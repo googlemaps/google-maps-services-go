@@ -76,11 +76,13 @@ const (
 
 // Distance is the API representation for a distance between two points.
 type Distance struct {
-	// HumanReadable is the human friendly distance. This is rounded and in an appropriate unit for the
-	// request. The units can be overriden with a request parameter.
+	// HumanReadable is the human friendly distance. This is rounded and in an
+	// appropriate unit for the request. The units can be overriden with a request
+	// parameter.
 	HumanReadable string `json:"text"`
-	// Meters is the numeric distance, always in meters. This is intended to be used only in
-	// algorithmic situations, e.g. sorting results by some user specified metric.
+	// Meters is the numeric distance, always in meters. This is intended to be used
+	// only in algorithmic situations, e.g. sorting results by some user specified
+	// metric.
 	Meters int `json:"value"`
 }
 
@@ -108,17 +110,22 @@ const (
 
 // OpeningHours describes the opening hours for a Place Details result.
 type OpeningHours struct {
-	// OpenNow is a boolean value indicating if the place is open at the current time. Please note, this field will be null if it isn't present in the response.
+	// OpenNow is a boolean value indicating if the place is open at the current time.
+	// Please note, this field will be null if it isn't present in the response.
 	OpenNow *bool `json:"open_now,omitempty"`
-	// Periods is an array of opening periods covering seven days, starting from Sunday, in chronological order.
+	// Periods is an array of opening periods covering seven days, starting from Sunday,
+	// in chronological order.
 	Periods []OpeningHoursPeriod `json:"periods,omitempty"`
-	// weekdayText is an array of seven strings representing the formatted opening hours for each day of the week, for example "Monday: 8:30 am – 5:30 pm".
+	// weekdayText is an array of seven strings representing the formatted opening hours
+	// for each day of the week, for example "Monday: 8:30 am – 5:30 pm".
 	WeekdayText []string `json:"weekday_text,omitempty"`
-	// PermanentlyClosed indicates that the place has permanently shut down. Please note, this field will be null if it isn't present in the response.
+	// PermanentlyClosed indicates that the place has permanently shut down. Please
+	// note, this field will be null if it isn't present in the response.
 	PermanentlyClosed *bool `json:"permanently_closed,omitempty"`
 }
 
-// OpeningHoursPeriod is a single OpeningHours day describing when the place opens and closes.
+// OpeningHoursPeriod is a single OpeningHours day describing when the place opens
+// and closes.
 type OpeningHoursPeriod struct {
 	// Open is when the place opens.
 	Open OpeningHoursOpenClose `json:"open"`
@@ -128,9 +135,11 @@ type OpeningHoursPeriod struct {
 
 // OpeningHoursOpenClose describes when the place is open.
 type OpeningHoursOpenClose struct {
-	// Day is a number from 0–6, corresponding to the days of the week, starting on Sunday. For example, 2 means Tuesday.
+	// Day is a number from 0–6, corresponding to the days of the week, starting on
+	// Sunday. For example, 2 means Tuesday.
 	Day time.Weekday `json:"day"`
-	// Time contains a time of day in 24-hour hhmm format. Values are in the range 0000–2359. The time will be reported in the place’s time zone.
+	// Time contains a time of day in 24-hour hhmm format. Values are in the range
+	// 0000–2359. The time will be reported in the place’s time zone.
 	Time string `json:"time"`
 }
 
@@ -146,8 +155,9 @@ type Photo struct {
 	HTMLAttributions []string `json:"html_attributions"`
 }
 
-// Component specifies a key for the parts of a structured address.
-// See https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering for more detail.
+// Component specifies a key for the parts of a structured address. See
+// https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering
+// for more detail.
 type Component string
 
 const (
@@ -163,21 +173,22 @@ const (
 	ComponentCountry = Component("country")
 )
 
-// RankBy specifies the order in which results are listed
+// RankBy specifies the order in which results are listed.
 type RankBy string
 
-// RankBy options for Places Search
+// RankBy options for Places Search.
 const (
 	RankByProminence = RankBy("prominence")
 	RankByDistance   = RankBy("distance")
 )
 
-// PlaceType restricts Place API search to the results to places matching the specified type.
+// PlaceType restricts Place API search to the results to places matching the
+// specified type.
 type PlaceType string
 
 // Warning: DO NOT EDIT PlaceType* - they are code generated.
 
-// Place Types for the Places API
+// Place Types for the Places API.
 const (
 	PlaceTypeAccounting            = PlaceType("accounting")
 	PlaceTypeAirport               = PlaceType("airport")
@@ -479,7 +490,8 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 	}
 }
 
-// AutocompletePlaceType restricts Place Autocomplete API to the results to places matching the specified type.
+// AutocompletePlaceType restricts Place Autocomplete API to the results to places
+// matching the specified type.
 type AutocompletePlaceType string
 
 // https://developers.google.com/places/web-service/autocomplete#place_types
@@ -491,7 +503,8 @@ const (
 	AutocompletePlaceTypeCities        = AutocompletePlaceType("(cities)")
 )
 
-// ParseAutocompletePlaceType will parse a string representation of a AutocompletePlaceTypes.
+// ParseAutocompletePlaceType will parse a string representation of a
+// AutocompletePlaceTypes.
 func ParseAutocompletePlaceType(placeType string) (AutocompletePlaceType, error) {
 	switch strings.ToLower(placeType) {
 	case "geocode":

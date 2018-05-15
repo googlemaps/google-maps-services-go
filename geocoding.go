@@ -131,13 +131,17 @@ func (r *GeocodingRequest) params() url.Values {
 type GeocodeAccuracy string
 
 const (
-	// GeocodeAccuracyRooftop restricts the results to addresses for which Google has location information accurate down to street address precision
+	// GeocodeAccuracyRooftop restricts the results to addresses for which Google has
+	// location information accurate down to street address precision.
 	GeocodeAccuracyRooftop = GeocodeAccuracy("ROOFTOP")
-	// GeocodeAccuracyRangeInterpolated restricts the results to those that reflect an approximation interpolated between two precise points.
+	// GeocodeAccuracyRangeInterpolated restricts the results to those that reflect an
+	// approximation interpolated between two precise points.
 	GeocodeAccuracyRangeInterpolated = GeocodeAccuracy("RANGE_INTERPOLATED")
-	// GeocodeAccuracyGeometricCenter restricts the results to geometric centers of a location such as a polyline or polygon.
+	// GeocodeAccuracyGeometricCenter restricts the results to geometric centers of a
+	// location such as a polyline or polygon.
 	GeocodeAccuracyGeometricCenter = GeocodeAccuracy("GEOMETRIC_CENTER")
-	// GeocodeAccuracyApproximate restricts the results to those that are characterized as approximate.
+	// GeocodeAccuracyApproximate restricts the results to those that are characterized
+	// as approximate.
 	GeocodeAccuracyApproximate = GeocodeAccuracy("APPROXIMATE")
 )
 
@@ -145,33 +149,39 @@ const (
 type GeocodingRequest struct {
 	// Geocoding fields
 
-	// Address is the street address that you want to geocode, in the format used by the national postal service of the country concerned.
+	// Address is the street address that you want to geocode, in the format used by
+	// the national postal service of the country concerned.
 	Address string
-	// Components is a component filter for which you wish to obtain a geocode. Either Address or Components is required in a geocoding request.
-	// For more detail on Component Filtering please see
+	// Components is a component filter for which you wish to obtain a geocode. Either
+	// Address or Components is required in a geocoding request. For more detail on
+	// Component Filtering please see
 	// https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering
 	Components map[Component]string
-	// Bounds is the bounding box of the viewport within which to bias geocode results more prominently. Optional.
+	// Bounds is the bounding box of the viewport within which to bias geocode results
+	// more prominently. Optional.
 	Bounds *LatLngBounds
 	// Region is the region code, specified as a ccTLD two-character value. Optional.
 	Region string
 
 	// Reverse geocoding fields
 
-	// LatLng is the textual latitude/longitude value for which you wish to obtain the closest, human-readable address. Either LatLng or PlaceID is required for Reverse Geocoding.
+	// LatLng is the textual latitude/longitude value for which you wish to obtain the
+	// closest, human-readable address. Either LatLng or PlaceID is required for
+	// Reverse Geocoding.
 	LatLng *LatLng
 	// ResultType is an array of one or more address types. Optional.
 	ResultType []string
 	// LocationType is an array of one or more geocoding accuracy types. Optional.
 	LocationType []GeocodeAccuracy
-	// PlaceID is a string which contains the place_id, which can be used for reverse geocoding requests. Either LatLng or PlaceID is required for Reverse Geocoding.
+	// PlaceID is a string which contains the place_id, which can be used for reverse
+	// geocoding requests. Either LatLng or PlaceID is required for Reverse Geocoding.
 	PlaceID string
 
 	// Language is the language in which to return results. Optional.
 	Language string
 
-	// Custom allows passing through custom parameters to the Geocoding back end. Use with caution.
-	// For more detail on why this is required, please see
+	// Custom allows passing through custom parameters to the Geocoding back end.
+	// Use with caution. For more detail on why this is required, please see
 	// https://googlegeodevelopers.blogspot.com/2016/11/address-geocoding-in-google-maps-apis.html
 	Custom url.Values
 }

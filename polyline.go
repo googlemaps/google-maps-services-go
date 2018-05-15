@@ -17,7 +17,6 @@ package maps
 import (
 	"bytes"
 	"io"
-	"log"
 )
 
 // Polyline represents a list of lat,lng points encoded as a byte array.
@@ -27,7 +26,7 @@ type Polyline struct {
 }
 
 // DecodePolyline converts a polyline encoded string to an array of LatLng objects.
-func DecodePolyline(poly string) []LatLng {
+func DecodePolyline(poly string) ([]LatLng, error) {
 	p := &Polyline{
 		Points: poly,
 	}
@@ -35,7 +34,7 @@ func DecodePolyline(poly string) []LatLng {
 }
 
 // Decode converts this encoded Polyline to an array of LatLng objects.
-func (p *Polyline) Decode() []LatLng {
+func (p *Polyline) Decode() ([]LatLng, error) {
 	input := bytes.NewBufferString(p.Points)
 
 	var lat, lng int64
@@ -44,10 +43,10 @@ func (p *Polyline) Decode() []LatLng {
 		dlat, _ := decodeInt(input)
 		dlng, err := decodeInt(input)
 		if err == io.EOF {
-			return path
+			return path, nil
 		}
 		if err != nil {
-			log.Fatal("unexpected err decoding polyline", err)
+			return nil, err
 		}
 
 		lat, lng = lat+dlat, lng+dlng
