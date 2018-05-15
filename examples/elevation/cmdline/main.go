@@ -95,7 +95,7 @@ func main() {
 // https://developers.google.com/maps/documentation/elevation/#Locations
 func decodeLocations(location string) ([]maps.LatLng, error) {
 	if strings.HasPrefix(location, "enc:") {
-		return maps.DecodePolyline(location[len("enc:"):]), nil
+		return maps.DecodePolyline(location[len("enc:"):])
 	}
 
 	if strings.Contains(location, "|") {
@@ -113,7 +113,7 @@ func decodeLocations(location string) ([]maps.LatLng, error) {
 // https://developers.google.com/maps/documentation/elevation/#Paths
 func decodePath(path string) ([]maps.LatLng, error) {
 	if strings.HasPrefix(path, "enc:") {
-		return maps.DecodePolyline(path[len("enc:"):]), nil
+		return maps.DecodePolyline(path[len("enc:"):])
 	}
 	result := []maps.LatLng{}
 	if strings.Contains(path, "|") {
