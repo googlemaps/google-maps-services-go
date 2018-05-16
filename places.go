@@ -499,6 +499,10 @@ func (r *PlaceDetailsRequest) params() url.Values {
 		q.Set("language", r.Language)
 	}
 
+	if len(r.Fields) > 0 {
+		q.Set("fields", strings.Join(r.fieldsAsStringArray(), ","))
+	}
+
 	return q
 }
 
@@ -510,6 +514,19 @@ type PlaceDetailsRequest struct {
 	// Language is the language code, indicating in which language the results should be
 	// returned, if possible.
 	Language string
+	// Fields allows you to select which parts of the returned details structure
+	// should be filled in. For more detail, please see the following URL:
+	// https://cloud.google.com/maps-platform/user-guide/product-changes/#places
+	Fields []PlaceDetailsFieldMask
+}
+
+// fieldsAsStringArray works around the type system
+func (r *PlaceDetailsRequest) fieldsAsStringArray() []string {
+	var res []string
+	for _, el := range r.Fields {
+		res = append(res, string(el))
+	}
+	return res
 }
 
 // PlaceDetailsResult is an individual Places API Place Details result
