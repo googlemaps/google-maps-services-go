@@ -500,7 +500,7 @@ func (r *PlaceDetailsRequest) params() url.Values {
 	}
 
 	if len(r.Fields) > 0 {
-		q.Set("fields", strings.Join(r.fieldsAsStringArray(), ","))
+		q.Set("fields", strings.Join(fieldsAsStringArray(r.Fields), ","))
 	}
 
 	return q
@@ -518,15 +518,6 @@ type PlaceDetailsRequest struct {
 	// should be filled in. For more detail, please see the following URL:
 	// https://cloud.google.com/maps-platform/user-guide/product-changes/#places
 	Fields []PlaceDetailsFieldMask
-}
-
-// fieldsAsStringArray works around the type system
-func (r *PlaceDetailsRequest) fieldsAsStringArray() []string {
-	var res []string
-	for _, el := range r.Fields {
-		res = append(res, string(el))
-	}
-	return res
 }
 
 // PlaceDetailsResult is an individual Places API Place Details result
@@ -939,4 +930,84 @@ func (resp *PlacePhotoResponse) Image() (image.Image, error) {
 	}
 	img, _, err := image.Decode(resp.Data)
 	return img, err
+}
+
+// FindPlaceFromTextInputType is the different types of inputs.
+type FindPlaceFromTextInputType string
+
+// The types of FindPlaceFromText Input Types.
+const (
+	FindPlaceFromTextInputTypeTextQuery   = FindPlaceFromTextInputType("textquery")
+	FindPlaceFromTextInputTypePhoneNumber = FindPlaceFromTextInputType("phonenumber")
+)
+
+// FindPlaceFromTextRequest is the options struct for Find Place From Text API
+type FindPlaceFromTextRequest struct {
+	// The text input specifying which place to search for (for example, a name,
+	// address, or phone number). Required.
+	Input string
+
+	// The type of input. Required.
+	InputType FindPlaceFromTextInputType
+
+	// Fields allows you to select which parts of the returned details structure
+	// should be filled in.
+	Fields []PlaceDetailsFieldMask
+}
+
+func (r *FindPlaceFromTextRequest) params() url.Values {
+	q := make(url.Values)
+
+	q.Set("input", r.Input)
+
+	q.Set("inputtype", string(r.InputType))
+
+	if len(r.Fields) > 0 {
+		q.Set("fields", strings.Join(fieldsAsStringArray(r.Fields), ","))
+	}
+
+	return q
+}
+
+// FindPlaceFromTextResponse is a response to the Find Place From Text request
+type FindPlaceFromTextResponse struct {
+	Candidates       []PlacesSearchResult
+	HTMLAttributions []string
+}
+
+var findPlaceFromTextAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/place/findplacefromtext/json",
+	acceptsClientID: false,
+}
+
+// FindPlaceFromText takes a text input, and returns a place. The text input
+// can be any kind of Places data, for example, a name, address, or phone number.
+func (c *Client) FindPlaceFromText(ctx context.Context, r *FindPlaceFromTextRequest) (FindPlaceFromTextResponse, error) {
+
+	if r.Input == "" {
+		return FindPlaceFromTextResponse{}, errors.New("maps: Input required")
+	}
+
+	// Radius is required, unless rank by distance, in which case it isn't allowed.
+
+	if r.InputType == "" {
+		return FindPlaceFromTextResponse{}, errors.New("maps: InputType required")
+	}
+
+	var response struct {
+		Candidates       []PlacesSearchResult `json:"candidates,omitempty"`
+		HTMLAttributions []string             `json:"html_attributions,omitempty"`
+		commonResponse
+	}
+
+	if err := c.getJSON(ctx, findPlaceFromTextAPI, r, &response); err != nil {
+		return FindPlaceFromTextResponse{}, err
+	}
+
+	if err := response.StatusError(); err != nil {
+		return FindPlaceFromTextResponse{}, err
+	}
+
+	return FindPlaceFromTextResponse{response.Candidates, response.HTMLAttributions}, nil
 }

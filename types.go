@@ -535,14 +535,18 @@ const (
 	PlaceDetailsFieldMaskURL                      = PlaceDetailsFieldMask("url")
 	PlaceDetailsFieldMaskUTCOffset                = PlaceDetailsFieldMask("utc_offset")
 	PlaceDetailsFieldMaskPermanentlyClosed        = PlaceDetailsFieldMask("permanently_closed")
+	PlaceDetailsFieldMaskGeometry                 = PlaceDetailsFieldMask("geometry")
 	PlaceDetailsFieldMaskGeometryLocation         = PlaceDetailsFieldMask("geometry.location")
 	PlaceDetailsFieldMaskGeometryViewport         = PlaceDetailsFieldMask("geometry.viewport")
+	PlaceDetailsFieldMaskPhoto                    = PlaceDetailsFieldMask("photo")
 	PlaceDetailsFieldMaskPhotoReference           = PlaceDetailsFieldMask("photo.photo_reference")
+	PlaceDetailsFieldMaskPhotos                   = PlaceDetailsFieldMask("photos")
 	PlaceDetailsFieldMaskIcon                     = PlaceDetailsFieldMask("icon")
 	PlaceDetailsFieldMaskTypes                    = PlaceDetailsFieldMask("types")
 	PlaceDetailsFieldMaskADRAddress               = PlaceDetailsFieldMask("adr_address")
 	PlaceDetailsFieldMaskScope                    = PlaceDetailsFieldMask("scope")
 	PlaceDetailsFieldMaskVicinity                 = PlaceDetailsFieldMask("vicinity")
+	PlaceDetailsFieldMaskOpeningHours             = PlaceDetailsFieldMask("opening_hours")
 	PlaceDetailsFieldMaskOpeningHoursWeekdayText  = PlaceDetailsFieldMask("opening_hours.weekday_text")
 	PlaceDetailsFieldMaskOpeningHoursOpenNow      = PlaceDetailsFieldMask("opening_hours.open_now")
 	PlaceDetailsFieldMaskOpeningHoursPeriod       = PlaceDetailsFieldMask("opening_hours.period")
@@ -574,12 +578,18 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskUTCOffset, nil
 	case "permanently_closed":
 		return PlaceDetailsFieldMaskPermanentlyClosed, nil
+	case "geometry":
+		return PlaceDetailsFieldMaskGeometry, nil
 	case "geometry.location":
 		return PlaceDetailsFieldMaskGeometryLocation, nil
 	case "geometry.viewport":
 		return PlaceDetailsFieldMaskGeometryViewport, nil
+	case "photo":
+		return PlaceDetailsFieldMaskPhoto, nil
 	case "photo.photo_reference":
 		return PlaceDetailsFieldMaskPhotoReference, nil
+	case "photos":
+		return PlaceDetailsFieldMaskPhotos, nil
 	case "icon":
 		return PlaceDetailsFieldMaskIcon, nil
 	case "types":
@@ -590,6 +600,8 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskScope, nil
 	case "vicinity":
 		return PlaceDetailsFieldMaskVicinity, nil
+	case "opening_hours":
+		return PlaceDetailsFieldMaskOpeningHours, nil
 	case "opening_hours.weekday_text":
 		return PlaceDetailsFieldMaskOpeningHoursWeekdayText, nil
 	case "opening_hours.open_now":
@@ -611,4 +623,13 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 	default:
 		return PlaceDetailsFieldMask("Unknown PlaceDetailsFieldMask"), fmt.Errorf("Unknown PlaceDetailsFieldMask \"%v\"", placeDetailsFieldMask)
 	}
+}
+
+// fieldsAsStringArray converts []PlaceDetailsFieldMask to []string
+func fieldsAsStringArray(fields []PlaceDetailsFieldMask) []string {
+	var res []string
+	for _, el := range fields {
+		res = append(res, string(el))
+	}
+	return res
 }
