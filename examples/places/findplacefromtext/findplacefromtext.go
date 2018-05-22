@@ -52,18 +52,16 @@ func main() {
 
 	var client *maps.Client
 	var err error
-	if *apiKey != "" {
-		client, err = maps.NewClient(maps.WithAPIKey(*apiKey))
-	} else {
+	if *apiKey == "" {
 		usageAndExit("Please specify an API Key.")
 	}
+	client, err = maps.NewClient(maps.WithAPIKey(*apiKey))
 	check(err)
 
-	r := &maps.FindPlaceFromTextRequest{}
-
-	r.Input = *input
-
-	parseInputType(*inputType, r)
+	r := &maps.FindPlaceFromTextRequest{
+		Input:     *input,
+		InputType: parseInputType(*inputType),
+	}
 
 	if *fields != "" {
 		f, err := parseFields(*fields)
@@ -77,10 +75,10 @@ func main() {
 	pretty.Println(resp)
 }
 
-func parseFields(fields string) ([]maps.PlaceDetailsFieldMask, error) {
-	var res []maps.PlaceDetailsFieldMask
+func parseFields(fields string) ([]maps.PlaceSearchFieldMask, error) {
+	var res []maps.PlaceSearchFieldMask
 	for _, s := range strings.Split(fields, ",") {
-		f, err := maps.ParsePlaceDetailsFieldMask(s)
+		f, err := maps.ParsePlaceSearchFieldMask(s)
 		if err != nil {
 			return nil, err
 		}
@@ -89,13 +87,15 @@ func parseFields(fields string) ([]maps.PlaceDetailsFieldMask, error) {
 	return res, nil
 }
 
-func parseInputType(inputType string, r *maps.FindPlaceFromTextRequest) {
+func parseInputType(inputType string) maps.FindPlaceFromTextInputType {
+	var it maps.FindPlaceFromTextInputType
 	switch inputType {
 	case "textquery":
-		r.InputType = maps.FindPlaceFromTextInputTypeTextQuery
+		it = maps.FindPlaceFromTextInputTypeTextQuery
 	case "phonenumber":
-		r.InputType = maps.FindPlaceFromTextInputTypePhoneNumber
+		it = maps.FindPlaceFromTextInputTypePhoneNumber
 	default:
 		usageAndExit(fmt.Sprintf("Unknown input type: '%s'", inputType))
 	}
+	return it
 }

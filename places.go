@@ -500,7 +500,7 @@ func (r *PlaceDetailsRequest) params() url.Values {
 	}
 
 	if len(r.Fields) > 0 {
-		q.Set("fields", strings.Join(fieldsAsStringArray(r.Fields), ","))
+		q.Set("fields", strings.Join(placeDetailsFieldMasksAsStringArray(r.Fields), ","))
 	}
 
 	return q
@@ -952,7 +952,7 @@ type FindPlaceFromTextRequest struct {
 
 	// Fields allows you to select which parts of the returned details structure
 	// should be filled in.
-	Fields []PlaceDetailsFieldMask
+	Fields []PlaceSearchFieldMask
 }
 
 func (r *FindPlaceFromTextRequest) params() url.Values {
@@ -963,7 +963,7 @@ func (r *FindPlaceFromTextRequest) params() url.Values {
 	q.Set("inputtype", string(r.InputType))
 
 	if len(r.Fields) > 0 {
-		q.Set("fields", strings.Join(fieldsAsStringArray(r.Fields), ","))
+		q.Set("fields", strings.Join(placeSearchFieldMasksAsStringArray(r.Fields), ","))
 	}
 
 	return q
