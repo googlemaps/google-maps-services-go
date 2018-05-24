@@ -759,7 +759,8 @@ func TestPlaceDetails(t *testing.T) {
                   "rating" : 1,
                   "type" : "overall"
                }
-            ],
+			],
+			"profile_photo_url": "https://lh3.googleusercontent.com/-EXtIWgDBHgs/AAAAAAAAAAI/AAAAAAAAAAA/AIcfdXCXHH76RsCp2i2B0qjO1WngDfIrQQ/s120-p-rw-no-mo/photo.jpg",
             "author_name" : "Rachel Lewis",
             "author_url" : "https://plus.google.com/114299517944848975298",
             "language" : "en",
@@ -843,6 +844,11 @@ func TestPlaceDetails(t *testing.T) {
 	authorName := "Rachel Lewis"
 	if authorName != resp.Reviews[0].AuthorName {
 		t.Errorf("expected %+v, was %+v", authorName, resp.Reviews[0].AuthorName)
+	}
+
+	authorProfilePhoto := "https://lh3.googleusercontent.com/-EXtIWgDBHgs/AAAAAAAAAAI/AAAAAAAAAAA/AIcfdXCXHH76RsCp2i2B0qjO1WngDfIrQQ/s120-p-rw-no-mo/photo.jpg"
+	if authorProfilePhoto != resp.Reviews[0].AuthorProfilePhoto {
+		t.Errorf("expected %+v, was %+v", authorProfilePhoto, resp.Reviews[0].AuthorProfilePhoto)
 	}
 
 	authorURL := "https://plus.google.com/114299517944848975298"
