@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
 	"golang.org/x/net/context"
 
 	// Included for image/jpeg's decoder
@@ -447,6 +448,8 @@ type PlacesSearchResult struct {
 	// PermanentlyClosed is a boolean flag indicating whether the place has permanently
 	// shut down.
 	PermanentlyClosed bool `json:"permanently_closed,omitempty"`
+	// ID is an identifier.
+	ID string `json:"id,omitempty"`
 }
 
 // AltID is the alternative place IDs for a place.
@@ -773,6 +776,10 @@ func (c *Client) PlaceAutocomplete(ctx context.Context, r *PlaceAutocompleteRequ
 		return AutocompleteResponse{}, errors.New("maps: Input missing")
 	}
 
+	if uuid.UUID(r.SessionToken).String() == "00000000-0000-0000-0000-000000000000" {
+		return AutocompleteResponse{}, errors.New("maps: Session missing")
+	}
+
 	var response struct {
 		Predictions []AutocompletePrediction `json:"predictions,omitempty"`
 		commonResponse
@@ -793,6 +800,7 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 	q := make(url.Values)
 
 	q.Set("input", r.Input)
+	q.Set("sessiontoken", uuid.UUID(r.SessionToken).String())
 
 	if r.Offset > 0 {
 		q.Set("offset", strconv.FormatUint(uint64(r.Offset), 10))
@@ -829,6 +837,14 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 	return q
 }
 
+// PlaceAutocompleteSessionToken is a session token for Place Autocomplete.
+type PlaceAutocompleteSessionToken uuid.UUID
+
+// NewPlaceAutocompleteSessionToken constructs a new Place Autocomplete session token.
+func NewPlaceAutocompleteSessionToken() PlaceAutocompleteSessionToken {
+	return PlaceAutocompleteSessionToken(uuid.New())
+}
+
 // PlaceAutocompleteRequest is the functional options struct for Place Autocomplete
 type PlaceAutocompleteRequest struct {
 	// Input is the text string on which to search. The Places service will return
@@ -857,6 +873,9 @@ type PlaceAutocompleteRequest struct {
 	// StrictBounds return only those places that are strictly within the region defined
 	// by location and radius.
 	StrictBounds bool
+	// SessionToken is a token that means you will get charged by autocomplete session
+	// instead of by character for Autocomplete
+	SessionToken PlaceAutocompleteSessionToken
 }
 
 var placesPhotoAPI = &apiConfig{

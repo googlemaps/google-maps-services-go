@@ -621,24 +621,30 @@ type PlaceSearchFieldMask string
 
 // The individual Place Search Field Masks.
 const (
-	PlaceSearchFieldMaskFormattedAddress  = PlaceSearchFieldMask("formatted_address")
-	PlaceSearchFieldMaskGeometry          = PlaceSearchFieldMask("geometry")
-	PlaceSearchFieldMaskIcon              = PlaceSearchFieldMask("icon")
-	PlaceSearchFieldMaskID                = PlaceSearchFieldMask("id")
-	PlaceSearchFieldMaskName              = PlaceSearchFieldMask("name")
-	PlaceSearchFieldMaskOpeningHours      = PlaceSearchFieldMask("opening_hours")
-	PlaceSearchFieldMaskPermanentlyClosed = PlaceSearchFieldMask("permanently_closed")
-	PlaceSearchFieldMaskPhotos            = PlaceSearchFieldMask("photos")
-	PlaceSearchFieldMaskPlaceID           = PlaceSearchFieldMask("place_id")
-	PlaceSearchFieldMaskPriceLevel        = PlaceSearchFieldMask("price_level")
-	PlaceSearchFieldMaskRatings           = PlaceSearchFieldMask("rating")
-	PlaceSearchFieldMaskTypes             = PlaceSearchFieldMask("types")
+	PlaceSearchFieldMaskAltID               = PlaceSearchFieldMask("alt_id")
+	PlaceSearchFieldMaskFormattedAddress    = PlaceSearchFieldMask("formatted_address")
+	PlaceSearchFieldMaskGeometry            = PlaceSearchFieldMask("geometry")
+	PlaceSearchFieldMaskIcon                = PlaceSearchFieldMask("icon")
+	PlaceSearchFieldMaskID                  = PlaceSearchFieldMask("id")
+	PlaceSearchFieldMaskName                = PlaceSearchFieldMask("name")
+	PlaceSearchFieldMaskOpeningHours        = PlaceSearchFieldMask("opening_hours")
+	PlaceSearchFieldMaskOpeningHoursOpenNow = PlaceSearchFieldMask("opening_hours/open_now")
+	PlaceSearchFieldMaskPermanentlyClosed   = PlaceSearchFieldMask("permanently_closed")
+	PlaceSearchFieldMaskPhotos              = PlaceSearchFieldMask("photos")
+	PlaceSearchFieldMaskPlaceID             = PlaceSearchFieldMask("place_id")
+	PlaceSearchFieldMaskPriceLevel          = PlaceSearchFieldMask("price_level")
+	PlaceSearchFieldMaskRatings             = PlaceSearchFieldMask("rating")
+	PlaceSearchFieldMaskReference           = PlaceSearchFieldMask("reference")
+	PlaceSearchFieldMaskTypes               = PlaceSearchFieldMask("types")
+	PlaceSearchFieldMaskVicinity            = PlaceSearchFieldMask("vicinity")
 )
 
 // ParsePlaceSearchFieldMask will parse a string representation of
 // PlaceSearchFieldMask.
 func ParsePlaceSearchFieldMask(placeSearchFieldMask string) (PlaceSearchFieldMask, error) {
 	switch strings.ToLower(placeSearchFieldMask) {
+	case "alt_id":
+		return PlaceSearchFieldMaskAltID, nil
 	case "formatted_address":
 		return PlaceSearchFieldMaskFormattedAddress, nil
 	case "geometry":
@@ -651,6 +657,8 @@ func ParsePlaceSearchFieldMask(placeSearchFieldMask string) (PlaceSearchFieldMas
 		return PlaceSearchFieldMaskName, nil
 	case "opening_hours":
 		return PlaceSearchFieldMaskOpeningHours, nil
+	case "opening_hours/open_now":
+		return PlaceSearchFieldMaskOpeningHoursOpenNow, nil
 	case "permanently_closed":
 		return PlaceSearchFieldMaskPermanentlyClosed, nil
 	case "photos":
@@ -661,8 +669,12 @@ func ParsePlaceSearchFieldMask(placeSearchFieldMask string) (PlaceSearchFieldMas
 		return PlaceSearchFieldMaskPriceLevel, nil
 	case "rating":
 		return PlaceSearchFieldMaskRatings, nil
+	case "reference":
+		return PlaceSearchFieldMaskReference, nil
 	case "types":
 		return PlaceSearchFieldMaskTypes, nil
+	case "vicinity":
+		return PlaceSearchFieldMaskVicinity, nil
 	default:
 		return PlaceSearchFieldMask(""), fmt.Errorf("Unknown PlaceSearchFieldMask \"%v\"", placeSearchFieldMask)
 	}
