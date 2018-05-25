@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/net/context"
 )
 
@@ -415,8 +416,8 @@ func TestQueryAutocompleteMissingInput(t *testing.T) {
 }
 
 func TestPlaceAutocompleteWithStrictbounds(t *testing.T) {
-	expectedQuery := "input=Amoeba&key=AIzaNotReallyAnAPIKey&location=37.76999%2C-122.44696&radius=500&strictbounds=true&types=establishment"
-
+	session := NewPlaceAutocompleteSessionToken()
+	expectedQuery := "input=Amoeba&key=AIzaNotReallyAnAPIKey&location=37.76999%2C-122.44696&radius=500&sessiontoken=" + uuid.UUID(session).String() + "&strictbounds=true&types=establishment"
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
@@ -424,48 +425,47 @@ func TestPlaceAutocompleteWithStrictbounds(t *testing.T) {
 
 	r := &PlaceAutocompleteRequest{
 		Input:        "Amoeba",
-		Types:        AutocompletePlaceType("establishment"),
+		Types:        AutocompletePlaceTypeEstablishment,
 		Location:     &LatLng{37.76999, -122.44696},
 		Radius:       500,
 		StrictBounds: true,
+		SessionToken: session,
 	}
 
 	_, err := c.PlaceAutocomplete(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
-	}
-
-	if server.successful != 1 {
+	} else if server.successful != 1 {
 		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }
 
 func TestPlaceAutocompleteMinimalRequestURL(t *testing.T) {
-	expectedQuery := "input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey"
-
+	session := NewPlaceAutocompleteSessionToken()
+	expectedQuery := "input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey&sessiontoken=" + uuid.UUID(session).String()
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
 
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &PlaceAutocompleteRequest{
-		Input: "quay resteraunt sydney",
+		Input:        "quay resteraunt sydney",
+		SessionToken: session,
 	}
 
 	_, err := c.PlaceAutocomplete(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
-	}
-
-	if server.successful != 1 {
+	} else if server.successful != 1 {
 		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }
 
 func TestPlaceAutocompleteMaximalRequestURL(t *testing.T) {
-	expectedQuery := "components=country%3AES&input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&offset=5&radius=10000&types=geocode"
+	session := NewPlaceAutocompleteSessionToken()
+	expectedQuery := "components=country%3AES&input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&offset=5&radius=10000&sessiontoken=" + uuid.UUID(session).String() + "&types=geocode"
 
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
@@ -478,22 +478,21 @@ func TestPlaceAutocompleteMaximalRequestURL(t *testing.T) {
 	}
 
 	r := &PlaceAutocompleteRequest{
-		Input:      "quay resteraunt sydney",
-		Offset:     5,
-		Location:   &LatLng{1.0, 2.0},
-		Radius:     10000,
-		Language:   "es",
-		Types:      placeType,
-		Components: map[Component]string{ComponentCountry: "ES"},
+		Input:        "quay resteraunt sydney",
+		Offset:       5,
+		Location:     &LatLng{1.0, 2.0},
+		Radius:       10000,
+		Language:     "es",
+		Types:        placeType,
+		Components:   map[Component]string{ComponentCountry: "ES"},
+		SessionToken: session,
 	}
 
 	_, err = c.PlaceAutocomplete(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
-	}
-
-	if server.successful != 1 {
+	} else if server.successful != 1 {
 		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }
@@ -514,6 +513,7 @@ func TestPlaceAutocompleteMissingInput(t *testing.T) {
 }
 
 func TestPlaceAutocompleteWithStructuredFormatting(t *testing.T) {
+	session := NewPlaceAutocompleteSessionToken()
 	response := `
 {
   "predictions": [
@@ -567,8 +567,9 @@ func TestPlaceAutocompleteWithStructuredFormatting(t *testing.T) {
 	defer server.Close()
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &PlaceAutocompleteRequest{
-		Input: "Theater de Meervaart",
-		Types: AutocompletePlaceType("establishment"),
+		Input:        "Theater de Meervaart",
+		Types:        AutocompletePlaceType("establishment"),
+		SessionToken: session,
 	}
 
 	resp, err := c.PlaceAutocomplete(context.Background(), r)
@@ -1013,6 +1014,7 @@ func TestTextSearchWithPermanentlyClosed(t *testing.T) {
 }
 
 func TestPlaceAutocompleteJsonMarshalLowerCase(t *testing.T) {
+	session := NewPlaceAutocompleteSessionToken()
 	response := `
 {
   "predictions": [
@@ -1066,8 +1068,9 @@ func TestPlaceAutocompleteJsonMarshalLowerCase(t *testing.T) {
 	defer server.Close()
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &PlaceAutocompleteRequest{
-		Input: "Theater de Meervaart",
-		Types: AutocompletePlaceType("establishment"),
+		Input:        "Theater de Meervaart",
+		Types:        AutocompletePlaceType("establishment"),
+		SessionToken: session,
 	}
 
 	resp, err := c.PlaceAutocomplete(context.Background(), r)
