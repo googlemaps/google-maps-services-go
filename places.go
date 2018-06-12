@@ -506,6 +506,14 @@ func (r *PlaceDetailsRequest) params() url.Values {
 		q.Set("fields", strings.Join(placeDetailsFieldMasksAsStringArray(r.Fields), ","))
 	}
 
+	if uuid.UUID(r.SessionToken).String() != "00000000-0000-0000-0000-000000000000" {
+		q.Set("sessiontoken", uuid.UUID(r.SessionToken).String())
+	}
+
+	if r.Region != "" {
+		q.Set("region", r.Region)
+	}
+
 	return q
 }
 
@@ -521,6 +529,13 @@ type PlaceDetailsRequest struct {
 	// should be filled in. For more detail, please see the following URL:
 	// https://cloud.google.com/maps-platform/user-guide/product-changes/#places
 	Fields []PlaceDetailsFieldMask
+	// SessionToken is a token that marks this request as part of a Place Autocomplete
+	// Session. Optional.
+	SessionToken PlaceAutocompleteSessionToken
+	// Region is the region code, specified as a ccTLD (country code top-level domain)
+	// two-character value. Most ccTLD codes are identical to ISO 3166-1 codes, with
+	// some exceptions. This parameter will only influence, not fully restrict, results.
+	Region string
 }
 
 // PlaceDetailsResult is an individual Places API Place Details result
