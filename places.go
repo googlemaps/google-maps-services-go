@@ -975,6 +975,33 @@ const (
 	FindPlaceFromTextInputTypePhoneNumber = FindPlaceFromTextInputType("phonenumber")
 )
 
+// FindPlaceFromTextLocationBiasType is the type of location bias for this request
+type FindPlaceFromTextLocationBiasType string
+
+// The types of FindPlaceFromTextLocationBiasType
+const (
+	FindPlaceFromTextLocationBiasIp        = FindPlaceFromTextLocationBiasType("ipbias")
+	FindPlaceFromTextLocationBiasPoint     = FindPlaceFromTextLocationBiasType("point")
+	FindPlaceFromTextLocationBiasCircle    = FindPlaceFromTextLocationBiasType("circle")
+	FindPlaceFromTextLocationBiasRectangle = FindPlaceFromTextLocationBiasType("rectangle")
+)
+
+// ParseFindPlaceFromTextLocationBiasType will parse a string to a FindPlaceFromTextLocationBiasType
+func ParseFindPlaceFromTextLocationBiasType(locationBias string) (FindPlaceFromTextLocationBiasType, error) {
+	t := strings.ToLower(locationBias)
+	switch t {
+	case "ipbias":
+		return FindPlaceFromTextLocationBiasIp, nil
+	case "point":
+		return FindPlaceFromTextLocationBiasPoint, nil
+	case "circle":
+		return FindPlaceFromTextLocationBiasCircle, nil
+	case "rectangle":
+		return FindPlaceFromTextLocationBiasRectangle, nil
+	}
+	return FindPlaceFromTextLocationBiasType(""), fmt.Errorf("Unknown FindPlaceFromTextLocationBiasType \"%v\"", locationBias)
+}
+
 // FindPlaceFromTextRequest is the options struct for Find Place From Text API
 type FindPlaceFromTextRequest struct {
 	// The text input specifying which place to search for (for example, a name,
@@ -987,6 +1014,24 @@ type FindPlaceFromTextRequest struct {
 	// Fields allows you to select which parts of the returned details structure
 	// should be filled in.
 	Fields []PlaceSearchFieldMask
+
+	// LocationBias is the type of location bias to apply to this request
+	LocationBias FindPlaceFromTextLocationBiasType
+
+	// LocationBiasPoint is the point for LocationBias type Point
+	LocationBiasPoint *LatLng
+
+	// LocationBiasCenter is the center for LocationBias type Circle
+	LocationBiasCenter *LatLng
+
+	// LocationBiasRadius is the radius for LocationBias type Circle
+	LocationBiasRadius int
+
+	// LocationBiasSouthWest is the South West boundary for LocationBias type Rectangle
+	LocationBiasSouthWest *LatLng
+
+	// LocationBiasSouthWest is the North East boundary for LocationBias type Rectangle
+	LocationBiasNorthEast *LatLng
 }
 
 func (r *FindPlaceFromTextRequest) params() url.Values {
@@ -998,6 +1043,19 @@ func (r *FindPlaceFromTextRequest) params() url.Values {
 
 	if len(r.Fields) > 0 {
 		q.Set("fields", strings.Join(placeSearchFieldMasksAsStringArray(r.Fields), ","))
+	}
+
+	if r.LocationBias != "" {
+		switch r.LocationBias {
+		case FindPlaceFromTextLocationBiasIp:
+			q.Set("locationbias", "ipbias")
+		case FindPlaceFromTextLocationBiasPoint:
+			q.Set("locationbias", fmt.Sprintf("point:%s", r.LocationBiasPoint.String()))
+		case FindPlaceFromTextLocationBiasCircle:
+			q.Set("locationbias", fmt.Sprintf("circle:%d@%s", r.LocationBiasRadius, r.LocationBiasCenter.String()))
+		case FindPlaceFromTextLocationBiasRectangle:
+			q.Set("locationbias", fmt.Sprintf("rectangle:%s|%s", r.LocationBiasSouthWest.String(), r.LocationBiasNorthEast.String()))
+		}
 	}
 
 	return q
@@ -1023,10 +1081,25 @@ func (c *Client) FindPlaceFromText(ctx context.Context, r *FindPlaceFromTextRequ
 		return FindPlaceFromTextResponse{}, errors.New("maps: Input required")
 	}
 
-	// Radius is required, unless rank by distance, in which case it isn't allowed.
-
 	if r.InputType == "" {
 		return FindPlaceFromTextResponse{}, errors.New("maps: InputType required")
+	}
+
+	if r.LocationBias != "" {
+		switch r.LocationBias {
+		case FindPlaceFromTextLocationBiasPoint:
+			if r.LocationBiasPoint == nil {
+				return FindPlaceFromTextResponse{}, errors.New("maps: LocationBiasPoint required when LocationBias set to FindPlaceFromTextLocationBiasPoint")
+			}
+		case FindPlaceFromTextLocationBiasCircle:
+			if r.LocationBiasCenter == nil || r.LocationBiasRadius == 0 {
+				return FindPlaceFromTextResponse{}, errors.New("maps: LocationBiasCenter and LocationBiasRadius required when LocationBias set to FindPlaceFromTextLocationBiasCircle")
+			}
+		case FindPlaceFromTextLocationBiasRectangle:
+			if r.LocationBiasSouthWest == nil || r.LocationBiasNorthEast == nil {
+				return FindPlaceFromTextResponse{}, errors.New("maps: LocationBiasSouthWest and LocationBiasNorthEast required when LocationBias set to FindPlaceFromTextLocationBiasRectangle")
+			}
+		}
 	}
 
 	var response struct {

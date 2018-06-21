@@ -28,10 +28,16 @@ import (
 )
 
 var (
-	apiKey    = flag.String("key", "", "API Key for using Google Maps API.")
-	input     = flag.String("input", "", "The text input specifying which place to search for (for example, a name, address, or phone number).")
-	inputType = flag.String("inputtype", "", "The type of input. This can be one of either textquery or phonenumber.")
-	fields    = flag.String("fields", "", "Comma seperated list of Fields")
+	apiKey       = flag.String("key", "", "API Key for using Google Maps API.")
+	input        = flag.String("input", "", "The text input specifying which place to search for (for example, a name, address, or phone number).")
+	inputType    = flag.String("inputtype", "", "The type of input. This can be one of either textquery or phonenumber.")
+	fields       = flag.String("fields", "", "Comma seperated list of Fields")
+	locationbias = flag.String("locationbias", "", "Location bias for this request. Optional. One of ipbias, point, circle, or rectangle.")
+	point        = flag.String("point", "", "The latitude/longitude for location bias point. This must be specified as latitude,longitude.")
+	center       = flag.String("center", "", "The center latitude/longitude for location bias circle. This must be specified as latitude,longitude.")
+	radius       = flag.Int("radius", 0, "The radius for location bias circle.")
+	southwest    = flag.String("southwest", "", "The South West latitude/longitude for location bias rectangle. This must be specified as latitude,longitude.")
+	northeast    = flag.String("northeast", "", "The North East latitude/longitude for location bias rectangle. This must be specified as latitude,longitude.")
 )
 
 func usageAndExit(msg string) {
@@ -61,6 +67,30 @@ func main() {
 	r := &maps.FindPlaceFromTextRequest{
 		Input:     *input,
 		InputType: parseInputType(*inputType),
+	}
+
+	if *locationbias != "" {
+		lb, err := maps.ParseFindPlaceFromTextLocationBiasType(*locationbias)
+		check(err)
+		r.LocationBias = lb
+		switch lb {
+		case maps.FindPlaceFromTextLocationBiasPoint:
+			l, err := maps.ParseLatLng(*point)
+			check(err)
+			r.LocationBiasPoint = &l
+		case maps.FindPlaceFromTextLocationBiasCircle:
+			l, err := maps.ParseLatLng(*center)
+			check(err)
+			r.LocationBiasCenter = &l
+			r.LocationBiasRadius = *radius
+		case maps.FindPlaceFromTextLocationBiasRectangle:
+			sw, err := maps.ParseLatLng(*southwest)
+			check(err)
+			r.LocationBiasSouthWest = &sw
+			ne, err := maps.ParseLatLng(*northeast)
+			check(err)
+			r.LocationBiasNorthEast = &ne
+		}
 	}
 
 	if *fields != "" {
