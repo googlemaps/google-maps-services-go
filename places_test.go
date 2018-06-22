@@ -1098,3 +1098,67 @@ func TestPlaceAutocompleteJsonMarshalLowerCase(t *testing.T) {
 
 	t.Error("TestPlaceAutocompleteJsonMarshalLowerCase error!")
 }
+
+func TestFindPlaceFromText(t *testing.T) {
+	expectedQuery := "fields=photos%2Cformatted_address%2Cname%2Copening_hours%2Crating&input=mongolian+grill&inputtype=textquery&key=AIzaNotReallyAnAPIKey&locationbias=circle%3A2000%4047.6918452%2C-122.2226413"
+	response := `	
+{
+	"candidates" : [
+	   {
+		  "formatted_address" : "9736 NE 117th Ln, Kirkland, WA 98034, USA",
+		  "name" : "Mongolian Grill Kirkland",
+		  "opening_hours" : {
+			 "open_now" : false,
+			 "weekday_text" : []
+		  },
+		  "photos" : [
+			 {
+				"height" : 2891,
+				"html_attributions" : [
+				   "\u003ca href=\"https://maps.google.com/maps/contrib/111759700246215860219/photos\"\u003eVamsi Kanamaluru\u003c/a\u003e"
+				],
+				"photo_reference" : "CmRaAAAAwzjnmCwlQAFViioiTzU3jGb1jzTnfUg3CThLhA92w9FeLvCFymiYgL3qlstXd0TngcZ45fF3mwJfPWHWKQ44rllAcC_Izp4A-euYZloBnjFAtEuKOx5gecBG5rR0CnymEhB0LxSGBDoojumIma5k6pudGhQdyUwhjplZjF1StMfaydwbGFE80Q",
+				"width" : 3175
+			 }
+		  ],
+		  "rating" : 4.2
+	   }
+	],
+	"debug_log" : {
+	   "line" : []
+	},
+	"status" : "OK"
+ }`
+	server := mockServerForQuery(expectedQuery, 200, response)
+	defer server.s.Close()
+	fields := []PlaceSearchFieldMask{PlaceSearchFieldMaskPhotos, PlaceSearchFieldMaskFormattedAddress, PlaceSearchFieldMaskName, PlaceSearchFieldMaskOpeningHours, PlaceSearchFieldMaskRating}
+
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
+	r := &FindPlaceFromTextRequest{
+		Input:              "mongolian grill",
+		InputType:          FindPlaceFromTextInputTypeTextQuery,
+		Fields:             fields,
+		LocationBias:       FindPlaceFromTextLocationBiasCircular,
+		LocationBiasCenter: &LatLng{47.6918452, -122.2226413},
+		LocationBiasRadius: 2000,
+	}
+
+	resp, err := c.FindPlaceFromText(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("r.Get returned non nil error: %v", err)
+		return
+	}
+
+	if 1 != len(resp.Candidates) {
+		t.Errorf("expected %+v, was %+v", 1, len(resp.Candidates))
+	}
+
+	if "9736 NE 117th Ln, Kirkland, WA 98034, USA" != resp.Candidates[0].FormattedAddress {
+		t.Errorf("expected %+v, was %+v", "9736 NE 117th Ln, Kirkland, WA 98034, USA", resp.Candidates[0].FormattedAddress)
+	}
+
+	if "Mongolian Grill Kirkland" != resp.Candidates[0].Name {
+		t.Errorf("expected %+v, was %+v", "Mongolian Grill Kirkland", resp.Candidates[0].Name)
+	}
+}

@@ -633,7 +633,7 @@ const (
 	PlaceSearchFieldMaskPhotos              = PlaceSearchFieldMask("photos")
 	PlaceSearchFieldMaskPlaceID             = PlaceSearchFieldMask("place_id")
 	PlaceSearchFieldMaskPriceLevel          = PlaceSearchFieldMask("price_level")
-	PlaceSearchFieldMaskRatings             = PlaceSearchFieldMask("rating")
+	PlaceSearchFieldMaskRating              = PlaceSearchFieldMask("rating")
 	PlaceSearchFieldMaskReference           = PlaceSearchFieldMask("reference")
 	PlaceSearchFieldMaskTypes               = PlaceSearchFieldMask("types")
 	PlaceSearchFieldMaskVicinity            = PlaceSearchFieldMask("vicinity")
@@ -668,7 +668,7 @@ func ParsePlaceSearchFieldMask(placeSearchFieldMask string) (PlaceSearchFieldMas
 	case "price_level":
 		return PlaceSearchFieldMaskPriceLevel, nil
 	case "rating":
-		return PlaceSearchFieldMaskRatings, nil
+		return PlaceSearchFieldMaskRating, nil
 	case "reference":
 		return PlaceSearchFieldMaskReference, nil
 	case "types":

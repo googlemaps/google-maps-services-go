@@ -980,10 +980,10 @@ type FindPlaceFromTextLocationBiasType string
 
 // The types of FindPlaceFromTextLocationBiasType
 const (
-	FindPlaceFromTextLocationBiasIp        = FindPlaceFromTextLocationBiasType("ipbias")
-	FindPlaceFromTextLocationBiasPoint     = FindPlaceFromTextLocationBiasType("point")
-	FindPlaceFromTextLocationBiasCircle    = FindPlaceFromTextLocationBiasType("circle")
-	FindPlaceFromTextLocationBiasRectangle = FindPlaceFromTextLocationBiasType("rectangle")
+	FindPlaceFromTextLocationBiasIp          = FindPlaceFromTextLocationBiasType("ipbias")
+	FindPlaceFromTextLocationBiasPoint       = FindPlaceFromTextLocationBiasType("point")
+	FindPlaceFromTextLocationBiasCircular    = FindPlaceFromTextLocationBiasType("circle")
+	FindPlaceFromTextLocationBiasRectangular = FindPlaceFromTextLocationBiasType("rectangle")
 )
 
 // ParseFindPlaceFromTextLocationBiasType will parse a string to a FindPlaceFromTextLocationBiasType
@@ -995,9 +995,9 @@ func ParseFindPlaceFromTextLocationBiasType(locationBias string) (FindPlaceFromT
 	case "point":
 		return FindPlaceFromTextLocationBiasPoint, nil
 	case "circle":
-		return FindPlaceFromTextLocationBiasCircle, nil
+		return FindPlaceFromTextLocationBiasCircular, nil
 	case "rectangle":
-		return FindPlaceFromTextLocationBiasRectangle, nil
+		return FindPlaceFromTextLocationBiasRectangular, nil
 	}
 	return FindPlaceFromTextLocationBiasType(""), fmt.Errorf("Unknown FindPlaceFromTextLocationBiasType \"%v\"", locationBias)
 }
@@ -1051,9 +1051,9 @@ func (r *FindPlaceFromTextRequest) params() url.Values {
 			q.Set("locationbias", "ipbias")
 		case FindPlaceFromTextLocationBiasPoint:
 			q.Set("locationbias", fmt.Sprintf("point:%s", r.LocationBiasPoint.String()))
-		case FindPlaceFromTextLocationBiasCircle:
+		case FindPlaceFromTextLocationBiasCircular:
 			q.Set("locationbias", fmt.Sprintf("circle:%d@%s", r.LocationBiasRadius, r.LocationBiasCenter.String()))
-		case FindPlaceFromTextLocationBiasRectangle:
+		case FindPlaceFromTextLocationBiasRectangular:
 			q.Set("locationbias", fmt.Sprintf("rectangle:%s|%s", r.LocationBiasSouthWest.String(), r.LocationBiasNorthEast.String()))
 		}
 	}
@@ -1091,11 +1091,11 @@ func (c *Client) FindPlaceFromText(ctx context.Context, r *FindPlaceFromTextRequ
 			if r.LocationBiasPoint == nil {
 				return FindPlaceFromTextResponse{}, errors.New("maps: LocationBiasPoint required when LocationBias set to FindPlaceFromTextLocationBiasPoint")
 			}
-		case FindPlaceFromTextLocationBiasCircle:
+		case FindPlaceFromTextLocationBiasCircular:
 			if r.LocationBiasCenter == nil || r.LocationBiasRadius == 0 {
 				return FindPlaceFromTextResponse{}, errors.New("maps: LocationBiasCenter and LocationBiasRadius required when LocationBias set to FindPlaceFromTextLocationBiasCircle")
 			}
-		case FindPlaceFromTextLocationBiasRectangle:
+		case FindPlaceFromTextLocationBiasRectangular:
 			if r.LocationBiasSouthWest == nil || r.LocationBiasNorthEast == nil {
 				return FindPlaceFromTextResponse{}, errors.New("maps: LocationBiasSouthWest and LocationBiasNorthEast required when LocationBias set to FindPlaceFromTextLocationBiasRectangle")
 			}

@@ -78,12 +78,12 @@ func main() {
 			l, err := maps.ParseLatLng(*point)
 			check(err)
 			r.LocationBiasPoint = &l
-		case maps.FindPlaceFromTextLocationBiasCircle:
+		case maps.FindPlaceFromTextLocationBiasCircular:
 			l, err := maps.ParseLatLng(*center)
 			check(err)
 			r.LocationBiasCenter = &l
 			r.LocationBiasRadius = *radius
-		case maps.FindPlaceFromTextLocationBiasRectangle:
+		case maps.FindPlaceFromTextLocationBiasRectangular:
 			sw, err := maps.ParseLatLng(*southwest)
 			check(err)
 			r.LocationBiasSouthWest = &sw
