@@ -624,6 +624,8 @@ type PlaceReview struct {
 	AuthorName string `json:"author_name,omitempty"`
 	// AuthorURL the URL to the user's Google+ profile, if available.
 	AuthorURL string `json:"author_url,omitempty"`
+	// AuthorPhoto the Google+ profile photo url of the user who submitted the review, if available.
+	AuthorProfilePhoto string `json:"profile_photo_url"`
 	// Language an IETF language code indicating the language used in the user's review.
 	// This field contains the main language tag only, and not the secondary tag
 	// indicating country or region.
