@@ -69,12 +69,17 @@ func main() {
 	}
 	check(err)
 
+	// s is a session token. Thread this through a series of requests that comprise
+	// a single autocomplete search session.
+	s := maps.NewPlaceAutocompleteSessionToken()
+
 	r := &maps.PlaceAutocompleteRequest{
 		Input:        *input,
 		Language:     *language,
 		Offset:       *offset,
 		Radius:       *radius,
 		StrictBounds: *strictbounds,
+		SessionToken: s,
 	}
 
 	parseLocation(*location, r)

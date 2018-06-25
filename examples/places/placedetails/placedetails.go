@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
@@ -32,6 +33,7 @@ var (
 	clientID  = flag.String("client_id", "", "ClientID for Maps for Work API access.")
 	signature = flag.String("signature", "", "Signature for Maps for Work API access.")
 	placeID   = flag.String("place_id", "", "Textual identifier that uniquely identifies a place.")
+	fields    = flag.String("fields", "", "Comma seperated list of Fields")
 )
 
 func usageAndExit(msg string) {
@@ -65,8 +67,26 @@ func main() {
 		PlaceID: *placeID,
 	}
 
+	if *fields != "" {
+		f, err := parseFields(*fields)
+		check(err)
+		r.Fields = f
+	}
+
 	resp, err := client.PlaceDetails(context.Background(), r)
 	check(err)
 
 	pretty.Println(resp)
+}
+
+func parseFields(fields string) ([]maps.PlaceDetailsFieldMask, error) {
+	var res []maps.PlaceDetailsFieldMask
+	for _, s := range strings.Split(fields, ",") {
+		f, err := maps.ParsePlaceDetailsFieldMask(s)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, f)
+	}
+	return res, nil
 }

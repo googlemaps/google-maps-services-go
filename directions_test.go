@@ -16,12 +16,14 @@ package maps
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 	"time"
 
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"golang.org/x/net/context"
 )
 
@@ -39,6 +41,9 @@ func mockServerForQuery(query string, code int, body string) *countingServer {
 
 	server.s = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if query != "" && r.URL.RawQuery != query {
+			dmp := diffmatchpatch.New()
+			diffs := dmp.DiffMain(query, r.URL.RawQuery, false)
+			log.Printf("Query != Expected Query: %s", dmp.DiffPrettyText(diffs))
 			server.failed = append(server.failed, r.URL.RawQuery)
 			http.Error(w, "fail", 999)
 			return

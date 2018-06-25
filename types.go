@@ -186,8 +186,6 @@ const (
 // specified type.
 type PlaceType string
 
-// Warning: DO NOT EDIT PlaceType* - they are code generated.
-
 // Place Types for the Places API.
 const (
 	PlaceTypeAccounting            = PlaceType("accounting")
@@ -287,8 +285,6 @@ const (
 	PlaceTypeVeterinaryCare        = PlaceType("veterinary_care")
 	PlaceTypeZoo                   = PlaceType("zoo")
 )
-
-// Warning: DO NOT EDIT ParsePlaceType() - it is generated code.
 
 // ParsePlaceType will parse a string representation of a PlaceType.
 func ParsePlaceType(placeType string) (PlaceType, error) {
@@ -486,7 +482,7 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 	case "zoo":
 		return PlaceTypeZoo, nil
 	default:
-		return PlaceType("Unknown PlaceType"), fmt.Errorf("Unknown PlaceType \"%v\"", placeType)
+		return PlaceType(""), fmt.Errorf("Unknown PlaceType \"%v\"", placeType)
 	}
 }
 
@@ -518,6 +514,176 @@ func ParseAutocompletePlaceType(placeType string) (AutocompletePlaceType, error)
 	case "(cities)":
 		return AutocompletePlaceTypeCities, nil
 	default:
-		return AutocompletePlaceType("Unknown AutocompletePlaceType"), fmt.Errorf("Unknown AutocompletePlaceType \"%v\"", placeType)
+		return AutocompletePlaceType(""), fmt.Errorf("Unknown AutocompletePlaceType \"%v\"", placeType)
 	}
+}
+
+// PlaceDetailsFieldMask allows you to specify which fields are to be returned with
+// a place details request. Please see the following URL for more detail:
+// https://cloud.google.com/maps-platform/user-guide/product-changes/#places
+type PlaceDetailsFieldMask string
+
+// The individual Place Details Field Masks.
+const (
+	PlaceDetailsFieldMaskAddressComponent         = PlaceDetailsFieldMask("address_component")
+	PlaceDetailsFieldMaskADRAddress               = PlaceDetailsFieldMask("adr_address")
+	PlaceDetailsFieldMaskAltID                    = PlaceDetailsFieldMask("alt_id")
+	PlaceDetailsFieldMaskFormattedAddress         = PlaceDetailsFieldMask("formatted_address")
+	PlaceDetailsFieldMaskFormattedPhoneNumber     = PlaceDetailsFieldMask("formatted_phone_number")
+	PlaceDetailsFieldMaskGeometry                 = PlaceDetailsFieldMask("geometry")
+	PlaceDetailsFieldMaskIcon                     = PlaceDetailsFieldMask("icon")
+	PlaceDetailsFieldMaskID                       = PlaceDetailsFieldMask("id")
+	PlaceDetailsFieldMaskInternationalPhoneNumber = PlaceDetailsFieldMask("international_phone_number")
+	PlaceDetailsFieldMaskName                     = PlaceDetailsFieldMask("name")
+	PlaceDetailsFieldMaskOpeningHours             = PlaceDetailsFieldMask("opening_hours")
+	PlaceDetailsFieldMaskPermanentlyClosed        = PlaceDetailsFieldMask("permanently_closed")
+	PlaceDetailsFieldMaskPhotos                   = PlaceDetailsFieldMask("photos")
+	PlaceDetailsFieldMaskPlaceID                  = PlaceDetailsFieldMask("place_id")
+	PlaceDetailsFieldMaskPriceLevel               = PlaceDetailsFieldMask("price_level")
+	PlaceDetailsFieldMaskRatings                  = PlaceDetailsFieldMask("rating")
+	PlaceDetailsFieldMaskReviews                  = PlaceDetailsFieldMask("reviews")
+	PlaceDetailsFieldMaskScope                    = PlaceDetailsFieldMask("scope")
+	PlaceDetailsFieldMaskTypes                    = PlaceDetailsFieldMask("types")
+	PlaceDetailsFieldMaskURL                      = PlaceDetailsFieldMask("url")
+	PlaceDetailsFieldMaskUTCOffset                = PlaceDetailsFieldMask("utc_offset")
+	PlaceDetailsFieldMaskVicinity                 = PlaceDetailsFieldMask("vicinity")
+	PlaceDetailsFieldMaskWebsite                  = PlaceDetailsFieldMask("website")
+)
+
+// ParsePlaceDetailsFieldMask will parse a string representation of
+// PlaceDetailsFieldMask.
+func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsFieldMask, error) {
+	switch strings.ToLower(placeDetailsFieldMask) {
+	case "address_component":
+		return PlaceDetailsFieldMaskAddressComponent, nil
+	case "adr_address":
+		return PlaceDetailsFieldMaskADRAddress, nil
+	case "alt_id":
+		return PlaceDetailsFieldMaskAltID, nil
+	case "formatted_address":
+		return PlaceDetailsFieldMaskFormattedAddress, nil
+	case "formatted_phone_number":
+		return PlaceDetailsFieldMaskFormattedPhoneNumber, nil
+	case "geometry":
+		return PlaceDetailsFieldMaskGeometry, nil
+	case "icon":
+		return PlaceDetailsFieldMaskIcon, nil
+	case "id":
+		return PlaceDetailsFieldMaskID, nil
+	case "international_phone_number":
+		return PlaceDetailsFieldMaskInternationalPhoneNumber, nil
+	case "name":
+		return PlaceDetailsFieldMaskName, nil
+	case "opening_hours":
+		return PlaceDetailsFieldMaskOpeningHours, nil
+	case "permanently_closed":
+		return PlaceDetailsFieldMaskPermanentlyClosed, nil
+	case "photos":
+		return PlaceDetailsFieldMaskPhotos, nil
+	case "place_id":
+		return PlaceDetailsFieldMaskPlaceID, nil
+	case "price_level":
+		return PlaceDetailsFieldMaskPriceLevel, nil
+	case "rating":
+		return PlaceDetailsFieldMaskRatings, nil
+	case "reviews":
+		return PlaceDetailsFieldMaskReviews, nil
+	case "scope":
+		return PlaceDetailsFieldMaskScope, nil
+	case "types":
+		return PlaceDetailsFieldMaskTypes, nil
+	case "url":
+		return PlaceDetailsFieldMaskURL, nil
+	case "utc_offset":
+		return PlaceDetailsFieldMaskUTCOffset, nil
+	case "vicinity":
+		return PlaceDetailsFieldMaskVicinity, nil
+	case "website":
+		return PlaceDetailsFieldMaskWebsite, nil
+	default:
+		return PlaceDetailsFieldMask(""), fmt.Errorf("Unknown PlaceDetailsFieldMask \"%v\"", placeDetailsFieldMask)
+	}
+}
+
+// fieldsAsStringArray converts []PlaceDetailsFieldMask to []string
+func placeDetailsFieldMasksAsStringArray(fields []PlaceDetailsFieldMask) []string {
+	var res []string
+	for _, el := range fields {
+		res = append(res, string(el))
+	}
+	return res
+}
+
+// PlaceSearchFieldMask allows you to specify which fields are to be returned with
+// a place search request. Please see the following URL for more detail:
+// https://cloud.google.com/maps-platform/user-guide/product-changes/#places
+type PlaceSearchFieldMask string
+
+// The individual Place Search Field Masks.
+const (
+	PlaceSearchFieldMaskAltID               = PlaceSearchFieldMask("alt_id")
+	PlaceSearchFieldMaskFormattedAddress    = PlaceSearchFieldMask("formatted_address")
+	PlaceSearchFieldMaskGeometry            = PlaceSearchFieldMask("geometry")
+	PlaceSearchFieldMaskIcon                = PlaceSearchFieldMask("icon")
+	PlaceSearchFieldMaskID                  = PlaceSearchFieldMask("id")
+	PlaceSearchFieldMaskName                = PlaceSearchFieldMask("name")
+	PlaceSearchFieldMaskOpeningHours        = PlaceSearchFieldMask("opening_hours")
+	PlaceSearchFieldMaskOpeningHoursOpenNow = PlaceSearchFieldMask("opening_hours/open_now")
+	PlaceSearchFieldMaskPermanentlyClosed   = PlaceSearchFieldMask("permanently_closed")
+	PlaceSearchFieldMaskPhotos              = PlaceSearchFieldMask("photos")
+	PlaceSearchFieldMaskPlaceID             = PlaceSearchFieldMask("place_id")
+	PlaceSearchFieldMaskPriceLevel          = PlaceSearchFieldMask("price_level")
+	PlaceSearchFieldMaskRating              = PlaceSearchFieldMask("rating")
+	PlaceSearchFieldMaskReference           = PlaceSearchFieldMask("reference")
+	PlaceSearchFieldMaskTypes               = PlaceSearchFieldMask("types")
+	PlaceSearchFieldMaskVicinity            = PlaceSearchFieldMask("vicinity")
+)
+
+// ParsePlaceSearchFieldMask will parse a string representation of
+// PlaceSearchFieldMask.
+func ParsePlaceSearchFieldMask(placeSearchFieldMask string) (PlaceSearchFieldMask, error) {
+	switch strings.ToLower(placeSearchFieldMask) {
+	case "alt_id":
+		return PlaceSearchFieldMaskAltID, nil
+	case "formatted_address":
+		return PlaceSearchFieldMaskFormattedAddress, nil
+	case "geometry":
+		return PlaceSearchFieldMaskGeometry, nil
+	case "icon":
+		return PlaceSearchFieldMaskIcon, nil
+	case "id":
+		return PlaceSearchFieldMaskID, nil
+	case "name":
+		return PlaceSearchFieldMaskName, nil
+	case "opening_hours":
+		return PlaceSearchFieldMaskOpeningHours, nil
+	case "opening_hours/open_now":
+		return PlaceSearchFieldMaskOpeningHoursOpenNow, nil
+	case "permanently_closed":
+		return PlaceSearchFieldMaskPermanentlyClosed, nil
+	case "photos":
+		return PlaceSearchFieldMaskPhotos, nil
+	case "place_id":
+		return PlaceSearchFieldMaskPlaceID, nil
+	case "price_level":
+		return PlaceSearchFieldMaskPriceLevel, nil
+	case "rating":
+		return PlaceSearchFieldMaskRating, nil
+	case "reference":
+		return PlaceSearchFieldMaskReference, nil
+	case "types":
+		return PlaceSearchFieldMaskTypes, nil
+	case "vicinity":
+		return PlaceSearchFieldMaskVicinity, nil
+	default:
+		return PlaceSearchFieldMask(""), fmt.Errorf("Unknown PlaceSearchFieldMask \"%v\"", placeSearchFieldMask)
+	}
+}
+
+func placeSearchFieldMasksAsStringArray(fields []PlaceSearchFieldMask) []string {
+	var res []string
+	for _, el := range fields {
+		res = append(res, string(el))
+	}
+	return res
 }

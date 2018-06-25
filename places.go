@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
 	"golang.org/x/net/context"
 
 	// Included for image/jpeg's decoder
@@ -447,6 +448,8 @@ type PlacesSearchResult struct {
 	// PermanentlyClosed is a boolean flag indicating whether the place has permanently
 	// shut down.
 	PermanentlyClosed bool `json:"permanently_closed,omitempty"`
+	// ID is an identifier.
+	ID string `json:"id,omitempty"`
 }
 
 // AltID is the alternative place IDs for a place.
@@ -499,6 +502,18 @@ func (r *PlaceDetailsRequest) params() url.Values {
 		q.Set("language", r.Language)
 	}
 
+	if len(r.Fields) > 0 {
+		q.Set("fields", strings.Join(placeDetailsFieldMasksAsStringArray(r.Fields), ","))
+	}
+
+	if uuid.UUID(r.SessionToken).String() != "00000000-0000-0000-0000-000000000000" {
+		q.Set("sessiontoken", uuid.UUID(r.SessionToken).String())
+	}
+
+	if r.Region != "" {
+		q.Set("region", r.Region)
+	}
+
 	return q
 }
 
@@ -510,6 +525,17 @@ type PlaceDetailsRequest struct {
 	// Language is the language code, indicating in which language the results should be
 	// returned, if possible.
 	Language string
+	// Fields allows you to select which parts of the returned details structure
+	// should be filled in. For more detail, please see the following URL:
+	// https://cloud.google.com/maps-platform/user-guide/product-changes/#places
+	Fields []PlaceDetailsFieldMask
+	// SessionToken is a token that marks this request as part of a Place Autocomplete
+	// Session. Optional.
+	SessionToken PlaceAutocompleteSessionToken
+	// Region is the region code, specified as a ccTLD (country code top-level domain)
+	// two-character value. Most ccTLD codes are identical to ISO 3166-1 codes, with
+	// some exceptions. This parameter will only influence, not fully restrict, results.
+	Region string
 }
 
 // PlaceDetailsResult is an individual Places API Place Details result
@@ -765,6 +791,10 @@ func (c *Client) PlaceAutocomplete(ctx context.Context, r *PlaceAutocompleteRequ
 		return AutocompleteResponse{}, errors.New("maps: Input missing")
 	}
 
+	if uuid.UUID(r.SessionToken).String() == "00000000-0000-0000-0000-000000000000" {
+		return AutocompleteResponse{}, errors.New("maps: Session missing")
+	}
+
 	var response struct {
 		Predictions []AutocompletePrediction `json:"predictions,omitempty"`
 		commonResponse
@@ -785,6 +815,7 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 	q := make(url.Values)
 
 	q.Set("input", r.Input)
+	q.Set("sessiontoken", uuid.UUID(r.SessionToken).String())
 
 	if r.Offset > 0 {
 		q.Set("offset", strconv.FormatUint(uint64(r.Offset), 10))
@@ -821,6 +852,14 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 	return q
 }
 
+// PlaceAutocompleteSessionToken is a session token for Place Autocomplete.
+type PlaceAutocompleteSessionToken uuid.UUID
+
+// NewPlaceAutocompleteSessionToken constructs a new Place Autocomplete session token.
+func NewPlaceAutocompleteSessionToken() PlaceAutocompleteSessionToken {
+	return PlaceAutocompleteSessionToken(uuid.New())
+}
+
 // PlaceAutocompleteRequest is the functional options struct for Place Autocomplete
 type PlaceAutocompleteRequest struct {
 	// Input is the text string on which to search. The Places service will return
@@ -849,6 +888,9 @@ type PlaceAutocompleteRequest struct {
 	// StrictBounds return only those places that are strictly within the region defined
 	// by location and radius.
 	StrictBounds bool
+	// SessionToken is a token that means you will get charged by autocomplete session
+	// instead of by character for Autocomplete
+	SessionToken PlaceAutocompleteSessionToken
 }
 
 var placesPhotoAPI = &apiConfig{
@@ -922,4 +964,157 @@ func (resp *PlacePhotoResponse) Image() (image.Image, error) {
 	}
 	img, _, err := image.Decode(resp.Data)
 	return img, err
+}
+
+// FindPlaceFromTextInputType is the different types of inputs.
+type FindPlaceFromTextInputType string
+
+// The types of FindPlaceFromText Input Types.
+const (
+	FindPlaceFromTextInputTypeTextQuery   = FindPlaceFromTextInputType("textquery")
+	FindPlaceFromTextInputTypePhoneNumber = FindPlaceFromTextInputType("phonenumber")
+)
+
+// FindPlaceFromTextLocationBiasType is the type of location bias for this request
+type FindPlaceFromTextLocationBiasType string
+
+// The types of FindPlaceFromTextLocationBiasType
+const (
+	FindPlaceFromTextLocationBiasIp          = FindPlaceFromTextLocationBiasType("ipbias")
+	FindPlaceFromTextLocationBiasPoint       = FindPlaceFromTextLocationBiasType("point")
+	FindPlaceFromTextLocationBiasCircular    = FindPlaceFromTextLocationBiasType("circle")
+	FindPlaceFromTextLocationBiasRectangular = FindPlaceFromTextLocationBiasType("rectangle")
+)
+
+// ParseFindPlaceFromTextLocationBiasType will parse a string to a FindPlaceFromTextLocationBiasType
+func ParseFindPlaceFromTextLocationBiasType(locationBias string) (FindPlaceFromTextLocationBiasType, error) {
+	t := strings.ToLower(locationBias)
+	switch t {
+	case "ipbias":
+		return FindPlaceFromTextLocationBiasIp, nil
+	case "point":
+		return FindPlaceFromTextLocationBiasPoint, nil
+	case "circle":
+		return FindPlaceFromTextLocationBiasCircular, nil
+	case "rectangle":
+		return FindPlaceFromTextLocationBiasRectangular, nil
+	}
+	return FindPlaceFromTextLocationBiasType(""), fmt.Errorf("Unknown FindPlaceFromTextLocationBiasType \"%v\"", locationBias)
+}
+
+// FindPlaceFromTextRequest is the options struct for Find Place From Text API
+type FindPlaceFromTextRequest struct {
+	// The text input specifying which place to search for (for example, a name,
+	// address, or phone number). Required.
+	Input string
+
+	// The type of input. Required.
+	InputType FindPlaceFromTextInputType
+
+	// Fields allows you to select which parts of the returned details structure
+	// should be filled in.
+	Fields []PlaceSearchFieldMask
+
+	// LocationBias is the type of location bias to apply to this request
+	LocationBias FindPlaceFromTextLocationBiasType
+
+	// LocationBiasPoint is the point for LocationBias type Point
+	LocationBiasPoint *LatLng
+
+	// LocationBiasCenter is the center for LocationBias type Circle
+	LocationBiasCenter *LatLng
+
+	// LocationBiasRadius is the radius for LocationBias type Circle
+	LocationBiasRadius int
+
+	// LocationBiasSouthWest is the South West boundary for LocationBias type Rectangle
+	LocationBiasSouthWest *LatLng
+
+	// LocationBiasSouthWest is the North East boundary for LocationBias type Rectangle
+	LocationBiasNorthEast *LatLng
+}
+
+func (r *FindPlaceFromTextRequest) params() url.Values {
+	q := make(url.Values)
+
+	q.Set("input", r.Input)
+
+	q.Set("inputtype", string(r.InputType))
+
+	if len(r.Fields) > 0 {
+		q.Set("fields", strings.Join(placeSearchFieldMasksAsStringArray(r.Fields), ","))
+	}
+
+	if r.LocationBias != "" {
+		switch r.LocationBias {
+		case FindPlaceFromTextLocationBiasIp:
+			q.Set("locationbias", "ipbias")
+		case FindPlaceFromTextLocationBiasPoint:
+			q.Set("locationbias", fmt.Sprintf("point:%s", r.LocationBiasPoint.String()))
+		case FindPlaceFromTextLocationBiasCircular:
+			q.Set("locationbias", fmt.Sprintf("circle:%d@%s", r.LocationBiasRadius, r.LocationBiasCenter.String()))
+		case FindPlaceFromTextLocationBiasRectangular:
+			q.Set("locationbias", fmt.Sprintf("rectangle:%s|%s", r.LocationBiasSouthWest.String(), r.LocationBiasNorthEast.String()))
+		}
+	}
+
+	return q
+}
+
+// FindPlaceFromTextResponse is a response to the Find Place From Text request
+type FindPlaceFromTextResponse struct {
+	Candidates       []PlacesSearchResult
+	HTMLAttributions []string
+}
+
+var findPlaceFromTextAPI = &apiConfig{
+	host:            "https://maps.googleapis.com",
+	path:            "/maps/api/place/findplacefromtext/json",
+	acceptsClientID: false,
+}
+
+// FindPlaceFromText takes a text input, and returns a place. The text input
+// can be any kind of Places data, for example, a name, address, or phone number.
+func (c *Client) FindPlaceFromText(ctx context.Context, r *FindPlaceFromTextRequest) (FindPlaceFromTextResponse, error) {
+
+	if r.Input == "" {
+		return FindPlaceFromTextResponse{}, errors.New("maps: Input required")
+	}
+
+	if r.InputType == "" {
+		return FindPlaceFromTextResponse{}, errors.New("maps: InputType required")
+	}
+
+	if r.LocationBias != "" {
+		switch r.LocationBias {
+		case FindPlaceFromTextLocationBiasPoint:
+			if r.LocationBiasPoint == nil {
+				return FindPlaceFromTextResponse{}, errors.New("maps: LocationBiasPoint required when LocationBias set to FindPlaceFromTextLocationBiasPoint")
+			}
+		case FindPlaceFromTextLocationBiasCircular:
+			if r.LocationBiasCenter == nil || r.LocationBiasRadius == 0 {
+				return FindPlaceFromTextResponse{}, errors.New("maps: LocationBiasCenter and LocationBiasRadius required when LocationBias set to FindPlaceFromTextLocationBiasCircle")
+			}
+		case FindPlaceFromTextLocationBiasRectangular:
+			if r.LocationBiasSouthWest == nil || r.LocationBiasNorthEast == nil {
+				return FindPlaceFromTextResponse{}, errors.New("maps: LocationBiasSouthWest and LocationBiasNorthEast required when LocationBias set to FindPlaceFromTextLocationBiasRectangle")
+			}
+		}
+	}
+
+	var response struct {
+		Candidates       []PlacesSearchResult `json:"candidates,omitempty"`
+		HTMLAttributions []string             `json:"html_attributions,omitempty"`
+		commonResponse
+	}
+
+	if err := c.getJSON(ctx, findPlaceFromTextAPI, r, &response); err != nil {
+		return FindPlaceFromTextResponse{}, err
+	}
+
+	if err := response.StatusError(); err != nil {
+		return FindPlaceFromTextResponse{}, err
+	}
+
+	return FindPlaceFromTextResponse{response.Candidates, response.HTMLAttributions}, nil
 }
