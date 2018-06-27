@@ -3,8 +3,13 @@ go_import_path: googlemaps.github.io/maps
 
 # See https://github.com/travis-ci/gimme/blob/master/.testdata/binary-linux for known golang versions
 go:
-  - 1.6.x
-  - 1.7.x
-  - 1.8.x
-  - 1.9.x
+  - "1.6.x"
+  - "1.7.x"
+  - "1.8.x"
+  - "1.9.x"
+  - "1.10.x"
   - tip
+
+script: 
+  - go list -f '{{if len .TestGoFiles}}"go test -v -covermode=atomic -coverprofile={{.Dir}}/coverage.txt {{.ImportPath}}"{{end}}' ./... | xargs sh -c
+  - go tool cover -func=coverage.txt
