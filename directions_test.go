@@ -19,11 +19,13 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 )
 
@@ -435,7 +437,7 @@ func TestDirectionsFailingServer(t *testing.T) {
 }
 
 func TestDirectionsRequestURL(t *testing.T) {
-	expectedQuery := "alternatives=true&avoid=tolls%7Cferries&destination=Parramatta&key=AIzaNotReallyAnAPIKey&language=es&mode=transit&optimize=true&origin=Sydney&region=es&transit_mode=rail&transit_routing_preference=fewer_transfers&units=imperial&waypoints=Charlestown%2CMA%7Cvia%3ALexington"
+	expectedQuery := "alternatives=true&avoid=tolls%7Cferries&destination=Parramatta&key=AIzaNotReallyAnAPIKey&language=es&mode=transit&origin=Sydney&region=es&transit_mode=rail&transit_routing_preference=fewer_transfers&units=imperial&waypoints=optimize%3Atrue%7CCharlestown%2CMA%7Cvia%3ALexington"
 
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
@@ -687,4 +689,32 @@ func TestNoFare(t *testing.T) {
 	if resp[0].Fare != nil {
 		t.Errorf("expected %+v, was %+v", nil, resp[0].Fare)
 	}
+}
+
+// https://maps.googleapis.com/maps/api/directions/json?
+// origin=Adelaide,SA
+// &destination=Adelaide,SA
+// &waypoints=optimize:true|Barossa+Valley,SA|Clare,SA|Connawarra,SA|McLaren+Vale,SA
+// https://github.com/googlemaps/google-maps-services-go/issues/138
+func TestConstructParamsWithOptimizeFlag(t *testing.T) {
+	require := require.New(t)
+	r := new(DirectionsRequest)
+	r.Destination = "Adelaide,SA"
+	r.Origin = "Adelaide,SA"
+	r.Optimize = true
+	r.Waypoints = []string{"Barossa+Valley,SA", "Clare,SA", "Connawarra,SA", "McLaren+Vale,SA"}
+	v := r.params()
+	uri, _ := url.QueryUnescape(v.Encode())
+	require.Equal("destination=Adelaide,SA&origin=Adelaide,SA&waypoints=optimize:true|Barossa+Valley,SA|Clare,SA|Connawarra,SA|McLaren+Vale,SA", uri)
+}
+
+func TestConstructParamsWithoutOptimizeFlag(t *testing.T) {
+	require := require.New(t)
+	r := new(DirectionsRequest)
+	r.Destination = "Adelaide,SA"
+	r.Origin = "Adelaide,SA"
+	r.Waypoints = []string{"Barossa+Valley,SA", "Clare,SA", "Connawarra,SA", "McLaren+Vale,SA"}
+	v := r.params()
+	uri, _ := url.QueryUnescape(v.Encode())
+	require.Equal("destination=Adelaide,SA&origin=Adelaide,SA&waypoints=Barossa+Valley,SA|Clare,SA|Connawarra,SA|McLaren+Vale,SA", uri)
 }

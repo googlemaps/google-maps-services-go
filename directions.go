@@ -15,6 +15,7 @@
 package maps
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net/url"
@@ -68,6 +69,15 @@ func (c *Client) Directions(ctx context.Context, r *DirectionsRequest) ([]Route,
 	return response.Routes, response.GeocodedWaypoints, nil
 }
 
+func getWaypointsQueryString(r *DirectionsRequest) string {
+	var b bytes.Buffer
+	if r.Optimize {
+		b.WriteString("optimize:true|")
+	}
+	b.WriteString(strings.Join(r.Waypoints, "|"))
+	return b.String()
+}
+
 func (r *DirectionsRequest) params() url.Values {
 	q := make(url.Values)
 	q.Set("origin", r.Origin)
@@ -82,13 +92,10 @@ func (r *DirectionsRequest) params() url.Values {
 		q.Set("arrival_time", r.ArrivalTime)
 	}
 	if len(r.Waypoints) != 0 {
-		q.Set("waypoints", strings.Join(r.Waypoints, "|"))
+		q.Set("waypoints", getWaypointsQueryString(r))
 	}
 	if r.Alternatives {
 		q.Set("alternatives", "true")
-	}
-	if r.Optimize {
-		q.Set("optimize", "true")
 	}
 	if len(r.Avoid) > 0 {
 		var avoid []string
