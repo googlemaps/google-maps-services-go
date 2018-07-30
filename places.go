@@ -982,7 +982,7 @@ type FindPlaceFromTextLocationBiasType string
 
 // The types of FindPlaceFromTextLocationBiasType
 const (
-	FindPlaceFromTextLocationBiasIp          = FindPlaceFromTextLocationBiasType("ipbias")
+	FindPlaceFromTextLocationBiasIP          = FindPlaceFromTextLocationBiasType("ipbias")
 	FindPlaceFromTextLocationBiasPoint       = FindPlaceFromTextLocationBiasType("point")
 	FindPlaceFromTextLocationBiasCircular    = FindPlaceFromTextLocationBiasType("circle")
 	FindPlaceFromTextLocationBiasRectangular = FindPlaceFromTextLocationBiasType("rectangle")
@@ -993,7 +993,7 @@ func ParseFindPlaceFromTextLocationBiasType(locationBias string) (FindPlaceFromT
 	t := strings.ToLower(locationBias)
 	switch t {
 	case "ipbias":
-		return FindPlaceFromTextLocationBiasIp, nil
+		return FindPlaceFromTextLocationBiasIP, nil
 	case "point":
 		return FindPlaceFromTextLocationBiasPoint, nil
 	case "circle":
@@ -1049,7 +1049,7 @@ func (r *FindPlaceFromTextRequest) params() url.Values {
 
 	if r.LocationBias != "" {
 		switch r.LocationBias {
-		case FindPlaceFromTextLocationBiasIp:
+		case FindPlaceFromTextLocationBiasIP:
 			q.Set("locationbias", "ipbias")
 		case FindPlaceFromTextLocationBiasPoint:
 			q.Set("locationbias", fmt.Sprintf("point:%s", r.LocationBiasPoint.String()))
