@@ -193,6 +193,19 @@ type GeocodingResult struct {
 	Geometry          AddressGeometry    `json:"geometry"`
 	Types             []string           `json:"types"`
 	PlaceID           string             `json:"place_id"`
+
+	// PartialMatch indicates that the geocoder did not return an exact match for
+	// the original request, though it was able to match part of the requested address.
+	// You may wish to examine the original request for misspellings and/or an incomplete address.
+	// Partial matches most often occur for street addresses that do not exist within the
+	// locality you pass in the request.
+	// Partial matches may also be returned when a request matches two or more locations in
+	// the same locality. For example, "21 Henr St, Bristol, UK" will return a partial match
+	// for both Henry Street and Henrietta Street.
+	// Note that if a request includes a misspelled address component, the geocoding service may
+	// suggest an alternative address.
+	// Suggestions triggered in this way will also be marked as a partial match.
+	PartialMatch bool `json:"partial_match"`
 }
 
 // AddressComponent is a part of an address
