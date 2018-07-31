@@ -111,7 +111,7 @@ func parseComponents(components string, r *maps.GeocodingRequest) {
 		case "country":
 			r.Components[maps.ComponentCountry] = i[1]
 		default:
-			log.Fatalf("parseComponents: wrong component name given %#v", i[0])
+			log.Fatalf("parseComponents: component name %#v unknown", i[0])
 		}
 	}
 }

@@ -206,6 +206,37 @@ type GeocodingResult struct {
 	// suggest an alternative address.
 	// Suggestions triggered in this way will also be marked as a partial match.
 	PartialMatch bool `json:"partial_match"`
+
+	// PlusCode (see https://en.wikipedia.org/wiki/Open_Location_Code and https://plus.codes/)
+	// is an encoded location reference, derived from latitude and longitude coordinates,
+	// that represents an area: 1/8000th of a degree by 1/8000th of a degree (about 14m x 14m at the equator)
+	// or smaller.
+	//
+	// Plus codes can be used as a replacement for street addresses in places where they do not exist
+	// (where buildings are not numbered or streets are not named).
+	// The plus code is formatted as a global code and a compound code:
+	// Typically, both the global code and compound code are returned.
+	// However, if the result is in a remote location (for example, an ocean or desert)
+	// only the global code may be returned.
+	PlusCode AddressPlusCode `json:"plus_code"`
+}
+
+// AddressPlusCode (see https://en.wikipedia.org/wiki/Open_Location_Code and https://plus.codes/)
+// is an encoded location reference, derived from latitude and longitude coordinates,
+// that represents an area: 1/8000th of a degree by 1/8000th of a degree (about 14m x 14m at the equator)
+// or smaller.
+//
+// Plus codes can be used as a replacement for street addresses in places where they do not exist
+// (where buildings are not numbered or streets are not named).
+// The plus code is formatted as a global code and a compound code:
+// Typically, both the global code and compound code are returned.
+// However, if the result is in a remote location (for example, an ocean or desert)
+// only the global code may be returned.
+type AddressPlusCode struct {
+	// GlobalCode is a 4 character area code and 6 character or longer local code (849VCWC8+R9).
+	GlobalCode string `json:"global_code"`
+	// CompoundCode is a 6 character or longer local code with an explicit location (CWC8+R9, Mountain View, CA, USA).
+	CompoundCode string `json:"compound_code"`
 }
 
 // AddressComponent is a part of an address
