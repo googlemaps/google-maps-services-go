@@ -89,22 +89,29 @@ func main() {
 }
 
 func parseComponents(components string, r *maps.GeocodingRequest) {
-	if components != "" {
-		c := strings.Split(components, "|")
-		for _, cf := range c {
-			i := strings.Split(cf, ":")
-			switch i[0] {
-			case "route":
-				r.Components[maps.ComponentRoute] = i[1]
-			case "locality":
-				r.Components[maps.ComponentLocality] = i[1]
-			case "administrative_area":
-				r.Components[maps.ComponentAdministrativeArea] = i[1]
-			case "postal_code":
-				r.Components[maps.ComponentPostalCode] = i[1]
-			case "country":
-				r.Components[maps.ComponentCountry] = i[1]
-			}
+	if components == "" {
+		return
+	}
+	if r.Components == nil {
+		r.Components = make(map[maps.Component]string)
+	}
+
+	c := strings.Split(components, "|")
+	for _, cf := range c {
+		i := strings.Split(cf, ":")
+		switch i[0] {
+		case "route":
+			r.Components[maps.ComponentRoute] = i[1]
+		case "locality":
+			r.Components[maps.ComponentLocality] = i[1]
+		case "administrative_area":
+			r.Components[maps.ComponentAdministrativeArea] = i[1]
+		case "postal_code":
+			r.Components[maps.ComponentPostalCode] = i[1]
+		case "country":
+			r.Components[maps.ComponentCountry] = i[1]
+		default:
+			log.Fatalf("parseComponents: component name %#v unknown", i[0])
 		}
 	}
 }

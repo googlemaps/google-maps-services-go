@@ -109,6 +109,7 @@ func TestGeocodingGoogleHQ(t *testing.T) {
                     }
                 }
             },
+            "partial_math": false,
             "place_id": "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
             "types": [
                 "street_address"
@@ -186,8 +187,9 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 			},
 			Types: nil,
 		},
-		PlaceID: "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
-		Types:   []string{"street_address"},
+		PartialMatch: false,
+		PlaceID:      "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
+		Types:        []string{"street_address"},
 	}
 
 	if !reflect.DeepEqual(resp[0], correctResponse) {
