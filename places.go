@@ -180,8 +180,8 @@ var placesTextSearchAPI = &apiConfig{
 // TextSearch issues the Places API Text Search request and retrieves the Response
 func (c *Client) TextSearch(ctx context.Context, r *TextSearchRequest) (PlacesSearchResponse, error) {
 
-	if r.Query == "" && r.PageToken == "" {
-		return PlacesSearchResponse{}, errors.New("maps: Query and PageToken both missing")
+	if r.Query == "" && r.PageToken == "" && r.Type == "" {
+		return PlacesSearchResponse{}, errors.New("maps: Query, PageToken and Type are all missing")
 	}
 
 	if r.Location != nil && r.Radius == 0 {
