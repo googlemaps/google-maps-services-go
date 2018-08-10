@@ -327,7 +327,7 @@ func TestTextSearchMissingQuery(t *testing.T) {
 	r := &TextSearchRequest{}
 	_, err := c.TextSearch(context.Background(), r)
 
-	if "maps: Query and PageToken both missing" != err.Error() {
+	if "maps: Query, PageToken and Type are all missing" != err.Error() {
 		t.Errorf("Wrong error returned \"%v\"", err)
 	}
 }
