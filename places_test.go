@@ -720,6 +720,10 @@ func TestPlaceDetails(t *testing.T) {
 		t.Errorf("Expected OpenNow to be true")
 	}
 
+	if *resp.UTCOffset != 660 {
+		t.Errorf("Expected UTCOffset to be 660")
+	}
+
 	if resp.OpeningHours.Periods[0].Open.Day != time.Monday || resp.OpeningHours.Periods[0].Close.Day != time.Monday {
 		t.Errorf("OpeningHours.Periods[0].Open.Day or Close.Day incorrect")
 	}
@@ -770,6 +774,56 @@ func TestPlaceDetails(t *testing.T) {
 	time := 1441848853
 	if time != resp.Reviews[0].Time {
 		t.Errorf("expected %+v, was %+v", time, resp.Reviews[0].Time)
+	}
+}
+
+func TestPlaceDetailsUTCOffsetAbsent(t *testing.T) {
+	response := `
+{
+   "html_attributions" : [],
+   "result" : {
+      "address_components" : [],
+      "formatted_address" : "3, Overseas Passenger Terminal, George St & Argyle Street, The Rocks NSW 2000, Australia",
+      "formatted_phone_number" : "(02) 9251 5600",
+      "geometry" : {
+         "location" : {
+            "lat" : -33.858018,
+            "lng" : 151.210091
+         }
+      },
+      "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/restaurant-71.png",
+      "international_phone_number" : "+61 2 9251 5600",
+      "name" : "Quay",
+      "place_id" : "ChIJ02qnq0KuEmsRHUJF4zo1x4I",
+      "price_level" : 4,
+      "rating" : 4.1,
+      "scope" : "GOOGLE",
+      "types" : [ "restaurant", "food", "point_of_interest", "establishment" ],
+      "url" : "https://plus.google.com/105746337161979416551/about?hl=en-US",
+      "user_ratings_total" : 275,
+      "vicinity" : "3 Overseas Passenger Terminal, George Street, The Rocks",
+      "website" : "http://www.quay.com.au/"
+   },
+   "status" : "OK"
+}
+`
+	server := mockServer(200, response)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+	placeID := "ChIJ02qnq0KuEmsRHUJF4zo1x4I"
+	r := &PlaceDetailsRequest{
+		PlaceID: placeID,
+	}
+
+	resp, err := c.PlaceDetails(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("r.Get returned non nil error: %v", err)
+		return
+	}
+
+	if resp.UTCOffset != nil {
+		t.Errorf("Expected UTCOffset to be nil")
 	}
 }
 
