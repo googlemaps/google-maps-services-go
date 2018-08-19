@@ -481,7 +481,7 @@ type PlaceDetailsResult struct {
 	// from UTC. For example, for places in Sydney, Australia during daylight saving
 	// time this would be 660 (+11 hours from UTC), and for places in California outside
 	// of daylight saving time this would be -480 (-8 hours from UTC).
-	UTCOffset int `json:"utc_offset,omitempty"`
+	UTCOffset *int `json:"utc_offset,omitempty"`
 	// Website lists the authoritative website for this place, such as a business'
 	// homepage.
 	Website string `json:"website,omitempty"`
