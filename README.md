@@ -40,7 +40,7 @@ contribute, please read [How to Contribute][contrib].
 
 ## Requirements
 
-- Go 1.5 or later.
+- Go 1.6 or later.
 - A Google Maps API key.
 
 ### API keys
@@ -190,7 +190,7 @@ Native objects for each of the API responses.
 [Maps documentation]: https://developers.google.com/maps/
 [Places documentation]: https://developers.google.com/places/
 
-[Google Maps API Web Services]: https://developers.google.com/maps/documentation/webservices/
+[Google Maps API Web Services]: https://developers.google.com/maps/apis-by-platform#web_service_apis
 [Directions API]: https://developers.google.com/maps/documentation/directions/
 [directions-client-id]: https://developers.google.com/maps/documentation/directions/get-api-key#client-id
 [directions-key]: https://developers.google.com/maps/documentation/directions/get-api-key#key
