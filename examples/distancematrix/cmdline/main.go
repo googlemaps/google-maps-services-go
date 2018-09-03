@@ -42,6 +42,7 @@ var (
 	arrivalTime              = flag.String("arrival_time", "", "Specifies the desired time of arrival.")
 	transitMode              = flag.String("transit_mode", "", "Specifies one or more preferred modes of transit.")
 	transitRoutingPreference = flag.String("transit_routing_preference", "", "Specifies preferences for transit requests.")
+	trafficModel             = flag.String("traffic_model", "", "Specifies the assumptions to use when calculating time in traffic.")
 )
 
 func usageAndExit(msg string) {
@@ -89,6 +90,7 @@ func main() {
 	lookupUnits(*units, r)
 	lookupTransitMode(*transitMode, r)
 	lookupTransitRoutingPreference(*transitRoutingPreference, r)
+	lookupTrafficModel(*trafficModel, r)
 
 	resp, err := client.DistanceMatrix(context.Background(), r)
 	check(err)
@@ -172,5 +174,20 @@ func lookupTransitRoutingPreference(transitRoutingPreference string, r *maps.Dis
 		// ignore
 	default:
 		log.Fatalf("Unknown transit routing preference %s", transitRoutingPreference)
+	}
+}
+
+func lookupTrafficModel(trafficModel string, r *maps.DistanceMatrixRequest) {
+	switch trafficModel {
+	case "best_guess":
+		r.TrafficModel = maps.TrafficModelBestGuess
+	case "pessimistic":
+		r.TrafficModel = maps.TrafficModelPessimistic
+	case "optimistic":
+		r.TrafficModel = maps.TrafficModelOptimistic
+	case "":
+		// ignore
+	default:
+		log.Fatalf("Unknown traffic_model %s", trafficModel)
 	}
 }

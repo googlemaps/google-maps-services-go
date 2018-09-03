@@ -17,6 +17,7 @@ package maps
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	"golang.org/x/net/context"
 )
@@ -81,6 +82,76 @@ func TestDistanceMatrixWithCoordinatesAndTraffic(t *testing.T) {
 	}
 	if !reflect.DeepEqual(resp, correctResponse) {
 		t.Errorf("expected %+v, was %+v", correctResponse, resp)
+	}
+}
+
+func TestDistanceMatrixWithMexicanOriginAndDestination(t *testing.T) {
+	// view-source:https://maps.googleapis.com/maps/api/distancematrix/json?origins=19.3021022,-99.2298197&destinations=19.51018,-99.12585&mode=driving&units=metric&departure_time=now&traffic_model=best_guess
+	response := `{
+		"destination_addresses" : [
+			 "Av Instituto Politécnico Nacional 3600, San Pedro Zacatenco, 07360 Ciudad de México, CDMX, Mexico"
+		],
+		"origin_addresses" : [
+			 "Cto. Fuentes del Pedregal 555, Los Framboyanes, 14150 Ciudad de México, CDMX, Mexico"
+		],
+		"rows" : [
+			 {
+					"elements" : [
+						 {
+								"distance" : {
+									 "text" : "30.5 km",
+									 "value" : 30539
+								},
+								"duration" : {
+									 "text" : "50 mins",
+									 "value" : 3001
+								},
+								"duration_in_traffic" : {
+									 "text" : "51 mins",
+									 "value" : 3040
+								},
+								"status" : "OK"
+						 }
+					]
+			 }
+		],
+		"status" : "OK"
+ }`
+	server := mockServer(200, response)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+	r := &DistanceMatrixRequest{
+		Origins:       []string{"19.3021022,-99.2298197"},
+		Destinations:  []string{"19.51018,-99.12585"},
+		DepartureTime: `now`,
+		Units:         `UnitsMetric`,
+		Mode:          TravelModeDriving,
+		TrafficModel:  TrafficModelBestGuess,
+	}
+	resp, err := c.DistanceMatrix(context.Background(), r)
+	if err != nil {
+		t.Errorf("r.Get returned non nil error, was %+v", err)
+	}
+	if resp.OriginAddresses[0] != "Cto. Fuentes del Pedregal 555, Los Framboyanes, 14150 Ciudad de México, CDMX, Mexico" {
+		t.Error("Incorrect origin address")
+	}
+	if resp.DestinationAddresses[0] != "Av Instituto Politécnico Nacional 3600, San Pedro Zacatenco, 07360 Ciudad de México, CDMX, Mexico" {
+		t.Error("Incorrect destination address")
+	}
+	if resp.Rows[0].Elements[0].Distance.HumanReadable != "30.5 km" {
+		t.Error("Incorrect human readable distance")
+	}
+	if resp.Rows[0].Elements[0].Distance.Meters != 30539 {
+		t.Error("Incorrect distance value")
+	}
+	if resp.Rows[0].Elements[0].Duration != time.Second*3001 {
+		t.Errorf("Incorrect Duration: %v", resp.Rows[0].Elements[0].Duration)
+	}
+	if resp.Rows[0].Elements[0].DurationInTraffic != time.Second*3040 {
+		t.Errorf("Incorrect DurationInTraffic: %v", resp.Rows[0].Elements[0].DurationInTraffic)
+	}
+	if resp.Rows[0].Elements[0].Status != "OK" {
+		t.Error("Incorrect element status")
 	}
 }
 
