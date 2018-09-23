@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"googlemaps.github.io/maps/internal/internal"
 	"io"
 	"net/http"
 	"net/url"
@@ -27,7 +28,6 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
 	"golang.org/x/time/rate"
-	"googlemaps.github.io/maps/internal"
 )
 
 // Client may be used to make requests to the Google Maps WebService APIs
