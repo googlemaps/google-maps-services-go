@@ -204,35 +204,38 @@ func (p Path) String() string {
 
 // MapStyle defines a custom style to alter the presentation of a specific feature
 // (roads, parks, and other features) of the map.
-type MapStyle struct {
-	Features map[FeatureName]MapElements
-}
+type MapStyle map[FeatureName]Elements
 
-func (ms MapStyle) Styles() []string {
+// mapStyles receives an object of type MapStyle and processes it
+// into a slice of valid Map Style Rules, each of which are parameter strings
+// formatted in accordance with the Google Static Maps Style Maps API and
+// ready for query string encoding.
+func mapStyles(ms MapStyle) []string {
 	features := make([]string, 0)
-	for feature, element := range ms.Features {
-		if es := element.String(); es != "" {
+	for feature, elements := range ms {
+		if es := elementsString(elements); es != "" {
 			features = append(features, fmt.Sprintf("feature:%s|%s", feature, es))
 		}
 	}
 	return features
 }
 
-// FeatureName is the name of a Feature which is receiving Map Styling elements.
+// FeatureName is the name of a Feature which is receiving Map Styling for it's Elements.
 type FeatureName string
 
-// ElementName is the name of an Element which is receiving Map Styling rules.
+// ElementName is the name of an Element which is receiving Map Styling Rules.
 type ElementName string
 
-// MapElements are a collection of per-Element Style Rules.
-type MapElements struct {
-	Elements map[ElementName]StyleRule
-}
+// Elements is a map of per-Element Style Rules.
+type Elements map[ElementName]StyleRules
 
-func (me MapElements) String() string {
+// elementsString receives an object of type Elements and for each
+// Map Element within it, processes it's Map Style Rules into a string
+// formatted in accordance with the Google Static Maps Style Maps API.
+func elementsString(me Elements) string {
 	str := ""
-	for element, rule := range me.Elements {
-		if rs := rule.String(); rs != "" {
+	for element, rules := range me {
+		if rs := rulesString(rules); rs != "" {
 			if str == "" {
 				str = fmt.Sprintf("|%s|%s", element, rs)
 			} else {
@@ -243,19 +246,21 @@ func (me MapElements) String() string {
 	return str
 }
 
-// StyleItem is the item for which a Style Option is being declared.
+// StyleItem is a Map Item which can have a Style Item defined.
 type StyleItem string
 
 // StyleOption is the value being defined for a specific Style item.
 type StyleOption string
 
-type StyleRule struct {
-	Rules map[StyleItem]StyleOption
-}
+// StyleRules is a map of Map Style Items, for each declared Item a single Style Option must be defined.
+type StyleRules map[StyleItem]StyleOption
 
-func (sr StyleRule) String() string {
+// rulesString receives an object of StyleRules and for each
+// Map Style Rule within it, processes it into a string
+// formatted in accordance with the Google Static Maps Style Maps API.
+func rulesString(sr StyleRules) string {
 	str := ""
-	for k, v := range sr.Rules {
+	for k, v := range sr {
 		if v != "" {
 			rule := fmt.Sprintf("%s:%s", k, v)
 			if str == "" {
@@ -356,7 +361,7 @@ func (r *StaticMapRequest) params() url.Values {
 		q.Set("visible", strings.Join(t, "|"))
 	}
 
-	for _, style := range r.MapStyles.Styles() {
+	for _, style := range mapStyles(r.MapStyles) {
 		if style != "" {
 			q.Add("style", style)
 		}

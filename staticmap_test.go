@@ -76,29 +76,36 @@ func TestStaticMode(t *testing.T) {
 
 func TestMapStyles(t *testing.T) {
 	r := StaticMapRequest{
+		Size:  "600x600",
+		Scale: 2,
+		Markers: []Marker{
+			Marker{
+				Location: []LatLng{
+					LatLng{
+						Lat: 51.477222,
+						Lng: 0,
+					},
+				},
+			},
+		},
+		Zoom: 13,
+
 		MapStyles: MapStyle{
-			Features: map[FeatureName]MapElements{
-				"poi": MapElements{map[ElementName]StyleRule{
-					"all": StyleRule{
-						Rules: map[StyleItem]StyleOption{
-							"visibility": "off",
-						},
-					},
-				}},
-				"landscape.natural.landcover": MapElements{map[ElementName]StyleRule{
-					"labels": StyleRule{
-						Rules: map[StyleItem]StyleOption{
-							"invert_lightness": "true",
-						},
-					},
-				}},
-				"roads.local": MapElements{map[ElementName]StyleRule{
-					"geometry.fill": StyleRule{
-						Rules: map[StyleItem]StyleOption{
-							"color": "#0000FF",
-						},
-					},
-				}},
+			"poi.attraction": Elements{
+				"all": StyleRules{
+					"visibility": "off",
+				},
+			},
+			"water": Elements{
+				"geometry.fill": StyleRules{
+					"color": "0xFF0000",
+				},
+			},
+			"landscape.natural": Elements{
+				"geometry": StyleRules{
+					"color": "0x0000FF",
+					"width": "50",
+				},
 			},
 		},
 	}
@@ -106,4 +113,20 @@ func TestMapStyles(t *testing.T) {
 	if c := strings.Count(values.Encode(), "style"); c != 3 {
 		t.Errorf("Generate query string does not contain sufficient Style parameters (found %d)", c)
 	}
+
+	// Uncomment this block of code to write a styled map to ./mapstyles.jpeg
+	/*
+		apiKey := "<YOUR API KEY HERE>"
+		client, err := NewClient(WithAPIKey(apiKey))
+		if err != nil {
+			t.Fatalf("Failed to create client (error: %s)", err.Error())
+		}
+		image, err := client.StaticMap(context.Background(), &r)
+		if err != nil {
+			t.Fatalf("Failed to create styled map image (error: %s)", err.Error())
+		}
+		buffer := &bytes.Buffer{}
+		jpeg.Encode(buffer, image, nil)
+		ioutil.WriteFile("./mapstyles.jpeg", buffer.Bytes(), os.ModePerm)
+	*/
 }
