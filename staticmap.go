@@ -205,7 +205,67 @@ func (p Path) String() string {
 // MapStyle defines a custom style to alter the presentation of a specific feature
 // (roads, parks, and other features) of the map.
 type MapStyle struct {
-	// TODO: Implement this.
+	Features map[FeatureName]MapElements
+}
+
+func (ms MapStyle) Styles() []string {
+	features := make([]string, 0)
+	for feature, element := range ms.Features {
+		if es := element.String(); es != "" {
+			features = append(features, fmt.Sprintf("feature:%s|%s", feature, es))
+		}
+	}
+	return features
+}
+
+// FeatureName is the name of a Feature which is receiving Map Styling elements.
+type FeatureName string
+
+// ElementName is the name of an Element which is receiving Map Styling rules.
+type ElementName string
+
+// MapElements are a collection of per-Element Style Rules.
+type MapElements struct {
+	Elements map[ElementName]StyleRule
+}
+
+func (me MapElements) String() string {
+	str := ""
+	for element, rule := range me.Elements {
+		if rs := rule.String(); rs != "" {
+			if str == "" {
+				str = fmt.Sprintf("|%s|%s", element, rs)
+			} else {
+				str = fmt.Sprintf("%s|%s|%s", str, element, rs)
+			}
+		}
+	}
+	return str
+}
+
+// StyleItem is the item for which a Style Option is being declared.
+type StyleItem string
+
+// StyleOption is the value being defined for a specific Style item.
+type StyleOption string
+
+type StyleRule struct {
+	Rules map[StyleItem]StyleOption
+}
+
+func (sr StyleRule) String() string {
+	str := ""
+	for k, v := range sr.Rules {
+		if v != "" {
+			rule := fmt.Sprintf("%s:%s", k, v)
+			if str == "" {
+				str = rule
+			} else {
+				str = fmt.Sprintf("%s|%s:%s", rule, k, v)
+			}
+		}
+	}
+	return str
 }
 
 // StaticMapRequest is the functional options struct for staticMap.Get
@@ -221,7 +281,7 @@ type StaticMapRequest struct {
 	// are 2 and 4
 	Scale int
 	// Format format (optional) defines the format of the resulting image. Default: PNG.
-	// Accepeted Values: There are several possible formats including GIF, JPEG and PNG
+	// Accepted Values: There are several possible formats including GIF, JPEG and PNG
 	// types.
 	Format Format
 	// Language (optional) defines the language to use for display of labels on map
@@ -241,6 +301,8 @@ type StaticMapRequest struct {
 	// Visible specifies one or more locations that should remain visible on the map,
 	// though no markers or other indicators will be displayed.
 	Visible []LatLng
+	// MapStyles (optional) contains map styles on a per-feature basis.
+	MapStyles MapStyle
 }
 
 func (r *StaticMapRequest) params() url.Values {
@@ -293,6 +355,13 @@ func (r *StaticMapRequest) params() url.Values {
 		}
 		q.Set("visible", strings.Join(t, "|"))
 	}
+
+	for _, style := range r.MapStyles.Styles() {
+		if style != "" {
+			q.Add("style", style)
+		}
+	}
+
 	return q
 }
 

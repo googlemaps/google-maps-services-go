@@ -20,6 +20,7 @@ import (
 	"image/png"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"golang.org/x/net/context"
@@ -70,5 +71,39 @@ func TestStaticMode(t *testing.T) {
 
 	if resp.Bounds().Min.X != 0 || resp.Bounds().Min.Y != 0 || resp.Bounds().Max.X != 640 || resp.Bounds().Max.Y != 400 {
 		t.Errorf("Response image not of the correct dimensions")
+	}
+}
+
+func TestMapStyles(t *testing.T) {
+	r := StaticMapRequest{
+		MapStyles: MapStyle{
+			Features: map[FeatureName]MapElements{
+				"poi": MapElements{map[ElementName]StyleRule{
+					"all": StyleRule{
+						Rules: map[StyleItem]StyleOption{
+							"visibility": "off",
+						},
+					},
+				}},
+				"landscape.natural.landcover": MapElements{map[ElementName]StyleRule{
+					"labels": StyleRule{
+						Rules: map[StyleItem]StyleOption{
+							"invert_lightness": "true",
+						},
+					},
+				}},
+				"roads.local": MapElements{map[ElementName]StyleRule{
+					"geometry.fill": StyleRule{
+						Rules: map[StyleItem]StyleOption{
+							"color": "#0000FF",
+						},
+					},
+				}},
+			},
+		},
+	}
+	values := r.params()
+	if c := strings.Count(values.Encode(), "style"); c != 3 {
+		t.Errorf("Generate query string does not contain sufficient Style parameters (found %d)", c)
 	}
 }
