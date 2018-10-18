@@ -73,6 +73,10 @@ func (c *Client) ReverseGeocode(ctx context.Context, r *GeocodingRequest) ([]Geo
 		return nil, err
 	}
 
+	if response.Status == "ZERO_RESULTS" {
+		return []GeocodingResult{}, nil
+	}
+
 	if err := response.StatusError(); err != nil {
 		return nil, err
 	}
