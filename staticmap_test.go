@@ -74,28 +74,28 @@ func TestStaticMode(t *testing.T) {
 	}
 }
 
-func TestMapStyles(t *testing.T) {
+func TestMapStylesMultiStyles(t *testing.T) {
 	r := StaticMapRequest{
-		Size:  "600x600",
-		Scale: 2,
-		Markers: []Marker{
-			Marker{
-				Location: []LatLng{
-					LatLng{
-						Lat: 51.477222,
-						Lng: 0,
-					},
+		MapStyles: MapStyle{
+			"landscape.natural": Elements{
+				"geometry": StyleRules{
+					"color": "0x0000FF",
+					"width": "50",
 				},
 			},
 		},
-		Zoom: 13,
+	}
 
+	values := r.params()
+	t.Log(values)
+	if c := strings.Count(values.Encode(), "style"); c != 1 {
+		t.Errorf("Generate query string does not contain sufficient Style parameters (found %d)", c)
+	}
+}
+
+func TestMapStylesFeaturesAndElements(t *testing.T) {
+	r := StaticMapRequest{
 		MapStyles: MapStyle{
-			"poi.attraction": Elements{
-				"all": StyleRules{
-					"visibility": "off",
-				},
-			},
 			"water": Elements{
 				"geometry.fill": StyleRules{
 					"color": "0xFF0000",
@@ -109,24 +109,33 @@ func TestMapStyles(t *testing.T) {
 			},
 		},
 	}
+
 	values := r.params()
-	if c := strings.Count(values.Encode(), "style"); c != 3 {
+	t.Log(values)
+	if c := strings.Count(values.Encode(), "style"); c != 2 {
 		t.Errorf("Generate query string does not contain sufficient Style parameters (found %d)", c)
 	}
+}
 
-	// Uncomment this block of code to write a styled map to ./mapstyles.jpeg
-	/*
-		apiKey := "<YOUR API KEY HERE>"
-		client, err := NewClient(WithAPIKey(apiKey))
-		if err != nil {
-			t.Fatalf("Failed to create client (error: %s)", err.Error())
-		}
-		image, err := client.StaticMap(context.Background(), &r)
-		if err != nil {
-			t.Fatalf("Failed to create styled map image (error: %s)", err.Error())
-		}
-		buffer := &bytes.Buffer{}
-		jpeg.Encode(buffer, image, nil)
-		ioutil.WriteFile("./mapstyles.jpeg", buffer.Bytes(), os.ModePerm)
-	*/
+func TestMapStylesMultiElementsPerFeature(t *testing.T) {
+	r := StaticMapRequest{
+		MapStyles: MapStyle{
+			"all": Elements{
+				"geometry": StyleRules{
+					"color":      "0xeeaabb",
+					"visibility": "simplified",
+				},
+				"labels.icon": StyleRules{
+					"saturation": "-50",
+					"weight":     "2",
+				},
+			},
+		},
+	}
+
+	values := r.params()
+	t.Log(values)
+	if c := strings.Count(values.Encode(), "style"); c != 2 {
+		t.Errorf("Generate query string does not contain sufficient Style parameters (found %d)", c)
+	}
 }

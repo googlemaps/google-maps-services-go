@@ -21,6 +21,7 @@ APIs:
 - [Places API]
 - [Roads API]
 - [Time Zone API]
+- [Maps Static API]
 
 Keep in mind that the same [terms and conditions](https://developers.google.com/maps/terms) apply
 to usage of the APIs when they're accessed through this library.
@@ -63,6 +64,7 @@ To get an API key:
     - Places API
     - Roads API
     - Time Zone API
+    - Maps Static API
  1. Create a new **Server key**.
  1. If you'd like to restrict requests to a specific IP address, do so now.
 
@@ -95,6 +97,7 @@ Additional documentation for the included  web services is available at
 - [Places API]
 - [Time Zone API]
 - [Roads API]
+- [Maps Static API]
 
 ## Usage
 
@@ -200,6 +203,7 @@ Native objects for each of the API responses.
 [Places API]: https://developers.google.com/places/web-service/
 [Roads API]: https://developers.google.com/maps/documentation/roads/
 [Time Zone API]: https://developers.google.com/maps/documentation/timezone/
+[Maps Static API]: https://developers.google.com/maps/documentation/maps-static/
 
 [issues]: https://github.com/googlemaps/google-maps-services-go/issues
 [contrib]: https://github.com/googlemaps/google-maps-services-go/blob/master/CONTRIB.md
