@@ -3,7 +3,6 @@ go_import_path: googlemaps.github.io/maps
 
 # See https://github.com/travis-ci/gimme/blob/master/.testdata/binary-linux for known golang versions
 go:
-  - "1.6"
   - "1.7"
   - "1.8"
   - "1.9"
