@@ -40,7 +40,7 @@ contribute, please read [How to Contribute][contrib].
 
 ## Requirements
 
-- Go 1.6 or later.
+- Go 1.7 or later.
 - A Google Maps API key.
 
 ### API keys
