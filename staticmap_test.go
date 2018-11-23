@@ -20,7 +20,6 @@ import (
 	"image/png"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"golang.org/x/net/context"
@@ -76,57 +75,12 @@ func TestStaticMode(t *testing.T) {
 
 func TestMapStyles(t *testing.T) {
 	r := StaticMapRequest{
-		Size:  "600x600",
-		Scale: 2,
-		Markers: []Marker{
-			Marker{
-				Location: []LatLng{
-					LatLng{
-						Lat: 51.477222,
-						Lng: 0,
-					},
-				},
-			},
-		},
-		Zoom: 13,
-
-		MapStyles: MapStyle{
-			"poi.attraction": Elements{
-				"all": StyleRules{
-					"visibility": "off",
-				},
-			},
-			"water": Elements{
-				"geometry.fill": StyleRules{
-					"color": "0xFF0000",
-				},
-			},
-			"landscape.natural": Elements{
-				"geometry": StyleRules{
-					"color": "0x0000FF",
-					"width": "50",
-				},
-			},
+		MapStyles: []string{
+			"x", "y",
 		},
 	}
 	values := r.params()
-	if c := strings.Count(values.Encode(), "style"); c != 3 {
-		t.Errorf("Generate query string does not contain sufficient Style parameters (found %d)", c)
+	if q := values.Encode(); q != "style=x&style=y" {
+		t.Errorf("Generated query string is wrong: %s", q)
 	}
-
-	// Uncomment this block of code to write a styled map to ./mapstyles.jpeg
-	/*
-		apiKey := "<YOUR API KEY HERE>"
-		client, err := NewClient(WithAPIKey(apiKey))
-		if err != nil {
-			t.Fatalf("Failed to create client (error: %s)", err.Error())
-		}
-		image, err := client.StaticMap(context.Background(), &r)
-		if err != nil {
-			t.Fatalf("Failed to create styled map image (error: %s)", err.Error())
-		}
-		buffer := &bytes.Buffer{}
-		jpeg.Encode(buffer, image, nil)
-		ioutil.WriteFile("./mapstyles.jpeg", buffer.Bytes(), os.ModePerm)
-	*/
 }
