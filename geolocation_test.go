@@ -18,14 +18,13 @@
 package maps
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
-
-	"golang.org/x/net/context"
 )
 
 func TestGeolocation(t *testing.T) {

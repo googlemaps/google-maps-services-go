@@ -16,13 +16,12 @@ package maps
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"net/url"
 	"strings"
 	"time"
-
-	"golang.org/x/net/context"
 )
 
 var directionsAPI = &apiConfig{

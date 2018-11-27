@@ -15,10 +15,9 @@
 package maps
 
 import (
+	"context"
 	"reflect"
 	"testing"
-
-	"golang.org/x/net/context"
 )
 
 func TestElevationDenver(t *testing.T) {

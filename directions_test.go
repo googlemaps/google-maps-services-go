@@ -15,6 +15,7 @@
 package maps
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -26,7 +27,6 @@ import (
 
 	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 const apiKey = "AIzaNotReallyAnAPIKey"
@@ -445,17 +445,17 @@ func TestDirectionsRequestURL(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &DirectionsRequest{
-		Origin:                   "Sydney",
-		Destination:              "Parramatta",
-		Mode:                     TravelModeTransit,
-		TransitMode:              []TransitMode{TransitModeRail},
-		Waypoints:                []string{"Charlestown,MA", "via:Lexington"},
-		Alternatives:             true,
-		Optimize:                 true,
-		Avoid:                    []Avoid{AvoidTolls, AvoidFerries},
-		Language:                 "es",
-		Region:                   "es",
-		Units:                    UnitsImperial,
+		Origin:       "Sydney",
+		Destination:  "Parramatta",
+		Mode:         TravelModeTransit,
+		TransitMode:  []TransitMode{TransitModeRail},
+		Waypoints:    []string{"Charlestown,MA", "via:Lexington"},
+		Alternatives: true,
+		Optimize:     true,
+		Avoid:        []Avoid{AvoidTolls, AvoidFerries},
+		Language:     "es",
+		Region:       "es",
+		Units:        UnitsImperial,
 		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
 	}
 

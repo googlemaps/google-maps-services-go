@@ -17,13 +17,13 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/kr/pretty"
-	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
 )
 
