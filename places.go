@@ -15,6 +15,7 @@
 package maps
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"image"
@@ -24,7 +25,6 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"golang.org/x/net/context"
 
 	// Included for image/jpeg's decoder
 	_ "image/jpeg"

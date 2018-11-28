@@ -16,6 +16,7 @@ package maps
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -24,7 +25,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
 	"golang.org/x/time/rate"
 	"googlemaps.github.io/maps/internal"

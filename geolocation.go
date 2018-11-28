@@ -18,9 +18,8 @@
 package maps
 
 import (
+	"context"
 	"fmt"
-
-	"golang.org/x/net/context"
 )
 
 var geolocationAPI = &apiConfig{

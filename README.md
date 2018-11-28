@@ -104,10 +104,10 @@ Sample usage of the Directions API with an API key:
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/kr/pretty"
-	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
 )
 
@@ -141,10 +141,10 @@ documentation for the API you're using. For example, see the guide for the
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/kr/pretty"
-	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
 )
 
