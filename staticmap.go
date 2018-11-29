@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"image"
 	"io/ioutil"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -106,13 +107,14 @@ type CustomIcon struct {
 }
 
 func (c CustomIcon) String() string {
-	r := []string{}
+	var r []string
+
 	if c.IconURL != "" {
 		r = append(r, fmt.Sprintf("icon:%s", c.IconURL))
 	}
 
 	if c.Anchor != "" {
-		r = append(r, fmt.Sprintf("anchor:%s", string(c.Anchor)))
+		r = append(r, fmt.Sprintf("anchor:%s", c.Anchor))
 	}
 
 	return strings.Join(r, "|")
@@ -135,7 +137,7 @@ type Marker struct {
 }
 
 func (m Marker) String() string {
-	r := []string{}
+	var r []string
 
 	if m.CustomIcon != (CustomIcon{}) {
 		r = append(r, m.CustomIcon.String())
@@ -149,7 +151,7 @@ func (m Marker) String() string {
 		}
 
 		if m.Size != "" {
-			r = append(r, fmt.Sprintf("Size:%s", m.Size))
+			r = append(r, fmt.Sprintf("size:%s", m.Size))
 		}
 	}
 
@@ -178,7 +180,8 @@ type Path struct {
 }
 
 func (p Path) String() string {
-	r := []string{}
+	var r []string
+
 	if p.Color != "" {
 		r = append(r, fmt.Sprintf("color:%s", p.Color))
 	}
@@ -188,88 +191,17 @@ func (p Path) String() string {
 	}
 
 	if p.Weight != 0 {
-		r = append(r, fmt.Sprintf("weight:%s", strconv.Itoa(p.Weight)))
+		r = append(r, fmt.Sprintf("weight:%d", p.Weight))
 	}
 
 	if p.Geodesic {
-		r = append(r, fmt.Sprintf("geodesic:%s", strconv.FormatBool(p.Geodesic)))
+		r = append(r, "geodesic:true")
 	}
 
 	for _, l := range p.Location {
 		r = append(r, l.String())
 	}
 	return strings.Join(r, "|")
-}
-
-// MapStyle defines a custom style to alter the presentation of a specific feature
-// (roads, parks, and other features) of the map.
-type MapStyle map[FeatureName]Elements
-
-// mapStyles receives an object of type MapStyle and processes it
-// into a slice of valid Map Style Rules, each of which are parameter strings
-// formatted in accordance with the Google Static Maps Style Maps API and
-// ready for query string encoding.
-func mapStyles(ms MapStyle) []string {
-	features := make([]string, 0)
-	for feature, elements := range ms {
-		if es := elementsString(elements); es != "" {
-			features = append(features, fmt.Sprintf("feature:%s|%s", feature, es))
-		}
-	}
-	return features
-}
-
-// FeatureName is the name of a Feature which is receiving Map Styling for it's Elements.
-type FeatureName string
-
-// ElementName is the name of an Element which is receiving Map Styling Rules.
-type ElementName string
-
-// Elements is a map of per-Element Style Rules.
-type Elements map[ElementName]StyleRules
-
-// elementsString receives an object of type Elements and for each
-// Map Element within it, processes it's Map Style Rules into a string
-// formatted in accordance with the Google Static Maps Style Maps API.
-func elementsString(me Elements) string {
-	str := ""
-	for element, rules := range me {
-		if rs := rulesString(rules); rs != "" {
-			if str == "" {
-				str = fmt.Sprintf("|%s|%s", element, rs)
-			} else {
-				str = fmt.Sprintf("%s|%s|%s", str, element, rs)
-			}
-		}
-	}
-	return str
-}
-
-// StyleItem is a Map Item which can have a Style Item defined.
-type StyleItem string
-
-// StyleOption is the value being defined for a specific Style item.
-type StyleOption string
-
-// StyleRules is a map of Map Style Items, for each declared Item a single Style Option must be defined.
-type StyleRules map[StyleItem]StyleOption
-
-// rulesString receives an object of StyleRules and for each
-// Map Style Rule within it, processes it into a string
-// formatted in accordance with the Google Static Maps Style Maps API.
-func rulesString(sr StyleRules) string {
-	str := ""
-	for k, v := range sr {
-		if v != "" {
-			rule := fmt.Sprintf("%s:%s", k, v)
-			if str == "" {
-				str = rule
-			} else {
-				str = fmt.Sprintf("%s|%s:%s", rule, k, v)
-			}
-		}
-	}
-	return str
 }
 
 // StaticMapRequest is the functional options struct for staticMap.Get
@@ -305,8 +237,8 @@ type StaticMapRequest struct {
 	// Visible specifies one or more locations that should remain visible on the map,
 	// though no markers or other indicators will be displayed.
 	Visible []LatLng
-	// MapStyles (optional) contains map styles on a per-feature basis.
-	MapStyles MapStyle
+	// MapStyles (optional) contains map styles.
+	MapStyles []string
 }
 
 func (r *StaticMapRequest) params() url.Values {
@@ -340,36 +272,30 @@ func (r *StaticMapRequest) params() url.Values {
 		q.Set("maptype", string(r.MapType))
 	}
 
-	if len(r.Markers) > 0 {
-		for _, m := range r.Markers {
-			q.Add("markers", m.String())
-		}
+	for _, m := range r.Markers {
+		q.Add("markers", m.String())
 	}
 
-	if len(r.Paths) > 0 {
-		for _, ps := range r.Paths {
-			q.Add("path", ps.String())
-		}
+	for _, ps := range r.Paths {
+		q.Add("path", ps.String())
 	}
 
 	if len(r.Visible) > 0 {
-		t := []string{}
-		for _, l := range r.Visible {
-			t = append(t, l.String())
+		t := make([]string, len(r.Visible))
+		for i, l := range r.Visible {
+			t[i] = l.String()
 		}
 		q.Set("visible", strings.Join(t, "|"))
 	}
 
-	for _, style := range mapStyles(r.MapStyles) {
-		if style != "" {
-			q.Add("style", style)
-		}
+	for _, style := range r.MapStyles {
+		q.Add("style", style)
 	}
 
 	return q
 }
 
-//StaticMap make a StaticMap API request
+// StaticMap makes a StaticMap API request.
 func (c *Client) StaticMap(ctx context.Context, r *StaticMapRequest) (image.Image, error) {
 	if len(r.Markers) == 0 && r.Center == "" && r.Zoom == 0 {
 		return nil, errors.New("maps: Center & Zoom required if Markers empty")
@@ -384,11 +310,12 @@ func (c *Client) StaticMap(ctx context.Context, r *StaticMapRequest) (image.Imag
 	}
 	defer resp.data.Close()
 
-	if resp.statusCode != 200 {
-		if b, err := ioutil.ReadAll(resp.data); err == nil {
-			return nil, fmt.Errorf("Static Map API returned Status Code %d: %s", resp.statusCode, string(b))
+	if resp.statusCode != http.StatusOK {
+		b, err := ioutil.ReadAll(resp.data)
+		if err != nil {
+			return nil, err
 		}
-		return nil, err
+		return nil, fmt.Errorf("Maps Static API: %d - %s", resp.statusCode, b)
 	}
 
 	img, _, err := image.Decode(resp.data)
