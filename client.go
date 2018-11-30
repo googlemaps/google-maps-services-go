@@ -203,15 +203,7 @@ func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, err
 	if client == nil {
 		client = http.DefaultClient
 	}
-	resp, err := client.Do(req.WithContext(ctx))
-	if err != nil {
-		select {
-		case <-ctx.Done():
-			err = ctx.Err()
-		default:
-		}
-	}
-	return resp, err
+	return client.Do(req.WithContext(ctx))
 }
 
 func (c *Client) getJSON(ctx context.Context, config *apiConfig, apiReq apiRequest, resp interface{}) error {
