@@ -25,7 +25,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"golang.org/x/net/context/ctxhttp"
 	"golang.org/x/time/rate"
 	"googlemaps.github.io/maps/internal"
 )
@@ -168,7 +167,7 @@ func (c *Client) get(ctx context.Context, config *apiConfig, apiReq apiRequest) 
 		return nil, err
 	}
 	req.URL.RawQuery = q
-	return ctxhttp.Do(ctx, c.httpClient, req)
+	return c.do(ctx, req)
 }
 
 func (c *Client) post(ctx context.Context, config *apiConfig, apiReq interface{}) (*http.Response, error) {
@@ -196,7 +195,23 @@ func (c *Client) post(ctx context.Context, config *apiConfig, apiReq interface{}
 	}
 
 	req.URL.RawQuery = q
-	return ctxhttp.Do(ctx, c.httpClient, req)
+	return c.do(ctx, req)
+}
+
+func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
+	client := c.httpClient
+	if client == nil {
+		client = http.DefaultClient
+	}
+	resp, err := client.Do(req.WithContext(ctx))
+	if err != nil {
+		select {
+		case <-ctx.Done():
+			err = ctx.Err()
+		default:
+		}
+	}
+	return resp, err
 }
 
 func (c *Client) getJSON(ctx context.Context, config *apiConfig, apiReq apiRequest, resp interface{}) error {
