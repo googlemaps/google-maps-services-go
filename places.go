@@ -389,8 +389,7 @@ func (r *PlaceDetailsRequest) params() url.Values {
 		q.Set("fields", strings.Join(placeDetailsFieldMasksAsStringArray(r.Fields), ","))
 	}
 
-	st := uuid.UUID(r.SessionToken).String()
-	if st != "00000000-0000-0000-0000-000000000000" {
+	if st := uuid.UUID(r.SessionToken).String(); st != "00000000-0000-0000-0000-000000000000" {
 		q.Set("sessiontoken", st)
 	}
 
@@ -698,8 +697,7 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 
 	q.Set("input", r.Input)
 
-	st := uuid.UUID(r.SessionToken).String()
-	if st != "00000000-0000-0000-0000-000000000000" {
+	if st := uuid.UUID(r.SessionToken).String(); st != "00000000-0000-0000-0000-000000000000" {
 		q.Set("sessiontoken", st)
 	}
 
