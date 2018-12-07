@@ -628,7 +628,7 @@ func TestCustomPassThroughGeocodingURL(t *testing.T) {
 }
 
 func TestGeocodingZeroResults(t *testing.T) {
-	server := mockServer(200, `{"status" : "ZERO_RESULTS"}`)
+	server := mockServer(200, `{"results" : [], "status" : "ZERO_RESULTS"}`)
 	defer server.Close()
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &GeocodingRequest{
@@ -636,6 +636,29 @@ func TestGeocodingZeroResults(t *testing.T) {
 	}
 
 	response, err := c.Geocode(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error for ZERO_RESULTS status")
+	}
+
+	if response == nil {
+		t.Errorf("Unexpected nil response for ZERO_RESULTS status")
+	}
+
+	if len(response) != 0 {
+		t.Errorf("Unexpected response for ZERO_RESULTS status")
+	}
+}
+
+func TestReverseGeocodingZeroResults(t *testing.T) {
+	server := mockServer(200, `{"results" : [], "status" : "ZERO_RESULTS"}`)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+	r := &GeocodingRequest{
+		LatLng: &LatLng{Lat: 28.0, Lng: 140.0},
+	}
+
+	response, err := c.ReverseGeocode(context.Background(), r)
 
 	if err != nil {
 		t.Errorf("Unexpected error for ZERO_RESULTS status")
