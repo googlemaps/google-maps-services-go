@@ -389,8 +389,8 @@ func (r *PlaceDetailsRequest) params() url.Values {
 		q.Set("fields", strings.Join(placeDetailsFieldMasksAsStringArray(r.Fields), ","))
 	}
 
-	if uuid.UUID(r.SessionToken).String() != "00000000-0000-0000-0000-000000000000" {
-		q.Set("sessiontoken", uuid.UUID(r.SessionToken).String())
+	if st := uuid.UUID(r.SessionToken).String(); st != "00000000-0000-0000-0000-000000000000" {
+		q.Set("sessiontoken", st)
 	}
 
 	if r.Region != "" {
@@ -676,10 +676,6 @@ func (c *Client) PlaceAutocomplete(ctx context.Context, r *PlaceAutocompleteRequ
 		return AutocompleteResponse{}, errors.New("maps: Input missing")
 	}
 
-	if uuid.UUID(r.SessionToken).String() == "00000000-0000-0000-0000-000000000000" {
-		return AutocompleteResponse{}, errors.New("maps: Session missing")
-	}
-
 	var response struct {
 		Predictions []AutocompletePrediction `json:"predictions,omitempty"`
 		commonResponse
@@ -700,7 +696,10 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 	q := make(url.Values)
 
 	q.Set("input", r.Input)
-	q.Set("sessiontoken", uuid.UUID(r.SessionToken).String())
+
+	if st := uuid.UUID(r.SessionToken).String(); st != "00000000-0000-0000-0000-000000000000" {
+		q.Set("sessiontoken", st)
+	}
 
 	if r.Offset > 0 {
 		q.Set("offset", strconv.FormatUint(uint64(r.Offset), 10))
