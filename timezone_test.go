@@ -124,3 +124,25 @@ func TestTimezoneRequestURL(t *testing.T) {
 		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
 	}
 }
+
+func TestTimezoneZeroResults(t *testing.T) {
+	server := mockServer(200, `{"status" : "ZERO_RESULTS"}`)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+
+	r := &TimezoneRequest{
+		Location:  &LatLng{28.0, 140.0},
+		Timestamp: time.Time{},
+	}
+
+	result, err := c.Timezone(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error for ZERO_RESULTS status")
+	}
+
+	var empty TimezoneResult
+	if *result != empty {
+		t.Errorf("Unexpected result for ZERO_RESULTS status")
+	}
+}

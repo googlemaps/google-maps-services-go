@@ -1115,3 +1115,100 @@ func TestFindPlaceFromText(t *testing.T) {
 		t.Errorf("expected %+v, was %+v", "Mongolian Grill Kirkland", resp.Candidates[0].Name)
 	}
 }
+
+func TestTextSearchZeroResults(t *testing.T) {
+	server := mockServer(200, `{"results" : [], "status" : "ZERO_RESULTS"}`)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+	r := &TextSearchRequest{
+		Query: "Nothing to see here",
+	}
+
+	resp, err := c.TextSearch(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error for ZERO_RESULTS status")
+	}
+
+	if len(resp.Results) != 0 {
+		t.Errorf("Unexpected results for ZERO_RESULTS status")
+	}
+}
+
+func TestNearbySearchZeroResults(t *testing.T) {
+	server := mockServer(200, `{"results" : [], "status" : "ZERO_RESULTS"}`)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+	r := &NearbySearchRequest{
+		Location: &LatLng{28.0, 140.0},
+		Radius:   100,
+	}
+
+	resp, err := c.NearbySearch(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error for ZERO_RESULTS status")
+	}
+
+	if len(resp.Results) != 0 {
+		t.Errorf("Unexpected results for ZERO_RESULTS status")
+	}
+}
+
+func TestFindPlaceFromTextZeroResults(t *testing.T) {
+	server := mockServer(200, `{"candidates" : [], "status" : "ZERO_RESULTS"}`)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+	r := &FindPlaceFromTextRequest{
+		Input:     "+12345506789",
+		InputType: FindPlaceFromTextInputTypeTextQuery,
+	}
+
+	resp, err := c.FindPlaceFromText(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error for ZERO_RESULTS status")
+	}
+
+	if len(resp.Candidates) != 0 {
+		t.Errorf("Unexpected candidates for ZERO_RESULTS status")
+	}
+}
+
+func TestPlaceAutocompleteZeroResults(t *testing.T) {
+	server := mockServer(200, `{"predictions" : [], "status" : "ZERO_RESULTS"}`)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+	r := &PlaceAutocompleteRequest{
+		Input: "gobbledygook",
+	}
+
+	resp, err := c.PlaceAutocomplete(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error for ZERO_RESULTS status")
+	}
+
+	if len(resp.Predictions) != 0 {
+		t.Errorf("Unexpected predictions for ZERO_RESULTS status")
+	}
+}
+
+func TestQueryAutocompleteZeroResults(t *testing.T) {
+	server := mockServer(200, `{"predictions" : [], "status" : "ZERO_RESULTS"}`)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+	r := &QueryAutocompleteRequest{
+		Input: "gobbledygook",
+	}
+
+	resp, err := c.QueryAutocomplete(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error for ZERO_RESULTS status")
+	}
+
+	if len(resp.Predictions) != 0 {
+		t.Errorf("Unexpected predictions for ZERO_RESULTS status")
+	}
+}

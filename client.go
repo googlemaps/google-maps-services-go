@@ -266,9 +266,10 @@ type commonResponse struct {
 	ErrorMessage string `json:"error_message"`
 }
 
-// StatusError returns an error iff this object has a non-OK Status.
+// StatusError returns an error if this object has a Status different
+// from OK or ZERO_RESULTS.
 func (c *commonResponse) StatusError() error {
-	if c.Status != "OK" {
+	if c.Status != "OK" && c.Status != "ZERO_RESULTS" {
 		return fmt.Errorf("maps: %s - %s", c.Status, c.ErrorMessage)
 	}
 	return nil

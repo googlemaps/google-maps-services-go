@@ -467,6 +467,27 @@ func TestDirectionsRequestURL(t *testing.T) {
 	}
 }
 
+func TestDirectionsZeroResults(t *testing.T) {
+	server := mockServer(200, `{"routes" : [], "status" : "ZERO_RESULTS"}`)
+	defer server.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
+	r := &DirectionsRequest{
+		Origin:      "Boston",
+		Destination: "Paris",
+		Mode:        TravelModeBicycling,
+	}
+
+	routes, _, err := c.Directions(context.Background(), r)
+
+	if err != nil {
+		t.Errorf("Unexpected error for ZERO_RESULTS status")
+	}
+
+	if len(routes) != 0 {
+		t.Errorf("Unexpected response for ZERO_RESULTS status")
+	}
+}
+
 func TestTrafficModel(t *testing.T) {
 	expectedQuery := "departure_time=now&destination=Parramatta+Town+Hall&key=AIzaNotReallyAnAPIKey&mode=driving&origin=Sydney+Town+Hall&traffic_model=pessimistic"
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
