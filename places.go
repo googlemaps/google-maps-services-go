@@ -727,7 +727,10 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 
 	var cf []string
 	for c, f := range r.Components {
-		cf = append(cf, string(c)+":"+f)
+		for i, v := range f {
+			f[i] = string(c) + ":" + v
+		}
+		cf = append(cf, strings.Join(f, "|"))
 	}
 	if len(cf) > 0 {
 		q.Set("components", strings.Join(cf, "|"))
@@ -768,7 +771,7 @@ type PlaceAutocompleteRequest struct {
 	Types AutocompletePlaceType
 	// Components is a grouping of places to which you would like to restrict your
 	// results. Currently, you can use components to filter by country.
-	Components map[Component]string
+	Components map[Component][]string
 	// StrictBounds return only those places that are strictly within the region defined
 	// by location and radius.
 	StrictBounds bool
