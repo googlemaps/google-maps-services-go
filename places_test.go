@@ -477,13 +477,15 @@ func TestPlaceAutocompleteMaximalRequestURL(t *testing.T) {
 	}
 
 	r := &PlaceAutocompleteRequest{
-		Input:      "quay resteraunt sydney",
-		Offset:     5,
-		Location:   &LatLng{1.0, 2.0},
-		Radius:     10000,
-		Language:   "es",
-		Types:      placeType,
-		Components: map[Component][]string{ComponentCountry:["ES", "AU"]},
+		Input:    "quay resteraunt sydney",
+		Offset:   5,
+		Location: &LatLng{1.0, 2.0},
+		Radius:   10000,
+		Language: "es",
+		Types:    placeType,
+		Components: map[Component][]string{
+			ComponentCountry: {"ES", "AU"},
+		},
 	}
 
 	_, err = c.PlaceAutocomplete(context.Background(), r)
