@@ -114,7 +114,7 @@ func parseComponents(components string, r *maps.PlaceAutocompleteRequest) {
 			i := strings.Split(cf, ":")
 			switch i[0] {
 			case "country":
-				r.Components[maps.ComponentCountry] = i[1]
+				r.Components[maps.ComponentCountry] = append(r.Components[maps.ComponentCountry], i[1])
 			default:
 				log.Fatalf("Unsupported component \"%v\"", i[0])
 			}
