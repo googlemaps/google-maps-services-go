@@ -445,17 +445,17 @@ func TestDirectionsRequestURL(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
 
 	r := &DirectionsRequest{
-		Origin:       "Sydney",
-		Destination:  "Parramatta",
-		Mode:         TravelModeTransit,
-		TransitMode:  []TransitMode{TransitModeRail},
-		Waypoints:    []string{"Charlestown,MA", "via:Lexington"},
-		Alternatives: true,
-		Optimize:     true,
-		Avoid:        []Avoid{AvoidTolls, AvoidFerries},
-		Language:     "es",
-		Region:       "es",
-		Units:        UnitsImperial,
+		Origin:                   "Sydney",
+		Destination:              "Parramatta",
+		Mode:                     TravelModeTransit,
+		TransitMode:              []TransitMode{TransitModeRail},
+		Waypoints:                []string{"Charlestown,MA", "via:Lexington"},
+		Alternatives:             true,
+		Optimize:                 true,
+		Avoid:                    []Avoid{AvoidTolls, AvoidFerries},
+		Language:                 "es",
+		Region:                   "es",
+		Units:                    UnitsImperial,
 		TransitRoutingPreference: TransitRoutingPreferenceFewerTransfers,
 	}
 

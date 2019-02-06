@@ -1,5 +1,8 @@
 language: go
 go_import_path: googlemaps.github.io/maps
+before_install:
+ - go get github.com/sergi/go-diff/...
+ - go get github.com/stretchr/testify/...
 
 # See https://github.com/travis-ci/gimme/blob/master/.testdata/binary-linux for known golang versions
 go:
