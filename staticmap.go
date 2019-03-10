@@ -134,6 +134,8 @@ type Marker struct {
 	CustomIcon CustomIcon
 	// Location is the Marker position
 	Location []LatLng
+	// Scale is the Marker scale
+	Scale int
 }
 
 func (m Marker) String() string {
@@ -152,6 +154,10 @@ func (m Marker) String() string {
 
 		if m.Size != "" {
 			r = append(r, fmt.Sprintf("size:%s", m.Size))
+		}
+
+		if m.Scale != 0 {
+			r = append(r, fmt.Sprintf("scale:%d", m.Scale))
 		}
 	}
 
