@@ -104,6 +104,8 @@ type CustomIcon struct {
 	IconURL string
 	// Anchor sets how the icon is placed in relation to the specified markers locations
 	Anchor Anchor
+	// Scale is the custom icon scale
+	Scale int
 }
 
 func (c CustomIcon) String() string {
@@ -115,6 +117,10 @@ func (c CustomIcon) String() string {
 
 	if c.Anchor != "" {
 		r = append(r, fmt.Sprintf("anchor:%s", c.Anchor))
+	}
+
+	if c.Scale != 0 {
+		r = append(r, fmt.Sprintf("scale:%d", c.Scale))
 	}
 
 	return strings.Join(r, "|")

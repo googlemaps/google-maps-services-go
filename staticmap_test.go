@@ -83,3 +83,28 @@ func TestMapStyles(t *testing.T) {
 		t.Errorf("Generated query string is wrong: %s", q)
 	}
 }
+
+func TestCustomIconMarkers(t *testing.T) {
+	marker := Marker{
+		CustomIcon: CustomIcon{
+			IconURL: "icon@2x.png",
+			Anchor:  "topleft",
+			Scale:   2,
+		},
+		Location: []LatLng{
+			{
+				Lat: 3.1225951401,
+				Lng: 101.6404967928,
+			},
+		},
+	}
+
+	r := StaticMapRequest{
+		Markers: []Marker{marker},
+	}
+
+	markers := r.params().Get("markers")
+	if m := markers; m != "icon:icon@2x.png|anchor:topleft|scale:2|3.1225951401,101.6404967928" {
+		t.Errorf("Generated query string is wrong: %s", m)
+	}
+}
