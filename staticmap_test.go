@@ -103,8 +103,8 @@ func TestCustomIconMarkers(t *testing.T) {
 		Markers: []Marker{marker},
 	}
 
-	values := r.params()
-	if q := values.Encode(); q != "markers=icon%3Aicon%402x.png%7Canchor%3Atopleft%7Cscale%3A2%7C3.1225951401%2C101.6404967928" {
-		t.Errorf("Generated query string is wrong: %s", q)
+	markers := r.params().Get("markers")
+	if m := markers; m != "icon:icon@2x.png|anchor:topleft|scale:2|3.1225951401,101.6404967928" {
+		t.Errorf("Generated query string is wrong: %s", m)
 	}
 }
