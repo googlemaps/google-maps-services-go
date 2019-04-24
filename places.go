@@ -243,6 +243,10 @@ func (r *TextSearchRequest) params() url.Values {
 		q.Set("pagetoken", r.PageToken)
 	}
 
+	if r.Region != "" {
+		q.Set("region", r.Region)
+	}
+
 	return q
 }
 
@@ -280,6 +284,13 @@ type TextSearchRequest struct {
 	// PageToken parameter will execute a search with the same parameters used
 	// previously — all parameters other than PageToken will be ignored.
 	PageToken string
+	// The region code, specified as a ccTLD (country code top-level domain) two-character
+	// value. Most ccTLD codes are identical to ISO 3166-1 codes, with some exceptions.
+	// This parameter will only influence, not fully restrict, search results. If more
+	// relevant results exist outside of the specified region, they may be included. When
+	// this parameter is used, the country name is omitted from the resulting formatted_address
+	// for results in the specified region.
+	Region string
 }
 
 // PlacesSearchResponse is the response to a Places API Search request.
