@@ -204,8 +204,20 @@ func (p Path) String() string {
 		r = append(r, "geodesic:true")
 	}
 
-	for _, l := range p.Location {
-		r = append(r, l.String())
+	if len(p.Location) == 0 {
+		return strings.Join(r, "|")
+	}
+
+	encodedLocationString := fmt.Sprintf("enc:%s", Encode(p.Location))
+	latLngsToString := make([]string, len(p.Location))
+	for i, l := range p.Location {
+		latLngsToString[i] = l.String()
+	}
+	locationString := strings.Join(latLngsToString, "|")
+	if len(locationString) > len(encodedLocationString) {
+		r = append(r, encodedLocationString)
+	} else {
+		r = append(r, latLngsToString...)
 	}
 	return strings.Join(r, "|")
 }
