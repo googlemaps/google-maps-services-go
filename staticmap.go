@@ -140,6 +140,8 @@ type Marker struct {
 	CustomIcon CustomIcon
 	// Location is the Marker position
 	Location []LatLng
+	// LocationAddress is the Marker position as a postal address or other geocodable location.
+	LocationAddress string
 }
 
 func (m Marker) String() string {
@@ -164,6 +166,10 @@ func (m Marker) String() string {
 	for _, l := range m.Location {
 		r = append(r, l.String())
 	}
+	if m.LocationAddress != "" {
+		r = append(r, m.LocationAddress)
+	}
+
 	return strings.Join(r, "|")
 }
 
