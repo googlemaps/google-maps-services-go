@@ -93,6 +93,20 @@ func WithAPIKey(apiKey string) ClientOption {
 	}
 }
 
+// WithAPIKeyAndSignature configures a Maps API client with an API Key and
+// signature. The signature is assumed to be URL modified Base64 encoded.
+func WithAPIKeyAndSignature(apiKey, signature string) ClientOption {
+	return func(c *Client) error {
+		c.apiKey = apiKey
+		decoded, err := base64.URLEncoding.DecodeString(signature)
+		if err != nil {
+			return err
+		}
+		c.signature = decoded
+		return nil
+	}
+}
+
 // WithBaseURL configures a Maps API client with a custom base url
 func WithBaseURL(baseURL string) ClientOption {
 	return func(c *Client) error {
@@ -133,9 +147,10 @@ func WithRateLimit(requestsPerSecond int) ClientOption {
 }
 
 type apiConfig struct {
-	host            string
-	path            string
-	acceptsClientID bool
+	host             string
+	path             string
+	acceptsClientID  bool
+	acceptsSignature bool
 }
 
 type apiRequest interface {
@@ -162,7 +177,7 @@ func (c *Client) get(ctx context.Context, config *apiConfig, apiReq apiRequest) 
 	if err != nil {
 		return nil, err
 	}
-	q, err := c.generateAuthQuery(config.path, apiReq.params(), config.acceptsClientID)
+	q, err := c.generateAuthQuery(config.path, apiReq.params(), config.acceptsClientID, config.acceptsSignature)
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +204,7 @@ func (c *Client) post(ctx context.Context, config *apiConfig, apiReq interface{}
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	q, err := c.generateAuthQuery(config.path, url.Values{}, config.acceptsClientID)
+	q, err := c.generateAuthQuery(config.path, url.Values{}, config.acceptsClientID, config.acceptsSignature)
 	if err != nil {
 		return nil, err
 	}
@@ -241,16 +256,20 @@ func (c *Client) getBinary(ctx context.Context, config *apiConfig, apiReq apiReq
 	return binaryResponse{httpResp.StatusCode, httpResp.Header.Get("Content-Type"), httpResp.Body}, nil
 }
 
-func (c *Client) generateAuthQuery(path string, q url.Values, acceptClientID bool) (string, error) {
+func (c *Client) generateAuthQuery(path string, q url.Values, acceptClientID bool, acceptsSignature bool) (string, error) {
 	if c.channel != "" {
 		q.Set("channel", c.channel)
 	}
 	if c.apiKey != "" {
 		q.Set("key", c.apiKey)
+		if acceptsSignature && len(c.signature) > 0 {
+			return internal.SignURL(path, c.signature, q)
+		}
 		return q.Encode(), nil
 	}
 	if acceptClientID {
-		return internal.SignURL(path, c.clientID, c.signature, q)
+		q.Set("client", c.clientID)
+		return internal.SignURL(path, c.signature, q)
 	}
 	return "", errors.New("maps: API Key missing")
 }

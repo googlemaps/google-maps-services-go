@@ -26,9 +26,10 @@ import (
 )
 
 var distanceMatrixAPI = &apiConfig{
-	host:            "https://maps.googleapis.com",
-	path:            "/maps/api/distancematrix/json",
-	acceptsClientID: true,
+	host:             "https://maps.googleapis.com",
+	path:             "/maps/api/distancematrix/json",
+	acceptsClientID:  true,
+	acceptsSignature: false,
 }
 
 // DistanceMatrix makes a Distance Matrix API request

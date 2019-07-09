@@ -26,9 +26,10 @@ import (
 )
 
 var timezoneAPI = &apiConfig{
-	host:            "https://maps.googleapis.com",
-	path:            "/maps/api/timezone/json",
-	acceptsClientID: true,
+	host:             "https://maps.googleapis.com",
+	path:             "/maps/api/timezone/json",
+	acceptsClientID:  true,
+	acceptsSignature: false,
 }
 
 // Timezone makes a Timezone API request
