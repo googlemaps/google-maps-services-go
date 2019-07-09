@@ -29,12 +29,12 @@ func generateSignature(key []byte, message string) (string, error) {
 	return base64.URLEncoding.EncodeToString(mac.Sum(nil)), nil
 }
 
-// SignURL signs a url with a clientID and signature.
+// SignURL signs a url with a signature.
 // The signature is assumed to be in URL safe base64 encoding.
 // The returned signature string is URLEncoded.
 // See: https://developers.google.com/maps/documentation/business/webservices/auth#digital_signatures
-func SignURL(path, clientID string, signature []byte, q url.Values) (string, error) {
-	q.Set("client", clientID)
+// See: https://developers.google.com/maps/faq#using-google-maps-apis
+func SignURL(path string, signature []byte, q url.Values) (string, error) {
 	encodedQuery := q.Encode()
 	message := fmt.Sprintf("%s?%s", path, encodedQuery)
 	s, err := generateSignature(signature, message)

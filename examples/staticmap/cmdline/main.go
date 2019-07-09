@@ -30,7 +30,7 @@ import (
 var (
 	apiKey    = flag.String("key", "", "API Key for using Google Maps API.")
 	clientID  = flag.String("client_id", "", "ClientID for Maps for Work API access.")
-	signature = flag.String("signature", "", "Signature for Maps for Work API access.")
+	signature = flag.String("signature", "", "Signature for Maps for Work API access or optional APIs.")
 	center    = flag.String("center", "", "Center the center of the map, equidistant from all edges of the map.")
 	zoom      = flag.Int("zoom", -1, "Zoom the zoom level of the map, which determines the magnification level of the map.")
 	size      = flag.String("size", "", "Size defines the rectangular dimensions of the map image.")
@@ -60,7 +60,11 @@ func main() {
 	var client *maps.Client
 	var err error
 	if *apiKey != "" {
-		client, err = maps.NewClient(maps.WithAPIKey(*apiKey))
+		if *signature != "" {
+			client, err = maps.NewClient(maps.WithAPIKeyAndSignature(*apiKey, *signature))
+		} else {
+			client, err = maps.NewClient(maps.WithAPIKey(*apiKey))
+		}
 	} else if *clientID != "" || *signature != "" {
 		client, err = maps.NewClient(maps.WithClientIDAndSignature(*clientID, *signature))
 	} else {

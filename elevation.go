@@ -25,9 +25,10 @@ import (
 )
 
 var elevationAPI = &apiConfig{
-	host:            "https://maps.googleapis.com",
-	path:            "/maps/api/elevation/json",
-	acceptsClientID: true,
+	host:             "https://maps.googleapis.com",
+	path:             "/maps/api/elevation/json",
+	acceptsClientID:  true,
+	acceptsSignature: false,
 }
 
 // Elevation makes an Elevation API request

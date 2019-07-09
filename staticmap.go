@@ -30,9 +30,10 @@ import (
 )
 
 var staticMapAPI = &apiConfig{
-	host:            "https://maps.googleapis.com",
-	path:            "/maps/api/staticmap",
-	acceptsClientID: true,
+	host:             "https://maps.googleapis.com",
+	path:             "/maps/api/staticmap",
+	acceptsClientID:  true,
+	acceptsSignature: true,
 }
 
 // MapType (optional) defines the type of map to construct. There are several possible

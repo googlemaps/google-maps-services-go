@@ -25,9 +25,10 @@ import (
 )
 
 var directionsAPI = &apiConfig{
-	host:            "https://maps.googleapis.com",
-	path:            "/maps/api/directions/json",
-	acceptsClientID: true,
+	host:             "https://maps.googleapis.com",
+	path:             "/maps/api/directions/json",
+	acceptsClientID:  true,
+	acceptsSignature: false,
 }
 
 // Directions issues the Directions request and retrieves the Response

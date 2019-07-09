@@ -31,9 +31,10 @@ import (
 )
 
 var placesNearbySearchAPI = &apiConfig{
-	host:            "https://maps.googleapis.com",
-	path:            "/maps/api/place/nearbysearch/json",
-	acceptsClientID: true,
+	host:             "https://maps.googleapis.com",
+	path:             "/maps/api/place/nearbysearch/json",
+	acceptsClientID:  true,
+	acceptsSignature: false,
 }
 
 // NearbySearch lets you search for places within a specified area. You can refine

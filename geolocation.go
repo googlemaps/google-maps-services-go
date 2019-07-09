@@ -23,9 +23,10 @@ import (
 )
 
 var geolocationAPI = &apiConfig{
-	host:            "https://www.googleapis.com",
-	path:            "/geolocation/v1/geolocate",
-	acceptsClientID: true,
+	host:             "https://www.googleapis.com",
+	path:             "/geolocation/v1/geolocate",
+	acceptsClientID:  true,
+	acceptsSignature: false,
 }
 
 // Geolocate makes a Geolocation API request

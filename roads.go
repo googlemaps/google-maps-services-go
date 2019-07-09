@@ -25,21 +25,24 @@ import (
 )
 
 var snapToRoadsAPI = &apiConfig{
-	host:            "https://roads.googleapis.com",
-	path:            "/v1/snapToRoads",
-	acceptsClientID: false,
+	host:             "https://roads.googleapis.com",
+	path:             "/v1/snapToRoads",
+	acceptsClientID:  false,
+	acceptsSignature: false,
 }
 
 var nearestRoadsAPI = &apiConfig{
-	host:            "https://roads.googleapis.com",
-	path:            "/v1/nearestRoads",
-	acceptsClientID: false,
+	host:             "https://roads.googleapis.com",
+	path:             "/v1/nearestRoads",
+	acceptsClientID:  false,
+	acceptsSignature: false,
 }
 
 var speedLimitsAPI = &apiConfig{
-	host:            "https://roads.googleapis.com",
-	path:            "/v1/speedLimits",
-	acceptsClientID: false,
+	host:             "https://roads.googleapis.com",
+	path:             "/v1/speedLimits",
+	acceptsClientID:  false,
+	acceptsSignature: false,
 }
 
 // SnapToRoad makes a Snap to Road API request

@@ -25,9 +25,10 @@ import (
 )
 
 var geocodingAPI = &apiConfig{
-	host:            "https://maps.googleapis.com",
-	path:            "/maps/api/geocode/json",
-	acceptsClientID: true,
+	host:             "https://maps.googleapis.com",
+	path:             "/maps/api/geocode/json",
+	acceptsClientID:  true,
+	acceptsSignature: false,
 }
 
 // Geocode makes a Geocoding API request
