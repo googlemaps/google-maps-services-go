@@ -261,6 +261,9 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
                         "lat" : -33.8674944,
                         "lng" : 151.2070825
                      },
+                     "transit_details" : {
+                        "trip_short_name": "7108"
+                     },
                      "travel_mode" : "DRIVING"
                   }
                ],
@@ -299,7 +302,9 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
 		EndLocation:      LatLng{Lat: -33.8707786, Lng: 151.206934},
 		Polyline:         Polyline{Points: "xvumEgs{y[V@|AH|@DdABbC@@?^@N?zD@\\?F@"},
 		Steps:            nil,
-		TransitDetails:   (*TransitDetails)(nil),
+		TransitDetails:   &TransitDetails{
+			TripShortName: "7108",
+		},
 		TravelMode:       "DRIVING",
 	})
 
