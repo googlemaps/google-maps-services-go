@@ -261,9 +261,9 @@ func TestDirectionsSydneyToParramatta(t *testing.T) {
                         "lat" : -33.8674944,
                         "lng" : 151.2070825
                      },
-					 "transit_details" : {
-						"trip_short_name": "7108"
-					 },
+                     "transit_details" : {
+                        "trip_short_name": "7108"
+                     },
                      "travel_mode" : "DRIVING"
                   }
                ],
