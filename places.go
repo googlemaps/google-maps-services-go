@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"image"
 	"io"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -812,6 +813,10 @@ func (c *Client) PlacePhoto(ctx context.Context, r *PlacePhotoRequest) (PlacePho
 	resp, err := c.getBinary(ctx, placesPhotoAPI, r)
 	if err != nil {
 		return PlacePhotoResponse{}, err
+	}
+
+	if resp.statusCode == http.StatusForbidden {
+		return PlacePhotoResponse{}, errors.New("maps: request exceeds your available quota")
 	}
 
 	return PlacePhotoResponse{resp.contentType, resp.data}, nil
