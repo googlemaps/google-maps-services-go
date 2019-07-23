@@ -357,6 +357,9 @@ type TransitDetails struct {
 	NumStops uint `json:"num_stops"`
 	// Line contains information about the transit line used in this step.
 	Line TransitLine `json:"line"`
+	// TripShortName contains additional information for this part of the
+	// trip.
+	TripShortName string `json:"trip_short_name"`
 }
 
 // TransitStop contains information about the stop/station for this part of the trip.
