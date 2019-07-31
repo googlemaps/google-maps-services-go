@@ -221,25 +221,14 @@ const (
 	PlaceTypeElectrician      = PlaceType("electrician")
 	PlaceTypeElectronicsStore = PlaceType("electronics_store")
 	PlaceTypeEmbassy          = PlaceType("embassy")
-	// Deprecated: Please see https://developers.google.com/places/web-service/supported_types#table4
-	PlaceTypeEstablishment = PlaceType("establishment")
-	// Deprecated: Please see https://developers.google.com/places/web-service/supported_types#table4
-	PlaceTypeFinance        = PlaceType("finance")
 	PlaceTypeFireStation    = PlaceType("fire_station")
 	PlaceTypeFlorist        = PlaceType("florist")
-	PlaceTypeFood           = PlaceType("food")
 	PlaceTypeFuneralHome    = PlaceType("funeral_home")
 	PlaceTypeFurnitureStore = PlaceType("furniture_store")
 	PlaceTypeGasStation     = PlaceType("gas_station")
-	// Deprecated: Please see https://developers.google.com/places/web-service/supported_types#table4
-	PlaceTypeGeneralContractor = PlaceType("general_contractor")
-	// Deprecated: Please see https://developers.google.com/places/web-service/supported_types#table4
-	PlaceTypeGroceryOrSupermarket = PlaceType("grocery_or_supermarket")
 	PlaceTypeGym                  = PlaceType("gym")
 	PlaceTypeHairCare             = PlaceType("hair_care")
 	PlaceTypeHardwareStore        = PlaceType("hardware_store")
-	// Deprecated: Please see https://developers.google.com/places/web-service/supported_types#table4
-	PlaceTypeHealth                = PlaceType("health")
 	PlaceTypeHinduTemple           = PlaceType("hindu_temple")
 	PlaceTypeHomeGoodsStore        = PlaceType("home_goods_store")
 	PlaceTypeHospital              = PlaceType("hospital")
@@ -266,8 +255,6 @@ const (
 	PlaceTypePetStore              = PlaceType("pet_store")
 	PlaceTypePharmacy              = PlaceType("pharmacy")
 	PlaceTypePhysiotherapist       = PlaceType("physiotherapist")
-	// Deprecated: Please see https://developers.google.com/places/web-service/supported_types#table4
-	PlaceTypePlaceOfWorship    = PlaceType("place_of_worship")
 	PlaceTypePlumber           = PlaceType("plumber")
 	PlaceTypePolice            = PlaceType("police")
 	PlaceTypePostOffice        = PlaceType("post_office")
@@ -361,34 +348,22 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypeElectronicsStore, nil
 	case "embassy":
 		return PlaceTypeEmbassy, nil
-	case "establishment":
-		return PlaceTypeEstablishment, nil
-	case "finance":
-		return PlaceTypeFinance, nil
 	case "fire_station":
 		return PlaceTypeFireStation, nil
 	case "florist":
 		return PlaceTypeFlorist, nil
-	case "food":
-		return PlaceTypeFood, nil
 	case "funeral_home":
 		return PlaceTypeFuneralHome, nil
 	case "furniture_store":
 		return PlaceTypeFurnitureStore, nil
 	case "gas_station":
 		return PlaceTypeGasStation, nil
-	case "general_contractor":
-		return PlaceTypeGeneralContractor, nil
-	case "grocery_or_supermarket":
-		return PlaceTypeGroceryOrSupermarket, nil
 	case "gym":
 		return PlaceTypeGym, nil
 	case "hair_care":
 		return PlaceTypeHairCare, nil
 	case "hardware_store":
 		return PlaceTypeHardwareStore, nil
-	case "health":
-		return PlaceTypeHealth, nil
 	case "hindu_temple":
 		return PlaceTypeHinduTemple, nil
 	case "home_goods_store":
@@ -441,8 +416,6 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypePharmacy, nil
 	case "physiotherapist":
 		return PlaceTypePhysiotherapist, nil
-	case "place_of_worship":
-		return PlaceTypePlaceOfWorship, nil
 	case "plumber":
 		return PlaceTypePlumber, nil
 	case "police":
