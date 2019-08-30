@@ -328,6 +328,8 @@ type PlacesSearchResult struct {
 	// Rating contains the place's rating, from 1.0 to 5.0, based on aggregated user
 	// reviews.
 	Rating float32 `json:"rating,omitempty"`
+	// UserRatingsTotal contains total number of the place's ratings
+	UserRatingsTotal int `json:"user_ratings_total,omitempty"`
 	// Types contains an array of feature types describing the given result.
 	Types []string `json:"types,omitempty"`
 	// OpeningHours may contain whether the place is open now or not.
@@ -469,6 +471,8 @@ type PlaceDetailsResult struct {
 	// Rating contains the place's rating, from 1.0 to 5.0, based on aggregated user
 	// reviews.
 	Rating float32 `json:"rating,omitempty"`
+	// UserRatingsTotal contains total number of the place's ratings
+	UserRatingsTotal int `json:"user_ratings_total,omitempty"`
 	// Types contains an array of feature types describing the given result.
 	Types []string `json:"types,omitempty"`
 	// OpeningHours may contain whether the place is open now or not.
