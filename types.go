@@ -188,47 +188,47 @@ type PlaceType string
 
 // Place Types for the Places API.
 const (
-	PlaceTypeAccounting       = PlaceType("accounting")
-	PlaceTypeAirport          = PlaceType("airport")
-	PlaceTypeAmusementPark    = PlaceType("amusement_park")
-	PlaceTypeAquarium         = PlaceType("aquarium")
-	PlaceTypeArtGallery       = PlaceType("art_gallery")
-	PlaceTypeAtm              = PlaceType("atm")
-	PlaceTypeBakery           = PlaceType("bakery")
-	PlaceTypeBank             = PlaceType("bank")
-	PlaceTypeBar              = PlaceType("bar")
-	PlaceTypeBeautySalon      = PlaceType("beauty_salon")
-	PlaceTypeBicycleStore     = PlaceType("bicycle_store")
-	PlaceTypeBookStore        = PlaceType("book_store")
-	PlaceTypeBowlingAlley     = PlaceType("bowling_alley")
-	PlaceTypeBusStation       = PlaceType("bus_station")
-	PlaceTypeCafe             = PlaceType("cafe")
-	PlaceTypeCampground       = PlaceType("campground")
-	PlaceTypeCarDealer        = PlaceType("car_dealer")
-	PlaceTypeCarRental        = PlaceType("car_rental")
-	PlaceTypeCarRepair        = PlaceType("car_repair")
-	PlaceTypeCarWash          = PlaceType("car_wash")
-	PlaceTypeCasino           = PlaceType("casino")
-	PlaceTypeCemetery         = PlaceType("cemetery")
-	PlaceTypeChurch           = PlaceType("church")
-	PlaceTypeCityHall         = PlaceType("city_hall")
-	PlaceTypeClothingStore    = PlaceType("clothing_store")
-	PlaceTypeConvenienceStore = PlaceType("convenience_store")
-	PlaceTypeCourthouse       = PlaceType("courthouse")
-	PlaceTypeDentist          = PlaceType("dentist")
-	PlaceTypeDepartmentStore  = PlaceType("department_store")
-	PlaceTypeDoctor           = PlaceType("doctor")
-	PlaceTypeElectrician      = PlaceType("electrician")
-	PlaceTypeElectronicsStore = PlaceType("electronics_store")
-	PlaceTypeEmbassy          = PlaceType("embassy")
-	PlaceTypeFireStation    = PlaceType("fire_station")
-	PlaceTypeFlorist        = PlaceType("florist")
-	PlaceTypeFuneralHome    = PlaceType("funeral_home")
-	PlaceTypeFurnitureStore = PlaceType("furniture_store")
-	PlaceTypeGasStation     = PlaceType("gas_station")
-	PlaceTypeGym                  = PlaceType("gym")
-	PlaceTypeHairCare             = PlaceType("hair_care")
-	PlaceTypeHardwareStore        = PlaceType("hardware_store")
+	PlaceTypeAccounting            = PlaceType("accounting")
+	PlaceTypeAirport               = PlaceType("airport")
+	PlaceTypeAmusementPark         = PlaceType("amusement_park")
+	PlaceTypeAquarium              = PlaceType("aquarium")
+	PlaceTypeArtGallery            = PlaceType("art_gallery")
+	PlaceTypeAtm                   = PlaceType("atm")
+	PlaceTypeBakery                = PlaceType("bakery")
+	PlaceTypeBank                  = PlaceType("bank")
+	PlaceTypeBar                   = PlaceType("bar")
+	PlaceTypeBeautySalon           = PlaceType("beauty_salon")
+	PlaceTypeBicycleStore          = PlaceType("bicycle_store")
+	PlaceTypeBookStore             = PlaceType("book_store")
+	PlaceTypeBowlingAlley          = PlaceType("bowling_alley")
+	PlaceTypeBusStation            = PlaceType("bus_station")
+	PlaceTypeCafe                  = PlaceType("cafe")
+	PlaceTypeCampground            = PlaceType("campground")
+	PlaceTypeCarDealer             = PlaceType("car_dealer")
+	PlaceTypeCarRental             = PlaceType("car_rental")
+	PlaceTypeCarRepair             = PlaceType("car_repair")
+	PlaceTypeCarWash               = PlaceType("car_wash")
+	PlaceTypeCasino                = PlaceType("casino")
+	PlaceTypeCemetery              = PlaceType("cemetery")
+	PlaceTypeChurch                = PlaceType("church")
+	PlaceTypeCityHall              = PlaceType("city_hall")
+	PlaceTypeClothingStore         = PlaceType("clothing_store")
+	PlaceTypeConvenienceStore      = PlaceType("convenience_store")
+	PlaceTypeCourthouse            = PlaceType("courthouse")
+	PlaceTypeDentist               = PlaceType("dentist")
+	PlaceTypeDepartmentStore       = PlaceType("department_store")
+	PlaceTypeDoctor                = PlaceType("doctor")
+	PlaceTypeElectrician           = PlaceType("electrician")
+	PlaceTypeElectronicsStore      = PlaceType("electronics_store")
+	PlaceTypeEmbassy               = PlaceType("embassy")
+	PlaceTypeFireStation           = PlaceType("fire_station")
+	PlaceTypeFlorist               = PlaceType("florist")
+	PlaceTypeFuneralHome           = PlaceType("funeral_home")
+	PlaceTypeFurnitureStore        = PlaceType("furniture_store")
+	PlaceTypeGasStation            = PlaceType("gas_station")
+	PlaceTypeGym                   = PlaceType("gym")
+	PlaceTypeHairCare              = PlaceType("hair_care")
+	PlaceTypeHardwareStore         = PlaceType("hardware_store")
 	PlaceTypeHinduTemple           = PlaceType("hindu_temple")
 	PlaceTypeHomeGoodsStore        = PlaceType("home_goods_store")
 	PlaceTypeHospital              = PlaceType("hospital")
@@ -255,28 +255,28 @@ const (
 	PlaceTypePetStore              = PlaceType("pet_store")
 	PlaceTypePharmacy              = PlaceType("pharmacy")
 	PlaceTypePhysiotherapist       = PlaceType("physiotherapist")
-	PlaceTypePlumber           = PlaceType("plumber")
-	PlaceTypePolice            = PlaceType("police")
-	PlaceTypePostOffice        = PlaceType("post_office")
-	PlaceTypeRealEstateAgency  = PlaceType("real_estate_agency")
-	PlaceTypeRestaurant        = PlaceType("restaurant")
-	PlaceTypeRoofingContractor = PlaceType("roofing_contractor")
-	PlaceTypeRvPark            = PlaceType("rv_park")
-	PlaceTypeSchool            = PlaceType("school")
-	PlaceTypeShoeStore         = PlaceType("shoe_store")
-	PlaceTypeShoppingMall      = PlaceType("shopping_mall")
-	PlaceTypeSpa               = PlaceType("spa")
-	PlaceTypeStadium           = PlaceType("stadium")
-	PlaceTypeStorage           = PlaceType("storage")
-	PlaceTypeStore             = PlaceType("store")
-	PlaceTypeSubwayStation     = PlaceType("subway_station")
-	PlaceTypeSynagogue         = PlaceType("synagogue")
-	PlaceTypeTaxiStand         = PlaceType("taxi_stand")
-	PlaceTypeTrainStation      = PlaceType("train_station")
-	PlaceTypeTravelAgency      = PlaceType("travel_agency")
-	PlaceTypeUniversity        = PlaceType("university")
-	PlaceTypeVeterinaryCare    = PlaceType("veterinary_care")
-	PlaceTypeZoo               = PlaceType("zoo")
+	PlaceTypePlumber               = PlaceType("plumber")
+	PlaceTypePolice                = PlaceType("police")
+	PlaceTypePostOffice            = PlaceType("post_office")
+	PlaceTypeRealEstateAgency      = PlaceType("real_estate_agency")
+	PlaceTypeRestaurant            = PlaceType("restaurant")
+	PlaceTypeRoofingContractor     = PlaceType("roofing_contractor")
+	PlaceTypeRvPark                = PlaceType("rv_park")
+	PlaceTypeSchool                = PlaceType("school")
+	PlaceTypeShoeStore             = PlaceType("shoe_store")
+	PlaceTypeShoppingMall          = PlaceType("shopping_mall")
+	PlaceTypeSpa                   = PlaceType("spa")
+	PlaceTypeStadium               = PlaceType("stadium")
+	PlaceTypeStorage               = PlaceType("storage")
+	PlaceTypeStore                 = PlaceType("store")
+	PlaceTypeSubwayStation         = PlaceType("subway_station")
+	PlaceTypeSynagogue             = PlaceType("synagogue")
+	PlaceTypeTaxiStand             = PlaceType("taxi_stand")
+	PlaceTypeTrainStation          = PlaceType("train_station")
+	PlaceTypeTravelAgency          = PlaceType("travel_agency")
+	PlaceTypeUniversity            = PlaceType("university")
+	PlaceTypeVeterinaryCare        = PlaceType("veterinary_care")
+	PlaceTypeZoo                   = PlaceType("zoo")
 )
 
 // ParsePlaceType will parse a string representation of a PlaceType.
@@ -504,30 +504,40 @@ type PlaceDetailsFieldMask string
 
 // The individual Place Details Field Masks.
 const (
-	PlaceDetailsFieldMaskAddressComponent         = PlaceDetailsFieldMask("address_component")
-	PlaceDetailsFieldMaskADRAddress               = PlaceDetailsFieldMask("adr_address")
-	PlaceDetailsFieldMaskAltID                    = PlaceDetailsFieldMask("alt_id")
-	PlaceDetailsFieldMaskFormattedAddress         = PlaceDetailsFieldMask("formatted_address")
-	PlaceDetailsFieldMaskFormattedPhoneNumber     = PlaceDetailsFieldMask("formatted_phone_number")
-	PlaceDetailsFieldMaskGeometry                 = PlaceDetailsFieldMask("geometry")
-	PlaceDetailsFieldMaskIcon                     = PlaceDetailsFieldMask("icon")
-	PlaceDetailsFieldMaskID                       = PlaceDetailsFieldMask("id")
-	PlaceDetailsFieldMaskInternationalPhoneNumber = PlaceDetailsFieldMask("international_phone_number")
-	PlaceDetailsFieldMaskName                     = PlaceDetailsFieldMask("name")
-	PlaceDetailsFieldMaskOpeningHours             = PlaceDetailsFieldMask("opening_hours")
-	PlaceDetailsFieldMaskPermanentlyClosed        = PlaceDetailsFieldMask("permanently_closed")
-	PlaceDetailsFieldMaskPhotos                   = PlaceDetailsFieldMask("photos")
-	PlaceDetailsFieldMaskPlaceID                  = PlaceDetailsFieldMask("place_id")
-	PlaceDetailsFieldMaskPriceLevel               = PlaceDetailsFieldMask("price_level")
-	PlaceDetailsFieldMaskRatings                  = PlaceDetailsFieldMask("rating")
-	PlaceDetailsFieldMaskUserRatingsTotal         = PlaceDetailsFieldMask("user_ratings_total")
-	PlaceDetailsFieldMaskReviews                  = PlaceDetailsFieldMask("reviews")
-	PlaceDetailsFieldMaskScope                    = PlaceDetailsFieldMask("scope")
-	PlaceDetailsFieldMaskTypes                    = PlaceDetailsFieldMask("types")
-	PlaceDetailsFieldMaskURL                      = PlaceDetailsFieldMask("url")
-	PlaceDetailsFieldMaskUTCOffset                = PlaceDetailsFieldMask("utc_offset")
-	PlaceDetailsFieldMaskVicinity                 = PlaceDetailsFieldMask("vicinity")
-	PlaceDetailsFieldMaskWebsite                  = PlaceDetailsFieldMask("website")
+	PlaceDetailsFieldMaskAddressComponent             = PlaceDetailsFieldMask("address_component")
+	PlaceDetailsFieldMaskADRAddress                   = PlaceDetailsFieldMask("adr_address")
+	PlaceDetailsFieldMaskAltID                        = PlaceDetailsFieldMask("alt_id")
+	PlaceDetailsFieldMaskFormattedAddress             = PlaceDetailsFieldMask("formatted_address")
+	PlaceDetailsFieldMaskFormattedPhoneNumber         = PlaceDetailsFieldMask("formatted_phone_number")
+	PlaceDetailsFieldMaskGeometry                     = PlaceDetailsFieldMask("geometry")
+	PlaceDetailsFieldMaskGeometryLocation             = PlaceDetailsFieldMask("geometry/location")
+	PlaceDetailsFieldMaskGeometryLocationLat          = PlaceDetailsFieldMask("geometry/location/lat")
+	PlaceDetailsFieldMaskGeometryLocationLng          = PlaceDetailsFieldMask("geometry/location/lng")
+	PlaceDetailsFieldMaskGeometryViewport             = PlaceDetailsFieldMask("geometry/viewport")
+	PlaceDetailsFieldMaskGeometryViewportNortheast    = PlaceDetailsFieldMask("geometry/viewport/northeast")
+	PlaceDetailsFieldMaskGeometryViewportNortheastLat = PlaceDetailsFieldMask("geometry/viewport/northeast/lat")
+	PlaceDetailsFieldMaskGeometryViewportNortheastLng = PlaceDetailsFieldMask("geometry/viewport/northeast/lng")
+	PlaceDetailsFieldMaskGeometryViewportSouthwest    = PlaceDetailsFieldMask("geometry/viewport/southwest")
+	PlaceDetailsFieldMaskGeometryViewportSouthwestLat = PlaceDetailsFieldMask("geometry/viewport/southwest/lat")
+	PlaceDetailsFieldMaskGeometryViewportSouthwestLng = PlaceDetailsFieldMask("geometry/viewport/southwest/lng")
+	PlaceDetailsFieldMaskIcon                         = PlaceDetailsFieldMask("icon")
+	PlaceDetailsFieldMaskID                           = PlaceDetailsFieldMask("id")
+	PlaceDetailsFieldMaskInternationalPhoneNumber     = PlaceDetailsFieldMask("international_phone_number")
+	PlaceDetailsFieldMaskName                         = PlaceDetailsFieldMask("name")
+	PlaceDetailsFieldMaskOpeningHours                 = PlaceDetailsFieldMask("opening_hours")
+	PlaceDetailsFieldMaskPermanentlyClosed            = PlaceDetailsFieldMask("permanently_closed")
+	PlaceDetailsFieldMaskPhotos                       = PlaceDetailsFieldMask("photos")
+	PlaceDetailsFieldMaskPlaceID                      = PlaceDetailsFieldMask("place_id")
+	PlaceDetailsFieldMaskPriceLevel                   = PlaceDetailsFieldMask("price_level")
+	PlaceDetailsFieldMaskRatings                      = PlaceDetailsFieldMask("rating")
+	PlaceDetailsFieldMaskUserRatingsTotal             = PlaceDetailsFieldMask("user_ratings_total")
+	PlaceDetailsFieldMaskReviews                      = PlaceDetailsFieldMask("reviews")
+	PlaceDetailsFieldMaskScope                        = PlaceDetailsFieldMask("scope")
+	PlaceDetailsFieldMaskTypes                        = PlaceDetailsFieldMask("types")
+	PlaceDetailsFieldMaskURL                          = PlaceDetailsFieldMask("url")
+	PlaceDetailsFieldMaskUTCOffset                    = PlaceDetailsFieldMask("utc_offset")
+	PlaceDetailsFieldMaskVicinity                     = PlaceDetailsFieldMask("vicinity")
+	PlaceDetailsFieldMaskWebsite                      = PlaceDetailsFieldMask("website")
 )
 
 // ParsePlaceDetailsFieldMask will parse a string representation of
@@ -546,6 +556,26 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskFormattedPhoneNumber, nil
 	case "geometry":
 		return PlaceDetailsFieldMaskGeometry, nil
+	case "geometry/location":
+		return PlaceDetailsFieldMaskGeometryLocation, nil
+	case "geometry/location/lat":
+		return PlaceDetailsFieldMaskGeometryLocationLat, nil
+	case "geometry/location/lng":
+		return PlaceDetailsFieldMaskGeometryLocationLng, nil
+	case "geometry/viewport":
+		return PlaceDetailsFieldMaskGeometryViewport, nil
+	case "geometry/viewport/northeast":
+		return PlaceDetailsFieldMaskGeometryViewportNortheast, nil
+	case "geometry/viewport/northeast/lat":
+		return PlaceDetailsFieldMaskGeometryViewportNortheastLat, nil
+	case "geometry/viewport/northeast/lng":
+		return PlaceDetailsFieldMaskGeometryViewportNortheastLng, nil
+	case "geometry/viewport/southwest":
+		return PlaceDetailsFieldMaskGeometryViewportSouthwest, nil
+	case "geometry/viewport/southwest/lat":
+		return PlaceDetailsFieldMaskGeometryViewportSouthwestLat, nil
+	case "geometry/viewport/southwest/lng":
+		return PlaceDetailsFieldMaskGeometryViewportSouthwestLng, nil
 	case "icon":
 		return PlaceDetailsFieldMaskIcon, nil
 	case "id":
@@ -603,23 +633,33 @@ type PlaceSearchFieldMask string
 
 // The individual Place Search Field Masks.
 const (
-	PlaceSearchFieldMaskAltID               = PlaceSearchFieldMask("alt_id")
-	PlaceSearchFieldMaskFormattedAddress    = PlaceSearchFieldMask("formatted_address")
-	PlaceSearchFieldMaskGeometry            = PlaceSearchFieldMask("geometry")
-	PlaceSearchFieldMaskIcon                = PlaceSearchFieldMask("icon")
-	PlaceSearchFieldMaskID                  = PlaceSearchFieldMask("id")
-	PlaceSearchFieldMaskName                = PlaceSearchFieldMask("name")
-	PlaceSearchFieldMaskOpeningHours        = PlaceSearchFieldMask("opening_hours")
-	PlaceSearchFieldMaskOpeningHoursOpenNow = PlaceSearchFieldMask("opening_hours/open_now")
-	PlaceSearchFieldMaskPermanentlyClosed   = PlaceSearchFieldMask("permanently_closed")
-	PlaceSearchFieldMaskPhotos              = PlaceSearchFieldMask("photos")
-	PlaceSearchFieldMaskPlaceID             = PlaceSearchFieldMask("place_id")
-	PlaceSearchFieldMaskPriceLevel          = PlaceSearchFieldMask("price_level")
-	PlaceSearchFieldMaskRating              = PlaceSearchFieldMask("rating")
-	PlaceSearchFieldMaskUserRatingsTotal    = PlaceSearchFieldMask("user_ratings_total")
-	PlaceSearchFieldMaskReference           = PlaceSearchFieldMask("reference")
-	PlaceSearchFieldMaskTypes               = PlaceSearchFieldMask("types")
-	PlaceSearchFieldMaskVicinity            = PlaceSearchFieldMask("vicinity")
+	PlaceSearchFieldMaskAltID                        = PlaceSearchFieldMask("alt_id")
+	PlaceSearchFieldMaskFormattedAddress             = PlaceSearchFieldMask("formatted_address")
+	PlaceSearchFieldMaskGeometry                     = PlaceSearchFieldMask("geometry")
+	PlaceSearchFieldMaskGeometryLocation             = PlaceSearchFieldMask("geometry/location")
+	PlaceSearchFieldMaskGeometryLocationLat          = PlaceSearchFieldMask("geometry/location/lat")
+	PlaceSearchFieldMaskGeometryLocationLng          = PlaceSearchFieldMask("geometry/location/lng")
+	PlaceSearchFieldMaskGeometryViewport             = PlaceSearchFieldMask("geometry/viewport")
+	PlaceSearchFieldMaskGeometryViewportNortheast    = PlaceSearchFieldMask("geometry/viewport/northeast")
+	PlaceSearchFieldMaskGeometryViewportNortheastLat = PlaceSearchFieldMask("geometry/viewport/northeast/lat")
+	PlaceSearchFieldMaskGeometryViewportNortheastLng = PlaceSearchFieldMask("geometry/viewport/northeast/lng")
+	PlaceSearchFieldMaskGeometryViewportSouthwest    = PlaceSearchFieldMask("geometry/viewport/southwest")
+	PlaceSearchFieldMaskGeometryViewportSouthwestLat = PlaceSearchFieldMask("geometry/viewport/southwest/lat")
+	PlaceSearchFieldMaskGeometryViewportSouthwestLng = PlaceSearchFieldMask("geometry/viewport/southwest/lng")
+	PlaceSearchFieldMaskIcon                         = PlaceSearchFieldMask("icon")
+	PlaceSearchFieldMaskID                           = PlaceSearchFieldMask("id")
+	PlaceSearchFieldMaskName                         = PlaceSearchFieldMask("name")
+	PlaceSearchFieldMaskOpeningHours                 = PlaceSearchFieldMask("opening_hours")
+	PlaceSearchFieldMaskOpeningHoursOpenNow          = PlaceSearchFieldMask("opening_hours/open_now")
+	PlaceSearchFieldMaskPermanentlyClosed            = PlaceSearchFieldMask("permanently_closed")
+	PlaceSearchFieldMaskPhotos                       = PlaceSearchFieldMask("photos")
+	PlaceSearchFieldMaskPlaceID                      = PlaceSearchFieldMask("place_id")
+	PlaceSearchFieldMaskPriceLevel                   = PlaceSearchFieldMask("price_level")
+	PlaceSearchFieldMaskRating                       = PlaceSearchFieldMask("rating")
+	PlaceSearchFieldMaskUserRatingsTotal             = PlaceSearchFieldMask("user_ratings_total")
+	PlaceSearchFieldMaskReference                    = PlaceSearchFieldMask("reference")
+	PlaceSearchFieldMaskTypes                        = PlaceSearchFieldMask("types")
+	PlaceSearchFieldMaskVicinity                     = PlaceSearchFieldMask("vicinity")
 )
 
 // ParsePlaceSearchFieldMask will parse a string representation of
@@ -632,6 +672,26 @@ func ParsePlaceSearchFieldMask(placeSearchFieldMask string) (PlaceSearchFieldMas
 		return PlaceSearchFieldMaskFormattedAddress, nil
 	case "geometry":
 		return PlaceSearchFieldMaskGeometry, nil
+	case "geometry/location":
+		return PlaceSearchFieldMaskGeometryLocation, nil
+	case "geometry/location/lat":
+		return PlaceSearchFieldMaskGeometryLocationLat, nil
+	case "geometry/location/lng":
+		return PlaceSearchFieldMaskGeometryLocationLng, nil
+	case "geometry/viewport":
+		return PlaceSearchFieldMaskGeometryViewport, nil
+	case "geometry/viewport/northeast":
+		return PlaceSearchFieldMaskGeometryViewportNortheast, nil
+	case "geometry/viewport/northeast/lat":
+		return PlaceSearchFieldMaskGeometryViewportNortheastLat, nil
+	case "geometry/viewport/northeast/lng":
+		return PlaceSearchFieldMaskGeometryViewportNortheastLng, nil
+	case "geometry/viewport/southwest":
+		return PlaceSearchFieldMaskGeometryViewportSouthwest, nil
+	case "geometry/viewport/southwest/lat":
+		return PlaceSearchFieldMaskGeometryViewportSouthwestLat, nil
+	case "geometry/viewport/southwest/lng":
+		return PlaceSearchFieldMaskGeometryViewportSouthwestLng, nil
 	case "icon":
 		return PlaceSearchFieldMaskIcon, nil
 	case "id":
