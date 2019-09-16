@@ -727,10 +727,11 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 
 	var cf []string
 	for c, f := range r.Components {
+		fc := make([]string, len(f))
 		for i, v := range f {
-			f[i] = string(c) + ":" + v
+			fc[i] = string(c) + ":" + v
 		}
-		cf = append(cf, strings.Join(f, "|"))
+		cf = append(cf, strings.Join(fc, "|"))
 	}
 	if len(cf) > 0 {
 		q.Set("components", strings.Join(cf, "|"))
