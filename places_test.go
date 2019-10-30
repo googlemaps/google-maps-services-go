@@ -17,6 +17,7 @@ package maps
 import (
 	"context"
 	"encoding/json"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -491,6 +492,51 @@ func TestPlaceAutocompleteMaximalRequestURL(t *testing.T) {
 
 	_, err = c.PlaceAutocomplete(context.Background(), r)
 
+	if err != nil {
+		t.Errorf("Unexpected error in constructing request URL: %+v", err)
+	} else if server.successful != 1 {
+		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
+	}
+}
+
+func TestPlaceAutocompleteWithMutipleComponentsWillWithoutMutation(t *testing.T) {
+	expectedQuery := "components=country%3AES%7Ccountry%3AAU%7Ccountry%3AHK&input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&offset=5&radius=10000&types=geocode"
+
+	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
+	defer server.s.Close()
+
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
+
+	placeType, err := ParseAutocompletePlaceType("geocode")
+	if err != nil {
+		t.Errorf("Unexpected error in parsing place type: %v", err)
+	}
+
+	r := &PlaceAutocompleteRequest{
+		Input:    "quay resteraunt sydney",
+		Offset:   5,
+		Location: &LatLng{1.0, 2.0},
+		Radius:   10000,
+		Language: "es",
+		Types:    placeType,
+		Components: map[Component][]string{
+			ComponentCountry: {"ES", "AU", "HK"},
+		},
+	}
+
+	var copiedComponents = map[Component][]string{
+		ComponentCountry: {"ES", "AU", "HK"},
+	}
+
+	// copy the request
+	var originalReq = *r
+	originalReq.Components = copiedComponents
+
+	_, err = c.PlaceAutocomplete(context.Background(), r)
+
+	if eq := reflect.DeepEqual(*r, originalReq); !eq {
+		t.Errorf("Unexpected mutation at PlaceAutocompleteRequest")
+	}
 	if err != nil {
 		t.Errorf("Unexpected error in constructing request URL: %+v", err)
 	} else if server.successful != 1 {
