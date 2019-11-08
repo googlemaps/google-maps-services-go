@@ -1,0 +1,19 @@
+# github.com/davecgh/go-spew v1.1.0
+github.com/davecgh/go-spew/spew
+# github.com/google/uuid v1.1.1
+github.com/google/uuid
+# github.com/kr/pretty v0.1.0
+github.com/kr/pretty
+# github.com/kr/text v0.1.0
+github.com/kr/text
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/sergi/go-diff v1.0.0
+github.com/sergi/go-diff/diffmatchpatch
+# github.com/stretchr/testify v1.4.0
+github.com/stretchr/testify/require
+github.com/stretchr/testify/assert
+# golang.org/x/time v0.0.0-20191024005414-555d28b269f0
+golang.org/x/time/rate
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2
