@@ -638,6 +638,9 @@ type AutocompleteResponse struct {
 type AutocompletePrediction struct {
 	// Description of the matched prediction.
 	Description string `json:"description,omitempty"`
+	// DistanceMeters is the straight-line distance from the prediction to the
+	// Origin if Origin was passed in the Query
+	DistanceMeters int `json:"distance_meters,omitempty"`
 	// PlaceID is the ID of the Place
 	PlaceID string `json:"place_id,omitempty"`
 	// Types is an array indicating the type of the address component.
@@ -726,6 +729,10 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 		q.Set("location", r.Location.String())
 	}
 
+	if r.Origin != nil {
+		q.Set("origin", r.Origin.String())
+	}
+
 	if r.Radius > 0 {
 		q.Set("radius", strconv.FormatUint(uint64(r.Radius), 10))
 	}
@@ -778,6 +785,9 @@ type PlaceAutocompleteRequest struct {
 	Offset uint
 	// Location is the point around which you wish to retrieve place information.
 	Location *LatLng
+	// Origin is the point from which to calculate the straight-line distance to the
+	// destination (returned as distance_meters).
+	Origin *LatLng
 	// Radius is the distance (in meters) within which to return place results. Note
 	// that setting a radius biases results to the indicated area, but may not fully
 	// restrict results to the specified area.

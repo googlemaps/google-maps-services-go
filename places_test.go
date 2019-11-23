@@ -465,7 +465,7 @@ func TestPlaceAutocompleteMinimalRequestURL(t *testing.T) {
 }
 
 func TestPlaceAutocompleteMaximalRequestURL(t *testing.T) {
-	expectedQuery := "components=country%3AES%7Ccountry%3AAU&input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&offset=5&radius=10000&types=geocode"
+	expectedQuery := "components=country%3AES%7Ccountry%3AAU&input=quay+resteraunt+sydney&key=AIzaNotReallyAnAPIKey&language=es&location=1%2C2&offset=5&origin=1%2C2&radius=10000&types=geocode"
 
 	server := mockServerForQuery(expectedQuery, 200, `{"status":"OK"}"`)
 	defer server.s.Close()
@@ -481,6 +481,7 @@ func TestPlaceAutocompleteMaximalRequestURL(t *testing.T) {
 		Input:    "quay resteraunt sydney",
 		Offset:   5,
 		Location: &LatLng{1.0, 2.0},
+		Origin:   &LatLng{1.0, 2.0},
 		Radius:   10000,
 		Language: "es",
 		Types:    placeType,
