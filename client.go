@@ -49,7 +49,7 @@ type ClientOption func(*Client) error
 var defaultRequestsPerSecond = 50
 
 const (
-	EXPERIENCE_ID_HEADER_NAME = "X-GOOG-MAPS-EXPERIENCE-ID"
+	ExperienceIdHeaderName = "X-GOOG-MAPS-EXPERIENCE-ID"
 )
 
 // NewClient constructs a new Client which can make requests to the Google Maps
@@ -276,7 +276,7 @@ func (c *Client) clearExperienceId() {
 
 func (c *Client) setExperienceIdHeader(req *http.Request) {
 	if len(c.experienceId) > 0 {
-		req.Header.Set(EXPERIENCE_ID_HEADER_NAME, strings.Join(c.experienceId, ","))
+		req.Header.Set(ExperienceIdHeaderName, strings.Join(c.experienceId, ","))
 	}
 }
 
