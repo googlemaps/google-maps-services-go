@@ -19,6 +19,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,4 +82,29 @@ func TestClientSetExperienceIdHeader(t *testing.T) {
 	c.experienceId = []string{}
 	c.setExperienceIdHeader(req)
 	assert.Equal(t, req.Header.Get(EXPERIENCE_ID_HEADER_NAME), "")
+}
+
+func TestClientExperienceIdSample(t *testing.T) {
+	// [START maps_experience_id]
+	experienceId := uuid.New().String()
+
+	// instantiate client with experience id
+	client, _ := NewClient(WithAPIKey("AIza-Maps-API-Key"), WithExperienceId("foo"))
+
+	// clear the current experience id
+	client.clearExperienceId()
+
+	// set a new experience id
+	otherExperienceId := uuid.New().String()
+	client.setExperienceId(experienceId, otherExperienceId)
+
+	// make API request, the client will set the header
+	// X-GOOG-MAPS-EXPERIENCE-ID: experienceId,otherExperienceId
+
+	// get current experience id
+	var ids []string
+	ids = client.getExperienceId()
+	// [END maps_experience_id]
+
+	assert.Equal(t, ids, []string{experienceId, otherExperienceId})
 }
