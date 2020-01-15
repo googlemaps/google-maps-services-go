@@ -66,20 +66,21 @@ func TestClientSetExperienceIdHeader(t *testing.T) {
 	ids := []string{"foo", "bar"}
 	c, _ := NewClient(WithAPIKey("AIza-Maps-API-Key"))
 
-	req, _ := http.NewRequest("GET", "/", nil)
-
 	// slice has two elements
 	c.experienceId = ids
+	req, _ := http.NewRequest("GET", "/", nil)
 	c.setExperienceIdHeader(req)
 	assert.Equal(t, req.Header.Get(EXPERIENCE_ID_HEADER_NAME), strings.Join(ids, ","))
 
 	// slice is nil
 	c.experienceId = nil
+	req, _ = http.NewRequest("GET", "/", nil)
 	c.setExperienceIdHeader(req)
 	assert.Equal(t, req.Header.Get(EXPERIENCE_ID_HEADER_NAME), "")
 
 	// slice is empty
 	c.experienceId = []string{}
+	req, _ = http.NewRequest("GET", "/", nil)
 	c.setExperienceIdHeader(req)
 	assert.Equal(t, req.Header.Get(EXPERIENCE_ID_HEADER_NAME), "")
 }

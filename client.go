@@ -275,9 +275,9 @@ func (c *Client) clearExperienceId() {
 }
 
 func (c *Client) setExperienceIdHeader(req *http.Request) {
-	// if len(c.experienceId) > 0 {
-	req.Header.Set(EXPERIENCE_ID_HEADER_NAME, strings.Join(c.experienceId, ","))
-	// }
+	if len(c.experienceId) > 0 {
+		req.Header.Set(EXPERIENCE_ID_HEADER_NAME, strings.Join(c.experienceId, ","))
+	}
 }
 
 type binaryResponse struct {
