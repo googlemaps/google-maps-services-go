@@ -15,7 +15,11 @@
 package maps
 
 import (
+	"net/http"
+	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClientChannelIsConfigured(t *testing.T) {
@@ -23,4 +27,58 @@ func TestClientChannelIsConfigured(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unable to create client with channel")
 	}
+}
+
+func TestClientWithExperienceId(t *testing.T) {
+	ids := []string{"foo", "bar"}
+	c, err := NewClient(WithAPIKey("AIza-Maps-API-Key"), WithExperienceId(ids...))
+	assert.Nil(t, err)
+	assert.Equal(t, c.experienceId, ids)
+}
+
+func TestClientSetExperienceId(t *testing.T) {
+	ids := []string{"foo", "bar"}
+	c, _ := NewClient(WithAPIKey("AIza-Maps-API-Key"))
+
+	c.setExperienceId(ids...)
+	assert.Equal(t, c.experienceId, ids)
+}
+
+func TestClientGetExperienceId(t *testing.T) {
+	ids := []string{"foo", "bar"}
+	c, _ := NewClient(WithAPIKey("AIza-Maps-API-Key"))
+
+	c.experienceId = ids
+	assert.Equal(t, c.getExperienceId(), ids)
+}
+
+func TestClientClearExperienceId(t *testing.T) {
+	ids := []string{"foo", "bar"}
+	c, _ := NewClient(WithAPIKey("AIza-Maps-API-Key"))
+
+	c.experienceId = ids
+	c.clearExperienceId()
+	assert.Nil(t, c.experienceId)
+}
+
+func TestClientSetExperienceIdHeader(t *testing.T) {
+	ids := []string{"foo", "bar"}
+	c, _ := NewClient(WithAPIKey("AIza-Maps-API-Key"))
+
+	req, _ := http.NewRequest("GET", "/", nil)
+
+	// slice has two elements
+	c.experienceId = ids
+	c.setExperienceIdHeader(req)
+	assert.Equal(t, req.Header.Get(EXPERIENCE_ID_HEADER_NAME), strings.Join(ids, ","))
+
+	// slice is nil
+	c.experienceId = nil
+	c.setExperienceIdHeader(req)
+	assert.Equal(t, req.Header.Get(EXPERIENCE_ID_HEADER_NAME), "")
+
+	// slice is empty
+	c.experienceId = []string{}
+	c.setExperienceIdHeader(req)
+	assert.Equal(t, req.Header.Get(EXPERIENCE_ID_HEADER_NAME), "")
 }

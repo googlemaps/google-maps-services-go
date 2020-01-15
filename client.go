@@ -24,6 +24,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"golang.org/x/time/rate"
 	"googlemaps.github.io/maps/internal"
@@ -39,12 +40,17 @@ type Client struct {
 	requestsPerSecond int
 	rateLimiter       *rate.Limiter
 	channel           string
+	experienceId      []string
 }
 
 // ClientOption is the type of constructor options for NewClient(...).
 type ClientOption func(*Client) error
 
 var defaultRequestsPerSecond = 50
+
+const (
+	EXPERIENCE_ID_HEADER_NAME = "X-GOOG-MAPS-EXPERIENCE-ID"
+)
 
 // NewClient constructs a new Client which can make requests to the Google Maps
 // WebService APIs.
@@ -146,6 +152,15 @@ func WithRateLimit(requestsPerSecond int) ClientOption {
 	}
 }
 
+// WithExperienceId configures the client with an initial experience id that
+// can be changed with the `setExperienceId` method.
+func WithExperienceId(ids ...string) ClientOption {
+	return func(c *Client) error {
+		c.experienceId = ids
+		return nil
+	}
+}
+
 type apiConfig struct {
 	host             string
 	path             string
@@ -177,6 +192,9 @@ func (c *Client) get(ctx context.Context, config *apiConfig, apiReq apiRequest) 
 	if err != nil {
 		return nil, err
 	}
+
+	c.setExperienceIdHeader(req)
+
 	q, err := c.generateAuthQuery(config.path, apiReq.params(), config.acceptsClientID, config.acceptsSignature)
 	if err != nil {
 		return nil, err
@@ -204,6 +222,9 @@ func (c *Client) post(ctx context.Context, config *apiConfig, apiReq interface{}
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
+
+	c.setExperienceIdHeader(req)
+
 	q, err := c.generateAuthQuery(config.path, url.Values{}, config.acceptsClientID, config.acceptsSignature)
 	if err != nil {
 		return nil, err
@@ -239,6 +260,24 @@ func (c *Client) postJSON(ctx context.Context, config *apiConfig, apiReq interfa
 	defer httpResp.Body.Close()
 
 	return json.NewDecoder(httpResp.Body).Decode(resp)
+}
+
+func (c *Client) setExperienceId(ids ...string) {
+	c.experienceId = ids
+}
+
+func (c *Client) getExperienceId() []string {
+	return c.experienceId
+}
+
+func (c *Client) clearExperienceId() {
+	c.experienceId = nil
+}
+
+func (c *Client) setExperienceIdHeader(req *http.Request) {
+	// if len(c.experienceId) > 0 {
+	req.Header.Set(EXPERIENCE_ID_HEADER_NAME, strings.Join(c.experienceId, ","))
+	// }
 }
 
 type binaryResponse struct {
