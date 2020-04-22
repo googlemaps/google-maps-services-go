@@ -346,6 +346,9 @@ type PlacesSearchResult struct {
 	// PermanentlyClosed is a boolean flag indicating whether the place has permanently
 	// shut down.
 	PermanentlyClosed bool `json:"permanently_closed,omitempty"`
+	// BusinessStatus is a string indicating the operational status of the
+	// place, if it is a business.
+	BusinessStatus string `json:"business_status,omitempty"`
 	// ID is an identifier.
 	ID string `json:"id,omitempty"`
 }
@@ -490,6 +493,9 @@ type PlaceDetailsResult struct {
 	// shut down (value true). If the place is not permanently closed, the flag is
 	// absent from the response.
 	PermanentlyClosed bool `json:"permanently_closed,omitempty"`
+	// BusinessStatus is a string indicating the operational status of the
+	// place, if it is a business.
+	BusinessStatus string `json:"business_status,omitempty"`
 	// Reviews is an array of up to five reviews. If a language parameter was specified
 	// in the Place Details request, the Places Service will bias the results to prefer
 	// reviews written in that language.

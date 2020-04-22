@@ -920,7 +920,8 @@ func TestTextSearchWithPermanentlyClosed(t *testing.T) {
 	         "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/school-71.png",
 	         "id" : "6b19d85f4ac1dd71ba400d8ad7fe540a64beacc7",
 	         "name" : "ABC Learning Centre",
-	         "permanently_closed" : true,
+			 "permanently_closed" : true,
+			 "business_status": "foo",
 	         "place_id" : "ChIJLdqTiaj51WsRv4Mkbq2qQEU",
 	         "reference" : "CnRmAAAAJJuaK6n6aI7imGz2zcqHpBanTQcafAIyja-5pGX6q67WDRT4DJ8M6HcjfxRCbOM-7RAw10sU9l-lZktErhP4mVmavboCyI_QG8iAHNjBPlqYcfFYjJLUE4gtrYvYhx1VGG88wYBbQXXAH4hcGQc3-xIQyNcdcFc9rmijjlL5g1U4KxoUYxqZLWwPfDWy1hkU0DqTUbAm26k",
 	         "types" : [ "school", "point_of_interest", "establishment" ]
@@ -962,6 +963,11 @@ func TestTextSearchWithPermanentlyClosed(t *testing.T) {
 	permanentlyClosed := true
 	if permanentlyClosed != result.PermanentlyClosed {
 		t.Errorf("expected %+v, was %+v", permanentlyClosed, result.PermanentlyClosed)
+	}
+
+	businessStatus := "foo"
+	if businessStatus != result.BusinessStatus {
+		t.Errorf("expected %+v, was %+v", businessStatus, result.BusinessStatus)
 	}
 
 	placeID := "ChIJLdqTiaj51WsRv4Mkbq2qQEU"
