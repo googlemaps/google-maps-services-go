@@ -306,6 +306,7 @@ func (dme *DistanceMatrixElement) MarshalJSON() ([]byte, error) {
 	x.safeDistanceMatrixElement = safeDistanceMatrixElement(*dme)
 
 	x.EncDuration = internal.NewDuration(dme.Duration)
+	x.EncDurationInTraffic = internal.NewDuration(dme.DurationInTraffic)
 
 	return json.Marshal(x)
 }

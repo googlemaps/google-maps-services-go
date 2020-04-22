@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 )
 
 const (
@@ -48,5 +49,25 @@ func TestSnappedPoint(t *testing.T) {
 	}
 	if !reflect.DeepEqual(out, sp) {
 		t.Errorf("expected equal snappedPoint, was %+v expected %+v", out, sp)
+	}
+}
+
+func TestDistanceMatrixElement_MarshalJSON(t *testing.T) {
+	dme := &DistanceMatrixElement{
+		Duration:          1*time.Second,
+		DurationInTraffic: 2*time.Second,
+	}
+	b, err := dme.MarshalJSON()
+	if err != nil {
+		t.Errorf("expected ok encode of DistanceMatrixElement, got: %v", err)
+	}
+
+	out := &DistanceMatrixElement{}
+	err = out.UnmarshalJSON(b)
+	if err != nil {
+		t.Errorf("expected ok decode of DistanceMatrixElement, got: %v", err)
+	}
+	if !reflect.DeepEqual(dme, out) {
+		t.Errorf("expected equal DistanceMatrixElement, was %+v expected %+v", out, dme)
 	}
 }
