@@ -507,6 +507,7 @@ const (
 	PlaceDetailsFieldMaskAddressComponent             = PlaceDetailsFieldMask("address_component")
 	PlaceDetailsFieldMaskADRAddress                   = PlaceDetailsFieldMask("adr_address")
 	PlaceDetailsFieldMaskAltID                        = PlaceDetailsFieldMask("alt_id")
+	PlaceDetailsFieldMaskBusinessStatus               = PlaceDetailsFieldMask("business_status")
 	PlaceDetailsFieldMaskFormattedAddress             = PlaceDetailsFieldMask("formatted_address")
 	PlaceDetailsFieldMaskFormattedPhoneNumber         = PlaceDetailsFieldMask("formatted_phone_number")
 	PlaceDetailsFieldMaskGeometry                     = PlaceDetailsFieldMask("geometry")
@@ -550,6 +551,8 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskADRAddress, nil
 	case "alt_id":
 		return PlaceDetailsFieldMaskAltID, nil
+	case "business_status":
+		return PlaceDetailsFieldMaskBusinessStatus, nil
 	case "formatted_address":
 		return PlaceDetailsFieldMaskFormattedAddress, nil
 	case "formatted_phone_number":
@@ -634,6 +637,7 @@ type PlaceSearchFieldMask string
 // The individual Place Search Field Masks.
 const (
 	PlaceSearchFieldMaskAltID                        = PlaceSearchFieldMask("alt_id")
+	PlaceSearchFieldMaskBusinessStatus               = PlaceSearchFieldMask("business_status")
 	PlaceSearchFieldMaskFormattedAddress             = PlaceSearchFieldMask("formatted_address")
 	PlaceSearchFieldMaskGeometry                     = PlaceSearchFieldMask("geometry")
 	PlaceSearchFieldMaskGeometryLocation             = PlaceSearchFieldMask("geometry/location")
