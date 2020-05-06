@@ -28,6 +28,7 @@ import (
 
 	"golang.org/x/time/rate"
 	"googlemaps.github.io/maps/internal"
+	"googlemaps.github.io/maps/metrics"
 )
 
 // Client may be used to make requests to the Google Maps WebService APIs
@@ -41,6 +42,7 @@ type Client struct {
 	rateLimiter       *rate.Limiter
 	channel           string
 	experienceId      []string
+	metricReporter    metrics.Reporter
 }
 
 // ClientOption is the type of constructor options for NewClient(...).
@@ -55,7 +57,10 @@ const (
 // NewClient constructs a new Client which can make requests to the Google Maps
 // WebService APIs.
 func NewClient(options ...ClientOption) (*Client, error) {
-	c := &Client{requestsPerSecond: defaultRequestsPerSecond}
+	c := &Client{
+		requestsPerSecond: defaultRequestsPerSecond,
+		metricReporter:    metrics.NoOpReporter{},
+	}
 	WithHTTPClient(&http.Client{})(c)
 	for _, option := range options {
 		err := option(c)
@@ -161,6 +166,13 @@ func WithExperienceId(ids ...string) ClientOption {
 	}
 }
 
+func WithMetricReporter(reporter metrics.Reporter) ClientOption {
+	return func(c *Client) error {
+		c.metricReporter = reporter
+		return nil
+	}
+}
+
 type apiConfig struct {
 	host             string
 	path             string
@@ -243,23 +255,31 @@ func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, err
 }
 
 func (c *Client) getJSON(ctx context.Context, config *apiConfig, apiReq apiRequest, resp interface{}) error {
+	requestMetrics := c.metricReporter.NewRequest(config.path)
 	httpResp, err := c.get(ctx, config, apiReq)
 	if err != nil {
+		requestMetrics.EndRequest(ctx, err, httpResp, "")
 		return err
 	}
 	defer httpResp.Body.Close()
 
-	return json.NewDecoder(httpResp.Body).Decode(resp)
+	err = json.NewDecoder(httpResp.Body).Decode(resp)
+	requestMetrics.EndRequest(ctx, err, httpResp, httpResp.Header.Get("x-goog-maps-metro-area"))
+	return err
 }
 
 func (c *Client) postJSON(ctx context.Context, config *apiConfig, apiReq interface{}, resp interface{}) error {
+	requestMetrics := c.metricReporter.NewRequest(config.path)
 	httpResp, err := c.post(ctx, config, apiReq)
 	if err != nil {
+		requestMetrics.EndRequest(ctx, err, httpResp, "")
 		return err
 	}
 	defer httpResp.Body.Close()
 
-	return json.NewDecoder(httpResp.Body).Decode(resp)
+	err = json.NewDecoder(httpResp.Body).Decode(resp)
+	requestMetrics.EndRequest(ctx, err, httpResp, httpResp.Header.Get("x-goog-maps-metro-area"))
+	return err
 }
 
 func (c *Client) setExperienceId(ids ...string) {
@@ -287,7 +307,9 @@ type binaryResponse struct {
 }
 
 func (c *Client) getBinary(ctx context.Context, config *apiConfig, apiReq apiRequest) (binaryResponse, error) {
+	requestMetrics := c.metricReporter.NewRequest(config.path)
 	httpResp, err := c.get(ctx, config, apiReq)
+	requestMetrics.EndRequest(ctx, err, httpResp, httpResp.Header.Get("x-goog-maps-metro-area"))
 	if err != nil {
 		return binaryResponse{}, err
 	}
