@@ -186,6 +186,14 @@ instead of an API key.
 
 Native objects for each of the API responses.
 
+### Monitoring
+
+It's possible to get metrics for status counts and latency histograms for monitoring.
+Use `maps.WithMetricReporter(metrics.OpenCensusReporter{})` to log metrics to OpenCensus,
+and `metrics.RegisterViews()` to make the metrics available to be exported.
+OpenCensus can export these metrics to a [variety of monitoring services](https://opencensus.io/exporters/).
+You can also implement your own metric reporter instead of using the provided one.
+
 [apikey]: https://developers.google.com/maps/faq#keysystem
 [clientid]: https://developers.google.com/maps/documentation/business/webservices/auth
 
