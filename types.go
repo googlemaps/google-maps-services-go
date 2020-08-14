@@ -270,6 +270,7 @@ const (
 	PlaceTypeStorage               = PlaceType("storage")
 	PlaceTypeStore                 = PlaceType("store")
 	PlaceTypeSubwayStation         = PlaceType("subway_station")
+	PlaceTypeSupermarket           = PlaceType("supermarket")
 	PlaceTypeSynagogue             = PlaceType("synagogue")
 	PlaceTypeTaxiStand             = PlaceType("taxi_stand")
 	PlaceTypeTrainStation          = PlaceType("train_station")
@@ -446,6 +447,8 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypeStore, nil
 	case "subway_station":
 		return PlaceTypeSubwayStation, nil
+	case "supermarket":
+		return PlaceTypeSupermarket, nil
 	case "synagogue":
 		return PlaceTypeSynagogue, nil
 	case "taxi_stand":
