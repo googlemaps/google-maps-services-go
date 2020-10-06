@@ -713,7 +713,6 @@ func TestPlaceDetails(t *testing.T) {
             "time" : 1441848853
          }
       ],
-      "scope" : "GOOGLE",
       "types" : [ "restaurant", "food", "point_of_interest", "establishment" ],
       "url" : "https://plus.google.com/105746337161979416551/about?hl=en-US",
       "user_ratings_total" : 275,
@@ -845,7 +844,6 @@ func TestPlaceDetailsUTCOffsetAbsent(t *testing.T) {
       "place_id" : "ChIJ02qnq0KuEmsRHUJF4zo1x4I",
       "price_level" : 4,
       "rating" : 4.1,
-      "scope" : "GOOGLE",
       "types" : [ "restaurant", "food", "point_of_interest", "establishment" ],
       "url" : "https://plus.google.com/105746337161979416551/about?hl=en-US",
       "user_ratings_total" : 275,

@@ -509,7 +509,6 @@ type PlaceDetailsFieldMask string
 const (
 	PlaceDetailsFieldMaskAddressComponent             = PlaceDetailsFieldMask("address_component")
 	PlaceDetailsFieldMaskADRAddress                   = PlaceDetailsFieldMask("adr_address")
-	PlaceDetailsFieldMaskAltID                        = PlaceDetailsFieldMask("alt_id")
 	PlaceDetailsFieldMaskBusinessStatus               = PlaceDetailsFieldMask("business_status")
 	PlaceDetailsFieldMaskFormattedAddress             = PlaceDetailsFieldMask("formatted_address")
 	PlaceDetailsFieldMaskFormattedPhoneNumber         = PlaceDetailsFieldMask("formatted_phone_number")
@@ -536,7 +535,6 @@ const (
 	PlaceDetailsFieldMaskRatings                      = PlaceDetailsFieldMask("rating")
 	PlaceDetailsFieldMaskUserRatingsTotal             = PlaceDetailsFieldMask("user_ratings_total")
 	PlaceDetailsFieldMaskReviews                      = PlaceDetailsFieldMask("reviews")
-	PlaceDetailsFieldMaskScope                        = PlaceDetailsFieldMask("scope")
 	PlaceDetailsFieldMaskTypes                        = PlaceDetailsFieldMask("types")
 	PlaceDetailsFieldMaskURL                          = PlaceDetailsFieldMask("url")
 	PlaceDetailsFieldMaskUTCOffset                    = PlaceDetailsFieldMask("utc_offset")
@@ -552,8 +550,6 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskAddressComponent, nil
 	case "adr_address":
 		return PlaceDetailsFieldMaskADRAddress, nil
-	case "alt_id":
-		return PlaceDetailsFieldMaskAltID, nil
 	case "business_status":
 		return PlaceDetailsFieldMaskBusinessStatus, nil
 	case "formatted_address":
@@ -606,8 +602,6 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskUserRatingsTotal, nil
 	case "reviews":
 		return PlaceDetailsFieldMaskReviews, nil
-	case "scope":
-		return PlaceDetailsFieldMaskScope, nil
 	case "types":
 		return PlaceDetailsFieldMaskTypes, nil
 	case "url":
@@ -639,7 +633,6 @@ type PlaceSearchFieldMask string
 
 // The individual Place Search Field Masks.
 const (
-	PlaceSearchFieldMaskAltID                        = PlaceSearchFieldMask("alt_id")
 	PlaceSearchFieldMaskBusinessStatus               = PlaceSearchFieldMask("business_status")
 	PlaceSearchFieldMaskFormattedAddress             = PlaceSearchFieldMask("formatted_address")
 	PlaceSearchFieldMaskGeometry                     = PlaceSearchFieldMask("geometry")
@@ -673,8 +666,6 @@ const (
 // PlaceSearchFieldMask.
 func ParsePlaceSearchFieldMask(placeSearchFieldMask string) (PlaceSearchFieldMask, error) {
 	switch strings.ToLower(placeSearchFieldMask) {
-	case "alt_id":
-		return PlaceSearchFieldMaskAltID, nil
 	case "formatted_address":
 		return PlaceSearchFieldMaskFormattedAddress, nil
 	case "geometry":

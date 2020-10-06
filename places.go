@@ -323,8 +323,6 @@ type PlacesSearchResult struct {
 	Icon string `json:"icon,omitempty"`
 	// PlaceID is a textual identifier that uniquely identifies a place.
 	PlaceID string `json:"place_id,omitempty"`
-	// Scope indicates the scope of the PlaceID.
-	Scope string `json:"scope,omitempty"`
 	// Rating contains the place's rating, from 1.0 to 5.0, based on aggregated user
 	// reviews.
 	Rating float32 `json:"rating,omitempty"`
@@ -336,9 +334,6 @@ type PlacesSearchResult struct {
 	OpeningHours *OpeningHours `json:"opening_hours,omitempty"`
 	// Photos is an array of photo objects, each containing a reference to an image.
 	Photos []Photo `json:"photos,omitempty"`
-	// AltIDs — An array of zero, one or more alternative place IDs for the place, with
-	// a scope related to each alternative ID.
-	AltIDs []AltID `json:"alt_ids,omitempty"`
 	// PriceLevel is the price level of the place, on a scale of 0 to 4.
 	PriceLevel int `json:"price_level,omitempty"`
 	// Vicinity contains a feature name of a nearby location.
@@ -351,16 +346,6 @@ type PlacesSearchResult struct {
 	BusinessStatus string `json:"business_status,omitempty"`
 	// ID is an identifier.
 	ID string `json:"id,omitempty"`
-}
-
-// AltID is the alternative place IDs for a place.
-type AltID struct {
-	// PlaceID is the APP scoped Place ID that you received when you initially created
-	// this Place, before it was given a Google wide Place ID.
-	PlaceID string `json:"place_id,omitempty"`
-	// Scope is the scope of this alternative place ID. It will always be APP,
-	// indicating that the alternative place ID is recognised by your application only.
-	Scope string `json:"scope,omitempty"`
 }
 
 var placeDetailsAPI = &apiConfig{
@@ -469,8 +454,6 @@ type PlaceDetailsResult struct {
 	Icon string `json:"icon,omitempty"`
 	// PlaceID is a textual identifier that uniquely identifies a place.
 	PlaceID string `json:"place_id,omitempty"`
-	// Scope indicates the scope of the PlaceID.
-	Scope string `json:"scope,omitempty"`
 	// Rating contains the place's rating, from 1.0 to 5.0, based on aggregated user
 	// reviews.
 	Rating float32 `json:"rating,omitempty"`
@@ -482,9 +465,6 @@ type PlaceDetailsResult struct {
 	OpeningHours *OpeningHours `json:"opening_hours,omitempty"`
 	// Photos is an array of photo objects, each containing a reference to an image.
 	Photos []Photo `json:"photos,omitempty"`
-	// AltIDs — An array of zero, one or more alternative place IDs for the place, with
-	// a scope related to each alternative ID.
-	AltIDs []AltID `json:"alt_ids,omitempty"`
 	// PriceLevel is the price level of the place, on a scale of 0 to 4.
 	PriceLevel int `json:"price_level,omitempty"`
 	// Vicinity contains a feature name of a nearby location.
