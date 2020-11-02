@@ -50,8 +50,14 @@ type ClientOption func(*Client) error
 
 var defaultRequestsPerSecond = 50
 
+type contextKey string
+func (c contextKey) String() string {
+	return "maps " + string(c)
+}
+
 const (
 	ExperienceIdHeaderName = "X-GOOG-MAPS-EXPERIENCE-ID"
+	contextExperienceId    = contextKey("EXP-IDS")
 )
 
 // NewClient constructs a new Client which can make requests to the Google Maps
@@ -122,7 +128,7 @@ func WithAPIKeyAndSignature(apiKey, signature string) ClientOption {
 // in the post/get handlers. Useful if a customer uses one client instance per different experiences calls
 func ExperienceIdContext(ctx context.Context, experienceIds ...string) context.Context {
 	if ctx != nil {
-		return context.WithValue(ctx, ExperienceIdHeaderName, experienceIds)
+		return context.WithValue(ctx, contextExperienceId, experienceIds)
 	}
 	return ctx
 }
@@ -308,7 +314,7 @@ func (c *Client) setExperienceIdHeader(ctx context.Context, req *http.Request) {
 	if len(c.experienceId) > 0 {
 		ids = append(ids, c.experienceId...)
 	}
-	if experiencesId := ctx.Value(ExperienceIdHeaderName); experiencesId != nil {
+	if experiencesId := ctx.Value(contextExperienceId); experiencesId != nil {
 		for _, v := range experiencesId.([]string) {
 			ids = append(ids, v)
 		}
