@@ -118,6 +118,15 @@ func WithAPIKeyAndSignature(apiKey, signature string) ClientOption {
 	}
 }
 
+// ExperienceIdContext injects the experienceIds in the context, from where they will be pull out
+// in the post/get handlers. Useful if a customer uses one client instance per different experiences calls
+func ExperienceIdContext(ctx context.Context, experienceIds ...string) context.Context {
+	if ctx != nil {
+		return context.WithValue(ctx, ExperienceIdHeaderName, experienceIds)
+	}
+	return ctx
+}
+
 // WithBaseURL configures a Maps API client with a custom base url
 func WithBaseURL(baseURL string) ClientOption {
 	return func(c *Client) error {
@@ -205,7 +214,7 @@ func (c *Client) get(ctx context.Context, config *apiConfig, apiReq apiRequest) 
 		return nil, err
 	}
 
-	c.setExperienceIdHeader(req)
+	c.setExperienceIdHeader(ctx, req)
 
 	q, err := c.generateAuthQuery(config.path, apiReq.params(), config.acceptsClientID, config.acceptsSignature)
 	if err != nil {
@@ -235,7 +244,7 @@ func (c *Client) post(ctx context.Context, config *apiConfig, apiReq interface{}
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	c.setExperienceIdHeader(req)
+	c.setExperienceIdHeader(ctx, req)
 
 	q, err := c.generateAuthQuery(config.path, url.Values{}, config.acceptsClientID, config.acceptsSignature)
 	if err != nil {
@@ -294,9 +303,18 @@ func (c *Client) clearExperienceId() {
 	c.experienceId = nil
 }
 
-func (c *Client) setExperienceIdHeader(req *http.Request) {
+func (c *Client) setExperienceIdHeader(ctx context.Context, req *http.Request) {
+	var ids []string
 	if len(c.experienceId) > 0 {
-		req.Header.Set(ExperienceIdHeaderName, strings.Join(c.experienceId, ","))
+		ids = append(ids, c.experienceId...)
+	}
+	if experiencesId := ctx.Value(ExperienceIdHeaderName); experiencesId != nil {
+		for _, v := range experiencesId.([]string) {
+			ids = append(ids, v)
+		}
+	}
+	if len(ids) != 0 {
+		req.Header.Set(ExperienceIdHeaderName, strings.Join(ids, ","))
 	}
 }
 

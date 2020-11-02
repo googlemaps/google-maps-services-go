@@ -15,6 +15,7 @@
 package maps
 
 import (
+	"context"
 	"net/http"
 	"strings"
 	"testing"
@@ -69,20 +70,45 @@ func TestClientSetExperienceIdHeader(t *testing.T) {
 	// slice has two elements
 	c.experienceId = ids
 	req, _ := http.NewRequest("GET", "/", nil)
-	c.setExperienceIdHeader(req)
-	assert.Equal(t, req.Header.Get(ExperienceIdHeaderName), strings.Join(ids, ","))
+	c.setExperienceIdHeader(context.Background(), req)
+	assert.Equal(t, strings.Join(ids, ","), req.Header.Get(ExperienceIdHeaderName))
 
 	// slice is nil
 	c.experienceId = nil
 	req, _ = http.NewRequest("GET", "/", nil)
-	c.setExperienceIdHeader(req)
-	assert.Equal(t, req.Header.Get(ExperienceIdHeaderName), "")
+	c.setExperienceIdHeader(context.Background(), req)
+	assert.Equal(t, "", req.Header.Get(ExperienceIdHeaderName))
 
 	// slice is empty
 	c.experienceId = []string{}
 	req, _ = http.NewRequest("GET", "/", nil)
-	c.setExperienceIdHeader(req)
-	assert.Equal(t, req.Header.Get(ExperienceIdHeaderName), "")
+	c.setExperienceIdHeader(context.Background(), req)
+	assert.Equal(t, "", req.Header.Get(ExperienceIdHeaderName))
+
+	var ctx context.Context
+	// context has one element
+	c.experienceId = []string{}
+	ctx = context.Background()
+	ctx = ExperienceIdContext(ctx, "foo")
+	req, _ = http.NewRequest("GET", "/", nil)
+	c.setExperienceIdHeader(ctx, req)
+	assert.Equal(t, "foo", req.Header.Get(ExperienceIdHeaderName))
+
+	// context has two elements
+	c.experienceId = []string{}
+	ctx = context.Background()
+	ctx = ExperienceIdContext(ctx, ids...)
+	req, _ = http.NewRequest("GET", "/", nil)
+	c.setExperienceIdHeader(ctx, req)
+	assert.Equal(t, strings.Join(ids, ","), req.Header.Get(ExperienceIdHeaderName))
+
+	// context has two elements and client has two elements
+	c.experienceId = ids
+	ctx = context.Background()
+	ctx = ExperienceIdContext(ctx, ids...)
+	req, _ = http.NewRequest("GET", "/", nil)
+	c.setExperienceIdHeader(ctx, req)
+	assert.Equal(t, strings.Join(ids, ",") + "," + strings.Join(ids, ","), req.Header.Get(ExperienceIdHeaderName))
 }
 
 func TestClientExperienceIdSample(t *testing.T) {
