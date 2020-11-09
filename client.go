@@ -133,6 +133,14 @@ func ExperienceIdContext(ctx context.Context, experienceIds ...string) context.C
 	return ctx
 }
 
+// ExperienceIdFromContext returns experienceIds from context if presented
+func ExperienceIdFromContext(ctx context.Context) []string {
+	if experiencesId := ctx.Value(contextExperienceId); experiencesId != nil {
+		return experiencesId.([]string)
+	}
+	return nil
+}
+
 // WithBaseURL configures a Maps API client with a custom base url
 func WithBaseURL(baseURL string) ClientOption {
 	return func(c *Client) error {
@@ -314,8 +322,8 @@ func (c *Client) setExperienceIdHeader(ctx context.Context, req *http.Request) {
 	if len(c.experienceId) > 0 {
 		ids = append(ids, c.experienceId...)
 	}
-	if experiencesId := ctx.Value(contextExperienceId); experiencesId != nil {
-		for _, v := range experiencesId.([]string) {
+	if experiencesId := ExperienceIdFromContext(ctx); experiencesId != nil {
+		for _, v := range experiencesId {
 			ids = append(ids, v)
 		}
 	}
