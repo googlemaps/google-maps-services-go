@@ -341,11 +341,12 @@ type binaryResponse struct {
 func (c *Client) getBinary(ctx context.Context, config *apiConfig, apiReq apiRequest) (binaryResponse, error) {
 	requestMetrics := c.metricReporter.NewRequest(config.path)
 	httpResp, err := c.get(ctx, config, apiReq)
-	requestMetrics.EndRequest(ctx, err, httpResp, httpResp.Header.Get("x-goog-maps-metro-area"))
 	if err != nil {
+		requestMetrics.EndRequest(ctx, err, httpResp, "")
 		return binaryResponse{}, err
 	}
 
+	requestMetrics.EndRequest(ctx, err, httpResp, httpResp.Header.Get("x-goog-maps-metro-area"))
 	return binaryResponse{httpResp.StatusCode, httpResp.Header.Get("Content-Type"), httpResp.Body}, nil
 }
 
