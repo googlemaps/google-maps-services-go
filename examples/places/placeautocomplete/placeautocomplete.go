@@ -84,6 +84,7 @@ func main() {
 
 	parseLocation(*location, r)
 	parsePlaceType(*placeType, r)
+	parseComponents(*components, r)
 
 	resp, err := client.PlaceAutocomplete(context.Background(), r)
 	check(err)
@@ -109,6 +110,9 @@ func parsePlaceType(placeType string, r *maps.PlaceAutocompleteRequest) {
 
 func parseComponents(components string, r *maps.PlaceAutocompleteRequest) {
 	if components != "" {
+		if r.Components == nil {
+			r.Components = make(map[maps.Component][]string)
+		}
 		c := strings.Split(components, "|")
 		for _, cf := range c {
 			i := strings.Split(cf, ":")
