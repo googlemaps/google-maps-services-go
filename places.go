@@ -920,9 +920,6 @@ type FindPlaceFromTextRequest struct {
 	// should be filled in.
 	Fields []PlaceSearchFieldMask
 
-	// Language specifies the language in which to return results. Optional.
-	Language string
-
 	// LocationBias is the type of location bias to apply to this request
 	LocationBias FindPlaceFromTextLocationBiasType
 
@@ -951,10 +948,6 @@ func (r *FindPlaceFromTextRequest) params() url.Values {
 
 	if len(r.Fields) > 0 {
 		q.Set("fields", strings.Join(placeSearchFieldMasksAsStringArray(r.Fields), ","))
-	}
-
-	if r.Language != "" {
-		q.Set("language", r.Language)
 	}
 
 	if r.LocationBias != "" {
