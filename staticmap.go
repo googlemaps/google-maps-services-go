@@ -253,6 +253,8 @@ type StaticMapRequest struct {
 	Region string
 	// MapType (optional) defines the type of map to construct.
 	MapType MapType
+	// MapId (optional) defines the identifier for a specific map.
+	MapId string
 	// Markers (optional) define one or more markers to attach to the image at specified
 	// locations.
 	Markers []Marker
@@ -295,6 +297,9 @@ func (r *StaticMapRequest) params() url.Values {
 	}
 	if r.MapType != "" {
 		q.Set("maptype", string(r.MapType))
+	}
+	if r.MapId != "" {
+		q.Set("map_id", r.MapId)
 	}
 
 	for _, m := range r.Markers {
