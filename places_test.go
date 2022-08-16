@@ -709,6 +709,7 @@ func TestPlaceDetails(t *testing.T) {
             "author_url" : "https://plus.google.com/114299517944848975298",
             "language" : "en",
             "rating" : 3,
+						"relative_time_description" : "10 months ago",
             "text" : "Overall disappointing. This is the second time i've been there and my experience was... Nothing to nibble on for 45 mins and then the bread came. My first entree was the marron which I thought was tasteless - perhaps others would say delicate? but there you go. The XO sea was fantastic. I chose the  vegetarian main dish which was all about the texture which was great but nothing at all outstanding about the dish. My husband and daughter chose the duck for their main course it was the smallest main course i've ever seen - their faces were priceless when it arrived!. Snow egg was beautiful but the granita on the bottom had some solid chunks of hard ice. The service was quite good...",
             "time" : 1441848853
          }
@@ -811,6 +812,11 @@ func TestPlaceDetails(t *testing.T) {
 	rating := 3
 	if rating != resp.Reviews[0].Rating {
 		t.Errorf("expected %+v, was %+v", rating, resp.Reviews[0].Rating)
+	}
+
+	relativeTimeDescription := "10 months ago"
+	if relativeTimeDescription != resp.Reviews[0].RelativeTimeDescription {
+		t.Errorf("expected %+v, was %+v", relativeTimeDescription, resp.Reviews[0].RelativeTimeDescription)
 	}
 
 	text := "Overall disappointing. This is the second time i've been there and my experience was... Nothing to nibble on for 45 mins and then the bread came. My first entree was the marron which I thought was tasteless - perhaps others would say delicate? but there you go. The XO sea was fantastic. I chose the  vegetarian main dish which was all about the texture which was great but nothing at all outstanding about the dish. My husband and daughter chose the duck for their main course it was the smallest main course i've ever seen - their faces were priceless when it arrived!. Snow egg was beautiful but the granita on the bottom had some solid chunks of hard ice. The service was quite good..."
