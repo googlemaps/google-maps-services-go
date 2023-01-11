@@ -78,7 +78,7 @@ For even more information, see the guide to [API keys][apikey].
 To install the Go Client for Google Maps Services, please execute the following `go get` command.
 
 ```bash
-    go get googlemaps.github.io/maps
+go get googlemaps.github.io/maps
 ```
 
 ## Developer Documentation
