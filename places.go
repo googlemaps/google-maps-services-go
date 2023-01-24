@@ -400,6 +400,15 @@ func (r *PlaceDetailsRequest) params() url.Values {
 		q.Set("region", r.Region)
 	}
 
+	if r.ReviewsNoTranslations {
+		q.Set("reviews_no_translations", "true")
+	}
+
+
+	if r.ReviewsSort != "" {
+		q.Set("reviews_sort", r.ReviewsSort)
+	}
+
 	return q
 }
 
@@ -422,6 +431,28 @@ type PlaceDetailsRequest struct {
 	// two-character value. Most ccTLD codes are identical to ISO 3166-1 codes, with
 	// some exceptions. This parameter will only influence, not fully restrict, results.
 	Region string
+	// ReviewsNoTranslations specifies whether to translate reviews. Specify
+	// ReviewsNoTranslations=true to disable translation of reviews; specify
+	// ReviewsNoTranslations=false to enable translation of reviews. Reviews
+	// are returned in their original language.
+	//
+	// If omitted, or passed with no value, translation of reviews is enabled. If
+	// the language parameter was specified in the request, use the specified
+	// language as the preferred language for translation. If language is
+	// omitted, the API attempts to use the Accept-Language header as the
+	// preferred language.
+	ReviewsNoTranslations bool
+	// ReviewsSort specifies the sorting method to use when returning reviews.
+	// Can be set to most_relevant (default) or newest.
+	//
+	//For most_relevant (default), reviews are sorted by relevance; the service
+	// will bias the results to return reviews originally written in the
+	// preferred language.
+	// For newest, reviews are sorted in chronological order; the preferred
+	// language does not affect the sort order.
+	// Google recommends that you display how the reviews are being sorted to the
+	// end user.
+	ReviewsSort string
 }
 
 // PlaceDetailsResult is an individual Places API Place Details result
