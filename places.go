@@ -422,7 +422,7 @@ type PlaceDetailsRequest struct {
 	Language string
 	// Fields allows you to select which parts of the returned details structure
 	// should be filled in. For more detail, please see the following URL:
-	// https://cloud.google.com/maps-platform/user-guide/product-changes/#places
+	// https://developers.google.com/maps/documentation/places/web-service/details#fields
 	Fields []PlaceDetailsFieldMask
 	// SessionToken is a token that marks this request as part of a Place Autocomplete
 	// Session. Optional.
@@ -515,14 +515,14 @@ type PlaceDetailsResult struct {
 	// special_days subfield of all hours, set for dates that have exceptional
 	// hours.
 	SecondaryOpeningHours *OpeningHours `json:"secondary_opening_hours,omitempty"`
-	// Photos is an array of photo objects, each containing a reference to an image.
-	Photos []Photo `json:"photos,omitempty"`
 	// PermanentlyClosed is a boolean flag indicating whether the place has permanently
 	// shut down (value true). If the place is not permanently closed, the flag is
 	// absent from the response.
 	//
 	// Deprecated: Use BusinessStatus instead.
 	PermanentlyClosed bool `json:"permanently_closed,omitempty"`
+	// Photos is an array of photo objects, each containing a reference to an image.
+	Photos []Photo `json:"photos,omitempty"`
 	// PlaceID is a textual identifier that uniquely identifies a place.
 	PlaceID string `json:"place_id,omitempty"`
 	// PriceLevel is the price level of the place, on a scale of 0 to 4.
@@ -578,17 +578,6 @@ type PlaceDetailsResult struct {
 	// HTMLAttributions contain a set of attributions about this listing which must be
 	// displayed to the user.
 	HTMLAttributions []string `json:"html_attributions,omitempty"`
-}
-
-// PlaceEditorialSummary contains a summary of the place. A summary is
-// comprised of a textual overview, and also includes the language code for
-// these if applicable. Summary text must be presented as-is and can not be
-// modified or altered.
-type PlaceEditorialSummary struct {
-	// Language is the language of the previous fields. May not always be present.
-	Language string `json:"language,omitempty"`
-	// Overview is a medium-length textual summary of the place.
-	Overview string `json:"overview,omitempty"`
 }
 
 // PlaceReview is a review of a Place
