@@ -400,6 +400,15 @@ func (r *PlaceDetailsRequest) params() url.Values {
 		q.Set("region", r.Region)
 	}
 
+	if r.ReviewsNoTranslations {
+		q.Set("reviews_no_translations", "true")
+	}
+
+
+	if r.ReviewsSort != "" {
+		q.Set("reviews_sort", r.ReviewsSort)
+	}
+
 	return q
 }
 
@@ -413,7 +422,7 @@ type PlaceDetailsRequest struct {
 	Language string
 	// Fields allows you to select which parts of the returned details structure
 	// should be filled in. For more detail, please see the following URL:
-	// https://cloud.google.com/maps-platform/user-guide/product-changes/#places
+	// https://developers.google.com/maps/documentation/places/web-service/details#fields
 	Fields []PlaceDetailsFieldMask
 	// SessionToken is a token that marks this request as part of a Place Autocomplete
 	// Session. Optional.
@@ -422,6 +431,28 @@ type PlaceDetailsRequest struct {
 	// two-character value. Most ccTLD codes are identical to ISO 3166-1 codes, with
 	// some exceptions. This parameter will only influence, not fully restrict, results.
 	Region string
+	// ReviewsNoTranslations specifies whether to translate reviews. Specify
+	// ReviewsNoTranslations=true to disable translation of reviews; specify
+	// ReviewsNoTranslations=false to enable translation of reviews. Reviews
+	// are returned in their original language.
+	//
+	// If omitted, or passed with no value, translation of reviews is enabled. If
+	// the language parameter was specified in the request, use the specified
+	// language as the preferred language for translation. If language is
+	// omitted, the API attempts to use the Accept-Language header as the
+	// preferred language.
+	ReviewsNoTranslations bool
+	// ReviewsSort specifies the sorting method to use when returning reviews.
+	// Can be set to most_relevant (default) or newest.
+	//
+	//For most_relevant (default), reviews are sorted by relevance; the service
+	// will bias the results to return reviews originally written in the
+	// preferred language.
+	// For newest, reviews are sorted in chronological order; the preferred
+	// language does not affect the sort order.
+	// Google recommends that you display how the reviews are being sorted to the
+	// end user.
+	ReviewsSort string
 }
 
 // PlaceDetailsResult is an individual Places API Place Details result
@@ -433,6 +464,20 @@ type PlaceDetailsResult struct {
 	FormattedAddress string `json:"formatted_address,omitempty"`
 	// AdrAddress is the address in the "adr" microformat.
 	AdrAddress string `json:"adr_address,omitempty"`
+	// BusinessStatus is a string indicating the operational status of the
+	// place, if it is a business.
+	BusinessStatus string `json:"business_status,omitempty"`
+	// CurbsidePickup specifies if the business supports curbside pickup.
+	CurbsidePickup bool `json:"curbside_pickup,omitempty"`
+	// Delivery specifies if the business supports delivery.
+	Delivery bool `json:"delivery,omitempty"`
+	// DineIn specifies if the business supports seating options.
+	DineIn bool `json:"dine_in,omitempty"`
+	// EditorialSummary contains a summary of the place. A summary is comprised
+	// of a textual overview, and also includes the language code for these if
+	// applicable. Summary text must be presented as-is and can not be modified
+	// or altered.
+	EditorialSummary *PlaceEditorialSummary `json:"editorial_summary,omitempty"`
 	// FormattedPhoneNumber contains the place's phone number in its local format. For
 	// example, the formatted_phone_number for Google's Sydney, Australia office is
 	// (02) 9374 4000.
@@ -446,54 +491,90 @@ type PlaceDetailsResult struct {
 	// location (geocode) of the place and (optionally) the viewport identifying its
 	// general area of coverage.
 	Geometry AddressGeometry `json:"geometry,omitempty"`
-	// Name contains the human-readable name for the returned result. For establishment
-	// results, this is usually the business name.
-	Name string `json:"name,omitempty"`
 	// Icon contains the URL of a recommended icon which may be displayed to the user
 	// when indicating this result.
 	Icon string `json:"icon,omitempty"`
-	// PlaceID is a textual identifier that uniquely identifies a place.
-	PlaceID string `json:"place_id,omitempty"`
-	// Rating contains the place's rating, from 1.0 to 5.0, based on aggregated user
-	// reviews.
-	Rating float32 `json:"rating,omitempty"`
-	// UserRatingsTotal contains total number of the place's ratings
-	UserRatingsTotal int `json:"user_ratings_total,omitempty"`
-	// Types contains an array of feature types describing the given result.
-	Types []string `json:"types,omitempty"`
+	// Name contains the human-readable name for the returned result. For establishment
+	// results, this is usually the business name.
+	Name string `json:"name,omitempty"`
 	// OpeningHours may contain whether the place is open now or not.
 	OpeningHours *OpeningHours `json:"opening_hours,omitempty"`
-	// Photos is an array of photo objects, each containing a reference to an image.
-	Photos []Photo `json:"photos,omitempty"`
-	// PriceLevel is the price level of the place, on a scale of 0 to 4.
-	PriceLevel int `json:"price_level,omitempty"`
-	// Vicinity contains a feature name of a nearby location.
-	Vicinity string `json:"vicinity,omitempty"`
+	// CurrentOpeningHours may contain the hours of operation for the next seven
+	// days (including today). The time period starts at midnight on the date of
+	// the request and ends at 11:59 pm six days later. This field includes the
+	// special_days subfield of all hours, set for dates that have exceptional
+	// hours.
+	CurrentOpeningHours *OpeningHours `json:"current_opening_hours,omitempty"`
+	// SecondaryOpeningHours may contain an array of entries for the next seven
+	// days including information about secondary hours of a business. Secondary
+	// hours are different from a business's main hours. For example, a
+	// restaurant can specify drive through hours or delivery hours as its
+	// secondary hours. This field populates the type subfield, which draws from
+	// a predefined list of opening hours types (such as DRIVE_THROUGH, PICKUP,
+	// or TAKEOUT) based on the types of the place. This field includes the
+	// special_days subfield of all hours, set for dates that have exceptional
+	// hours.
+	SecondaryOpeningHours *OpeningHours `json:"secondary_opening_hours,omitempty"`
 	// PermanentlyClosed is a boolean flag indicating whether the place has permanently
 	// shut down (value true). If the place is not permanently closed, the flag is
 	// absent from the response.
+	//
+	// Deprecated: Use BusinessStatus instead.
 	PermanentlyClosed bool `json:"permanently_closed,omitempty"`
-	// BusinessStatus is a string indicating the operational status of the
-	// place, if it is a business.
-	BusinessStatus string `json:"business_status,omitempty"`
+	// Photos is an array of photo objects, each containing a reference to an image.
+	Photos []Photo `json:"photos,omitempty"`
+	// PlaceID is a textual identifier that uniquely identifies a place.
+	PlaceID string `json:"place_id,omitempty"`
+	// PriceLevel is the price level of the place, on a scale of 0 to 4.
+	PriceLevel int `json:"price_level,omitempty"`
+	// Rating contains the place's rating, from 1.0 to 5.0, based on aggregated user
+	// reviews.
+	Rating float32 `json:"rating,omitempty"`
+	// Reservable specifies if the place supports reservations.
+	Reservable bool `json:"reservable,omitempty"`
 	// Reviews is an array of up to five reviews. If a language parameter was specified
 	// in the Place Details request, the Places Service will bias the results to prefer
 	// reviews written in that language.
 	Reviews []PlaceReview `json:"reviews,omitempty"`
-	// UTCOffset contains the number of minutes this place’s current timezone is offset
-	// from UTC. For example, for places in Sydney, Australia during daylight saving
-	// time this would be 660 (+11 hours from UTC), and for places in California outside
-	// of daylight saving time this would be -480 (-8 hours from UTC).
-	UTCOffset *int `json:"utc_offset,omitempty"`
-	// Website lists the authoritative website for this place, such as a business'
-	// homepage.
-	Website string `json:"website,omitempty"`
+	// ServesBeer specifies if the place serves beer.
+	ServesBeer bool `json:"serves_beer,omitempty"`
+	// ServesBreakfast specifies if the place serves breakfast.
+	ServesBreakfast bool `json:"serves_breakfast,omitempty"`
+	// ServesBrunch specifies if the place serves brunch.
+	ServesBrunch bool `json:"serves_brunch,omitempty"`
+	// ServesDinner specifies if the place serves dinner.
+	ServesDinner bool `json:"serves_dinner,omitempty"`
+	// ServesLunch specifies if the place serves lunch.
+	ServesLunch bool `json:"serves_lunch,omitempty"`
+	// ServesVegetarianFood specifies if the place serves vegetarian food.
+	ServesVegetarianFood bool `json:"serves_vegetarian_food,omitempty"`
+	// ServesWine specifies if the place serves wine.
+	ServesWine bool `json:"serves_wine,omitempty"`
+	// Takeout specifies if the business supports takeout.
+	Takeout bool `json:"takeout,omitempty"`
+	// Types contains an array of feature types describing the given result.
+	Types []string `json:"types,omitempty"`
 	// URL contains the URL of the official Google page for this place. This will be the
 	// establishment's Google+ page if the Google+ page exists, otherwise it will be the
 	// Google-owned page that contains the best available information about the place.
 	// Applications must link to or embed this page on any screen that shows detailed
 	// results about the place to the user.
 	URL string `json:"url,omitempty"`
+	// UserRatingsTotal contains total number of the place's ratings
+	UserRatingsTotal int `json:"user_ratings_total,omitempty"`
+	// UTCOffset contains the number of minutes this place’s current timezone is offset
+	// from UTC. For example, for places in Sydney, Australia during daylight saving
+	// time this would be 660 (+11 hours from UTC), and for places in California outside
+	// of daylight saving time this would be -480 (-8 hours from UTC).
+	UTCOffset *int `json:"utc_offset,omitempty"`
+	// Vicinity contains a feature name of a nearby location.
+	Vicinity string `json:"vicinity,omitempty"`
+	// Website lists the authoritative website for this place, such as a business'
+	// homepage.
+	Website string `json:"website,omitempty"`
+	// WheelchairAccessibleEntrance specifies if the place has an entrance that
+	// is wheelchair-accessible.
+	WheelchairAccessibleEntrance bool `json:"wheelchair_accessible_entrance,omitempty"`
 	// HTMLAttributions contain a set of attributions about this listing which must be
 	// displayed to the user.
 	HTMLAttributions []string `json:"html_attributions,omitempty"`

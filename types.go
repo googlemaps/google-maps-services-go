@@ -155,6 +155,17 @@ type Photo struct {
 	HTMLAttributions []string `json:"html_attributions"`
 }
 
+// PlaceEditorialSummary contains a summary of the place. A summary is
+// comprised of a textual overview, and also includes the language code for
+// these if applicable. Summary text must be presented as-is and can not be
+// modified or altered.
+type PlaceEditorialSummary struct {
+	// Language is the language of the previous fields. May not always be present.
+	Language string `json:"language,omitempty"`
+	// Overview is a medium-length textual summary of the place.
+	Overview string `json:"overview,omitempty"`
+}
+
 // Component specifies a key for the parts of a structured address. See
 // https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering
 // for more detail.
@@ -502,7 +513,7 @@ func ParseAutocompletePlaceType(placeType string) (AutocompletePlaceType, error)
 
 // PlaceDetailsFieldMask allows you to specify which fields are to be returned with
 // a place details request. Please see the following URL for more detail:
-// https://cloud.google.com/maps-platform/user-guide/product-changes/#places
+// https://developers.google.com/maps/documentation/places/web-service/details#fields
 type PlaceDetailsFieldMask string
 
 // The individual Place Details Field Masks.
@@ -510,6 +521,10 @@ const (
 	PlaceDetailsFieldMaskAddressComponent             = PlaceDetailsFieldMask("address_component")
 	PlaceDetailsFieldMaskADRAddress                   = PlaceDetailsFieldMask("adr_address")
 	PlaceDetailsFieldMaskBusinessStatus               = PlaceDetailsFieldMask("business_status")
+	PlaceDetailsFieldMaskCurbsidePickup               = PlaceDetailsFieldMask("curbside_pickup")
+	PlaceDetailsFieldMaskDelivery                     = PlaceDetailsFieldMask("delivery")
+	PlaceDetailsFieldMaskDineIn                       = PlaceDetailsFieldMask("dine_in")
+	PlaceDetailsFieldMaskEditorialSummary             = PlaceDetailsFieldMask("editorial_summary")
 	PlaceDetailsFieldMaskFormattedAddress             = PlaceDetailsFieldMask("formatted_address")
 	PlaceDetailsFieldMaskFormattedPhoneNumber         = PlaceDetailsFieldMask("formatted_phone_number")
 	PlaceDetailsFieldMaskGeometry                     = PlaceDetailsFieldMask("geometry")
@@ -528,18 +543,30 @@ const (
 	PlaceDetailsFieldMaskInternationalPhoneNumber     = PlaceDetailsFieldMask("international_phone_number")
 	PlaceDetailsFieldMaskName                         = PlaceDetailsFieldMask("name")
 	PlaceDetailsFieldMaskOpeningHours                 = PlaceDetailsFieldMask("opening_hours")
+	PlaceDetailsFieldMaskCurrentOpeningHours          = PlaceDetailsFieldMask("current_opening_hours")
+	PlaceDetailsFieldMaskSecondaryOpeningHours        = PlaceDetailsFieldMask("secondary_opening_hours")
 	PlaceDetailsFieldMaskPermanentlyClosed            = PlaceDetailsFieldMask("permanently_closed")
 	PlaceDetailsFieldMaskPhotos                       = PlaceDetailsFieldMask("photos")
 	PlaceDetailsFieldMaskPlaceID                      = PlaceDetailsFieldMask("place_id")
 	PlaceDetailsFieldMaskPriceLevel                   = PlaceDetailsFieldMask("price_level")
 	PlaceDetailsFieldMaskRatings                      = PlaceDetailsFieldMask("rating")
 	PlaceDetailsFieldMaskUserRatingsTotal             = PlaceDetailsFieldMask("user_ratings_total")
+	PlaceDetailsFieldMaskReservable                   = PlaceDetailsFieldMask("reservable")
 	PlaceDetailsFieldMaskReviews                      = PlaceDetailsFieldMask("reviews")
+	PlaceDetailsFieldMaskServesBeer                   = PlaceDetailsFieldMask("serves_beer")
+	PlaceDetailsFieldMaskServesBreakfast              = PlaceDetailsFieldMask("serves_breakfast")
+	PlaceDetailsFieldMaskServesBrunch                 = PlaceDetailsFieldMask("serves_brunch")
+	PlaceDetailsFieldMaskServesDinner                 = PlaceDetailsFieldMask("serves_dinner")
+	PlaceDetailsFieldMaskServesLunch                  = PlaceDetailsFieldMask("serves_lunch")
+	PlaceDetailsFieldMaskServesVegetarianFood         = PlaceDetailsFieldMask("serves_vegetarian_food")
+	PlaceDetailsFieldMaskServesWine                   = PlaceDetailsFieldMask("serves_wine")
+	PlaceDetailsFieldMaskTakeout                      = PlaceDetailsFieldMask("takeout")
 	PlaceDetailsFieldMaskTypes                        = PlaceDetailsFieldMask("types")
 	PlaceDetailsFieldMaskURL                          = PlaceDetailsFieldMask("url")
 	PlaceDetailsFieldMaskUTCOffset                    = PlaceDetailsFieldMask("utc_offset")
 	PlaceDetailsFieldMaskVicinity                     = PlaceDetailsFieldMask("vicinity")
 	PlaceDetailsFieldMaskWebsite                      = PlaceDetailsFieldMask("website")
+	PlaceDetailsFieldMaskWheelchairAccessibleEntrance = PlaceDetailsFieldMask("wheelchair_accessible_entrance")
 )
 
 // ParsePlaceDetailsFieldMask will parse a string representation of
@@ -552,6 +579,14 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskADRAddress, nil
 	case "business_status":
 		return PlaceDetailsFieldMaskBusinessStatus, nil
+	case "curbside_pickup":
+		return PlaceDetailsFieldMaskCurbsidePickup, nil
+	case "delivery":
+		return PlaceDetailsFieldMaskDelivery, nil
+	case "dine_in":
+		return PlaceDetailsFieldMaskDineIn, nil
+	case "editorial_summary":
+		return PlaceDetailsFieldMaskEditorialSummary, nil
 	case "formatted_address":
 		return PlaceDetailsFieldMaskFormattedAddress, nil
 	case "formatted_phone_number":
@@ -588,6 +623,10 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskName, nil
 	case "opening_hours":
 		return PlaceDetailsFieldMaskOpeningHours, nil
+	case "current_opening_hours":
+		return PlaceDetailsFieldMaskCurrentOpeningHours, nil
+	case "secondary_opening_hours":
+		return PlaceDetailsFieldMaskSecondaryOpeningHours, nil
 	case "permanently_closed":
 		return PlaceDetailsFieldMaskPermanentlyClosed, nil
 	case "photos":
@@ -600,8 +639,26 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskRatings, nil
 	case "user_ratings_total":
 		return PlaceDetailsFieldMaskUserRatingsTotal, nil
+	case "reservable":
+		return PlaceDetailsFieldMaskReservable, nil
 	case "reviews":
 		return PlaceDetailsFieldMaskReviews, nil
+	case "serves_beer":
+		return PlaceDetailsFieldMaskServesBeer, nil
+	case "serves_breakfast":
+		return PlaceDetailsFieldMaskServesBreakfast, nil
+	case "serves_brunch":
+		return PlaceDetailsFieldMaskServesBrunch, nil
+	case "serves_dinner":
+		return PlaceDetailsFieldMaskServesDinner, nil
+	case "serves_lunch":
+		return PlaceDetailsFieldMaskServesLunch, nil
+	case "serves_vegetarian_food":
+		return PlaceDetailsFieldMaskServesVegetarianFood, nil
+	case "serves_wine":
+		return PlaceDetailsFieldMaskServesWine, nil
+	case "takeout":
+		return PlaceDetailsFieldMaskTakeout, nil
 	case "types":
 		return PlaceDetailsFieldMaskTypes, nil
 	case "url":
@@ -612,6 +669,8 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskVicinity, nil
 	case "website":
 		return PlaceDetailsFieldMaskWebsite, nil
+	case "wheelchair_accessible_entrance":
+		return PlaceDetailsFieldMaskWheelchairAccessibleEntrance, nil
 	default:
 		return PlaceDetailsFieldMask(""), fmt.Errorf("Unknown PlaceDetailsFieldMask \"%v\"", placeDetailsFieldMask)
 	}
