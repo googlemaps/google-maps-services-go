@@ -524,7 +524,7 @@ const (
 	PlaceDetailsFieldMaskCurbsidePickup               = PlaceDetailsFieldMask("curbside_pickup")
 	PlaceDetailsFieldMaskDelivery                     = PlaceDetailsFieldMask("delivery")
 	PlaceDetailsFieldMaskDineIn                       = PlaceDetailsFieldMask("dine_in")
-	PlaceDetailsFieldMaskEditorialSummary               = PlaceDetailsFieldMask("editorial_summary")
+	PlaceDetailsFieldMaskEditorialSummary             = PlaceDetailsFieldMask("editorial_summary")
 	PlaceDetailsFieldMaskFormattedAddress             = PlaceDetailsFieldMask("formatted_address")
 	PlaceDetailsFieldMaskFormattedPhoneNumber         = PlaceDetailsFieldMask("formatted_phone_number")
 	PlaceDetailsFieldMaskGeometry                     = PlaceDetailsFieldMask("geometry")
