@@ -727,6 +727,63 @@ func TestPlaceDetails(t *testing.T) {
                 "Sunday: 12:00 – 8:45 PM"
             ]
         },
+		"secondary_opening_hours": [
+            {
+                "open_now": true,
+                "periods": [
+                    {
+                        "close": {
+                            "day": 0,
+                            "time": "2045"
+                        },
+                        "open": {
+                            "day": 0,
+                            "time": "1200"
+                        }
+                    },
+                    {
+                        "close": {
+                            "day": 4,
+                            "time": "2045"
+                        },
+                        "open": {
+                            "day": 4,
+                            "time": "1800"
+                        }
+                    },
+                    {
+                        "close": {
+                            "day": 5,
+                            "time": "2045"
+                        },
+                        "open": {
+                            "day": 5,
+                            "time": "1800"
+                        }
+                    },
+                    {
+                        "close": {
+                            "day": 6,
+                            "time": "2045"
+                        },
+                        "open": {
+                            "day": 6,
+                            "time": "1200"
+                        }
+                    }
+                ],
+                "type": "KITCHEN",
+                "weekday_text": [
+                    "Monday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Tuesday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Wednesday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Thursday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Friday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Saturday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Sunday: 11:30 AM – 2:00 PM, 5:00 – 9:00 PM"
+                ]
+            }
+	    ],
         "place_id": "ChIJ4cQcDV2uEmsRMxTEHBIe9ZQ",
         "serves_dinner": true,
         "utc_offset": 660,
@@ -739,10 +796,10 @@ func TestPlaceDetails(t *testing.T) {
 	defer server.Close()
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	placeID := "ChIJ4cQcDV2uEmsRMxTEHBIe9ZQ"
-	fields := []PlaceDetailsFieldMask{PlaceDetailsFieldMaskBusinessStatus, PlaceDetailsFieldMaskDineIn, PlaceDetailsFieldMaskFormattedAddress, PlaceDetailsFieldMaskGeometry, PlaceDetailsFieldMaskName, PlaceDetailsFieldMaskCurrentOpeningHours, PlaceDetailsFieldMaskPlaceID, PlaceDetailsFieldMaskServesDinner, PlaceDetailsFieldMaskUTCOffset, PlaceDetailsFieldMaskWheelchairAccessibleEntrance}
+	fields := []PlaceDetailsFieldMask{PlaceDetailsFieldMaskBusinessStatus, PlaceDetailsFieldMaskDineIn, PlaceDetailsFieldMaskFormattedAddress, PlaceDetailsFieldMaskGeometry, PlaceDetailsFieldMaskName, PlaceDetailsFieldMaskCurrentOpeningHours, PlaceDetailsFieldMaskSecondaryOpeningHours, PlaceDetailsFieldMaskPlaceID, PlaceDetailsFieldMaskServesDinner, PlaceDetailsFieldMaskUTCOffset, PlaceDetailsFieldMaskWheelchairAccessibleEntrance}
 	r := &PlaceDetailsRequest{
 		PlaceID: placeID,
-		Fields: fields,
+		Fields:  fields,
 	}
 
 	resp, err := c.PlaceDetails(context.Background(), r)
@@ -777,6 +834,14 @@ func TestPlaceDetails(t *testing.T) {
 
 	if resp.OpeningHours.Periods[0].Open.Time != "1200" || resp.OpeningHours.Periods[0].Close.Time != "2045" {
 		t.Errorf("OpeningHours.Periods[0].Open.Time or Close.Time incorrect")
+	}
+
+	if resp.SecondaryOpeningHours[0].Periods[0].Open.Day != time.Sunday || resp.OpeningHours.Periods[0].Close.Day != time.Sunday {
+		t.Errorf("SecondaryOpeningHours[0].Periods[0].Open.Day or Close.Day incorrect")
+	}
+
+	if resp.SecondaryOpeningHours[0].Periods[0].Open.Time != "1200" || resp.OpeningHours.Periods[0].Close.Time != "2045" {
+		t.Errorf("SecondaryOpeningHours[0].Periods[0].Open.Time or Close.Time incorrect")
 	}
 
 	weekdayText := "Monday: Closed"
