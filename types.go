@@ -725,6 +725,8 @@ const (
 // PlaceSearchFieldMask.
 func ParsePlaceSearchFieldMask(placeSearchFieldMask string) (PlaceSearchFieldMask, error) {
 	switch strings.ToLower(placeSearchFieldMask) {
+	case "business_status":
+		return PlaceSearchFieldMaskBusinessStatus, nil
 	case "formatted_address":
 		return PlaceSearchFieldMaskFormattedAddress, nil
 	case "geometry":
