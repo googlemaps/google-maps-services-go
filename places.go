@@ -404,7 +404,6 @@ func (r *PlaceDetailsRequest) params() url.Values {
 		q.Set("reviews_no_translations", "true")
 	}
 
-
 	if r.ReviewsSort != "" {
 		q.Set("reviews_sort", r.ReviewsSort)
 	}
@@ -514,7 +513,7 @@ type PlaceDetailsResult struct {
 	// or TAKEOUT) based on the types of the place. This field includes the
 	// special_days subfield of all hours, set for dates that have exceptional
 	// hours.
-	SecondaryOpeningHours *OpeningHours `json:"secondary_opening_hours,omitempty"`
+	SecondaryOpeningHours []OpeningHours `json:"secondary_opening_hours,omitempty"`
 	// PermanentlyClosed is a boolean flag indicating whether the place has permanently
 	// shut down (value true). If the place is not permanently closed, the flag is
 	// absent from the response.
