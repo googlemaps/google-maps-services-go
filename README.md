@@ -16,6 +16,7 @@ Services] to your Go application.
 The Go Client for Google Maps Services is a Go Client library for the following Google Maps
 APIs:
 
+- [Address Validation API]
 - [Directions API]
 - [Distance Matrix API]
 - [Elevation API]
@@ -59,6 +60,7 @@ To get an API key:
  1. Select one of your existing projects, or create a new project.
  1. Enable the API(s) you want to use. The Go Client for Google Maps Services
     accesses the following APIs:
+	- Address Validation API
     - Directions API
     - Distance Matrix API
     - Elevation API
@@ -92,6 +94,7 @@ Additional documentation for the included  web services is available at
 [developers.google.com/maps][Maps documentation] and
 [developers.google.com/places][Places documentation].
 
+- [Address Validation API]
 - [Directions API]
 - [Distance Matrix API]
 - [Elevation API]
@@ -204,6 +207,7 @@ You can also implement your own metric reporter instead of using the provided on
 [Places documentation]: https://developers.google.com/places/
 
 [Google Maps API Web Services]: https://developers.google.com/maps/apis-by-platform#web_service_apis
+[Address Validation API]: https://developers.google.com/maps/documentation/address-validation/
 [Directions API]: https://developers.google.com/maps/documentation/directions/
 [directions-client-id]: https://developers.google.com/maps/documentation/directions/get-api-key#client-id
 [directions-key]: https://developers.google.com/maps/documentation/directions/get-api-key#key
