@@ -2,7 +2,7 @@ Go Client for Google Maps Services
 ==================================
 
 [![Build Status](https://travis-ci.org/googlemaps/google-maps-services-go.svg?branch=master)](https://travis-ci.org/googlemaps/google-maps-services-go)
-[![GoDoc](https://godoc.org/googlemaps.github.io/maps?status.svg)](https://godoc.org/googlemaps.github.io/maps)
+[![GoDoc](https://godoc.org/github.com/robin-samuel/maps?status.svg)](https://godoc.org/github.com/robin-samuel/maps)
 [![Go Report Card](https://goreportcard.com/badge/github.com/googlemaps/google-maps-services-go)](https://goreportcard.com/report/github.com/googlemaps/google-maps-services-go)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/googlemaps/google-maps-services-go)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -83,12 +83,12 @@ For even more information, see the guide to [API keys][apikey].
 To install the Go Client for Google Maps Services, please execute the following `go get` command.
 
 ```bash
-go get googlemaps.github.io/maps
+go get github.com/robin-samuel/maps
 ```
 
 ## Developer Documentation
 
-View the [reference documentation](https://godoc.org/googlemaps.github.io/maps)
+View the [reference documentation](https://godoc.org/github.com/robin-samuel/maps)
 
 Additional documentation for the included  web services is available at
 [developers.google.com/maps][Maps documentation] and
@@ -116,7 +116,7 @@ import (
 	"log"
 
 	"github.com/kr/pretty"
-	"googlemaps.github.io/maps"
+	"github.com/robin-samuel/maps"
 )
 
 func main() {
@@ -153,7 +153,7 @@ import (
 	"log"
 
 	"github.com/kr/pretty"
-	"googlemaps.github.io/maps"
+	"github.com/robin-samuel/maps"
 )
 
 func main() {

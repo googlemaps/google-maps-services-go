@@ -24,7 +24,7 @@ import (
 	"os"
 
 	"github.com/kr/pretty"
-	"googlemaps.github.io/maps"
+	"github.com/robin-samuel/maps"
 )
 
 var (

@@ -24,7 +24,7 @@ import (
 	"log"
 	"os"
 
-	"googlemaps.github.io/maps"
+	"github.com/robin-samuel/maps"
 )
 
 var (
