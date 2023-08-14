@@ -41,7 +41,7 @@ func (c *Client) ValidateAddress(ctx context.Context, r *AddressValidationReques
 		AddressValidationResult
 		ErrorResponse
 	}
-	if err := c.getJSON(ctx, addressValidationAPI, r, &response); err != nil {
+	if err := c.postJSON(ctx, addressValidationAPI, r, &response); err != nil {
 		return nil, err
 	}
 
