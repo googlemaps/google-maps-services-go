@@ -277,6 +277,7 @@ const (
 	PlaceTypeRoofingContractor     = PlaceType("roofing_contractor")
 	PlaceTypeRvPark                = PlaceType("rv_park")
 	PlaceTypeSchool                = PlaceType("school")
+	PlaceTypeSecondarySchool       = PlaceType("secondary_school")
 	PlaceTypeShoeStore             = PlaceType("shoe_store")
 	PlaceTypeShoppingMall          = PlaceType("shopping_mall")
 	PlaceTypeSpa                   = PlaceType("spa")
@@ -455,6 +456,8 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypeRvPark, nil
 	case "school":
 		return PlaceTypeSchool, nil
+	case "secondary_school":
+		return PlaceTypeSecondarySchool, nil
 	case "shoe_store":
 		return PlaceTypeShoeStore, nil
 	case "shopping_mall":
