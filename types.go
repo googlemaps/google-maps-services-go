@@ -229,6 +229,7 @@ const (
 	PlaceTypeDentist               = PlaceType("dentist")
 	PlaceTypeDepartmentStore       = PlaceType("department_store")
 	PlaceTypeDoctor                = PlaceType("doctor")
+	PlaceTypeDrugstore             = PlaceType("drugstore")
 	PlaceTypeElectrician           = PlaceType("electrician")
 	PlaceTypeElectronicsStore      = PlaceType("electronics_store")
 	PlaceTypeEmbassy               = PlaceType("embassy")
@@ -248,6 +249,7 @@ const (
 	PlaceTypeLaundry               = PlaceType("laundry")
 	PlaceTypeLawyer                = PlaceType("lawyer")
 	PlaceTypeLibrary               = PlaceType("library")
+	PlaceTypeLightRailStation      = PlaceType("light_rail_station")
 	PlaceTypeLiquorStore           = PlaceType("liquor_store")
 	PlaceTypeLocalGovernmentOffice = PlaceType("local_government_office")
 	PlaceTypeLocksmith             = PlaceType("locksmith")
@@ -269,11 +271,13 @@ const (
 	PlaceTypePlumber               = PlaceType("plumber")
 	PlaceTypePolice                = PlaceType("police")
 	PlaceTypePostOffice            = PlaceType("post_office")
+	PlaceTypePrimarySchool         = PlaceType("primary_school")
 	PlaceTypeRealEstateAgency      = PlaceType("real_estate_agency")
 	PlaceTypeRestaurant            = PlaceType("restaurant")
 	PlaceTypeRoofingContractor     = PlaceType("roofing_contractor")
 	PlaceTypeRvPark                = PlaceType("rv_park")
 	PlaceTypeSchool                = PlaceType("school")
+	PlaceTypeSecondarySchool       = PlaceType("secondary_school")
 	PlaceTypeShoeStore             = PlaceType("shoe_store")
 	PlaceTypeShoppingMall          = PlaceType("shopping_mall")
 	PlaceTypeSpa                   = PlaceType("spa")
@@ -284,7 +288,9 @@ const (
 	PlaceTypeSupermarket           = PlaceType("supermarket")
 	PlaceTypeSynagogue             = PlaceType("synagogue")
 	PlaceTypeTaxiStand             = PlaceType("taxi_stand")
+	PlaceTypeTouristAttraction     = PlaceType("tourist_attraction")
 	PlaceTypeTrainStation          = PlaceType("train_station")
+	PlaceTypeTransitStation        = PlaceType("transit_station")
 	PlaceTypeTravelAgency          = PlaceType("travel_agency")
 	PlaceTypeUniversity            = PlaceType("university")
 	PlaceTypeVeterinaryCare        = PlaceType("veterinary_care")
@@ -354,6 +360,8 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypeDepartmentStore, nil
 	case "doctor":
 		return PlaceTypeDoctor, nil
+	case "drugstore":
+		return PlaceTypeDrugstore, nil
 	case "electrician":
 		return PlaceTypeElectrician, nil
 	case "electronics_store":
@@ -392,6 +400,8 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypeLawyer, nil
 	case "library":
 		return PlaceTypeLibrary, nil
+	case "light_rail_station":
+		return PlaceTypeLightRailStation, nil
 	case "liquor_store":
 		return PlaceTypeLiquorStore, nil
 	case "local_government_office":
@@ -434,6 +444,8 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypePolice, nil
 	case "post_office":
 		return PlaceTypePostOffice, nil
+	case "primary_school":
+		return PlaceTypePrimarySchool, nil
 	case "real_estate_agency":
 		return PlaceTypeRealEstateAgency, nil
 	case "restaurant":
@@ -444,6 +456,8 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypeRvPark, nil
 	case "school":
 		return PlaceTypeSchool, nil
+	case "secondary_school":
+		return PlaceTypeSecondarySchool, nil
 	case "shoe_store":
 		return PlaceTypeShoeStore, nil
 	case "shopping_mall":
@@ -464,8 +478,12 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypeSynagogue, nil
 	case "taxi_stand":
 		return PlaceTypeTaxiStand, nil
+	case "tourist_attraction":
+		return PlaceTypeTouristAttraction, nil
 	case "train_station":
 		return PlaceTypeTrainStation, nil
+	case "transit_station":
+		return PlaceTypeTransitStation, nil
 	case "travel_agency":
 		return PlaceTypeTravelAgency, nil
 	case "university":
