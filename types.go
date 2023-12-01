@@ -155,6 +155,17 @@ type Photo struct {
 	HTMLAttributions []string `json:"html_attributions"`
 }
 
+// PlaceEditorialSummary contains a summary of the place. A summary is
+// comprised of a textual overview, and also includes the language code for
+// these if applicable. Summary text must be presented as-is and can not be
+// modified or altered.
+type PlaceEditorialSummary struct {
+	// Language is the language of the previous fields. May not always be present.
+	Language string `json:"language,omitempty"`
+	// Overview is a medium-length textual summary of the place.
+	Overview string `json:"overview,omitempty"`
+}
+
 // Component specifies a key for the parts of a structured address. See
 // https://developers.google.com/maps/documentation/geocoding/intro#ComponentFiltering
 // for more detail.
@@ -218,6 +229,7 @@ const (
 	PlaceTypeDentist               = PlaceType("dentist")
 	PlaceTypeDepartmentStore       = PlaceType("department_store")
 	PlaceTypeDoctor                = PlaceType("doctor")
+	PlaceTypeDrugstore             = PlaceType("drugstore")
 	PlaceTypeElectrician           = PlaceType("electrician")
 	PlaceTypeElectronicsStore      = PlaceType("electronics_store")
 	PlaceTypeEmbassy               = PlaceType("embassy")
@@ -237,6 +249,7 @@ const (
 	PlaceTypeLaundry               = PlaceType("laundry")
 	PlaceTypeLawyer                = PlaceType("lawyer")
 	PlaceTypeLibrary               = PlaceType("library")
+	PlaceTypeLightRailStation      = PlaceType("light_rail_station")
 	PlaceTypeLiquorStore           = PlaceType("liquor_store")
 	PlaceTypeLocalGovernmentOffice = PlaceType("local_government_office")
 	PlaceTypeLocksmith             = PlaceType("locksmith")
@@ -258,11 +271,13 @@ const (
 	PlaceTypePlumber               = PlaceType("plumber")
 	PlaceTypePolice                = PlaceType("police")
 	PlaceTypePostOffice            = PlaceType("post_office")
+	PlaceTypePrimarySchool         = PlaceType("primary_school")
 	PlaceTypeRealEstateAgency      = PlaceType("real_estate_agency")
 	PlaceTypeRestaurant            = PlaceType("restaurant")
 	PlaceTypeRoofingContractor     = PlaceType("roofing_contractor")
 	PlaceTypeRvPark                = PlaceType("rv_park")
 	PlaceTypeSchool                = PlaceType("school")
+	PlaceTypeSecondarySchool       = PlaceType("secondary_school")
 	PlaceTypeShoeStore             = PlaceType("shoe_store")
 	PlaceTypeShoppingMall          = PlaceType("shopping_mall")
 	PlaceTypeSpa                   = PlaceType("spa")
@@ -273,7 +288,9 @@ const (
 	PlaceTypeSupermarket           = PlaceType("supermarket")
 	PlaceTypeSynagogue             = PlaceType("synagogue")
 	PlaceTypeTaxiStand             = PlaceType("taxi_stand")
+	PlaceTypeTouristAttraction     = PlaceType("tourist_attraction")
 	PlaceTypeTrainStation          = PlaceType("train_station")
+	PlaceTypeTransitStation        = PlaceType("transit_station")
 	PlaceTypeTravelAgency          = PlaceType("travel_agency")
 	PlaceTypeUniversity            = PlaceType("university")
 	PlaceTypeVeterinaryCare        = PlaceType("veterinary_care")
@@ -343,6 +360,8 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypeDepartmentStore, nil
 	case "doctor":
 		return PlaceTypeDoctor, nil
+	case "drugstore":
+		return PlaceTypeDrugstore, nil
 	case "electrician":
 		return PlaceTypeElectrician, nil
 	case "electronics_store":
@@ -381,6 +400,8 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypeLawyer, nil
 	case "library":
 		return PlaceTypeLibrary, nil
+	case "light_rail_station":
+		return PlaceTypeLightRailStation, nil
 	case "liquor_store":
 		return PlaceTypeLiquorStore, nil
 	case "local_government_office":
@@ -423,6 +444,8 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypePolice, nil
 	case "post_office":
 		return PlaceTypePostOffice, nil
+	case "primary_school":
+		return PlaceTypePrimarySchool, nil
 	case "real_estate_agency":
 		return PlaceTypeRealEstateAgency, nil
 	case "restaurant":
@@ -433,6 +456,8 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypeRvPark, nil
 	case "school":
 		return PlaceTypeSchool, nil
+	case "secondary_school":
+		return PlaceTypeSecondarySchool, nil
 	case "shoe_store":
 		return PlaceTypeShoeStore, nil
 	case "shopping_mall":
@@ -453,8 +478,12 @@ func ParsePlaceType(placeType string) (PlaceType, error) {
 		return PlaceTypeSynagogue, nil
 	case "taxi_stand":
 		return PlaceTypeTaxiStand, nil
+	case "tourist_attraction":
+		return PlaceTypeTouristAttraction, nil
 	case "train_station":
 		return PlaceTypeTrainStation, nil
+	case "transit_station":
+		return PlaceTypeTransitStation, nil
 	case "travel_agency":
 		return PlaceTypeTravelAgency, nil
 	case "university":
@@ -502,7 +531,7 @@ func ParseAutocompletePlaceType(placeType string) (AutocompletePlaceType, error)
 
 // PlaceDetailsFieldMask allows you to specify which fields are to be returned with
 // a place details request. Please see the following URL for more detail:
-// https://cloud.google.com/maps-platform/user-guide/product-changes/#places
+// https://developers.google.com/maps/documentation/places/web-service/details#fields
 type PlaceDetailsFieldMask string
 
 // The individual Place Details Field Masks.
@@ -510,6 +539,10 @@ const (
 	PlaceDetailsFieldMaskAddressComponent             = PlaceDetailsFieldMask("address_component")
 	PlaceDetailsFieldMaskADRAddress                   = PlaceDetailsFieldMask("adr_address")
 	PlaceDetailsFieldMaskBusinessStatus               = PlaceDetailsFieldMask("business_status")
+	PlaceDetailsFieldMaskCurbsidePickup               = PlaceDetailsFieldMask("curbside_pickup")
+	PlaceDetailsFieldMaskDelivery                     = PlaceDetailsFieldMask("delivery")
+	PlaceDetailsFieldMaskDineIn                       = PlaceDetailsFieldMask("dine_in")
+	PlaceDetailsFieldMaskEditorialSummary             = PlaceDetailsFieldMask("editorial_summary")
 	PlaceDetailsFieldMaskFormattedAddress             = PlaceDetailsFieldMask("formatted_address")
 	PlaceDetailsFieldMaskFormattedPhoneNumber         = PlaceDetailsFieldMask("formatted_phone_number")
 	PlaceDetailsFieldMaskGeometry                     = PlaceDetailsFieldMask("geometry")
@@ -528,18 +561,30 @@ const (
 	PlaceDetailsFieldMaskInternationalPhoneNumber     = PlaceDetailsFieldMask("international_phone_number")
 	PlaceDetailsFieldMaskName                         = PlaceDetailsFieldMask("name")
 	PlaceDetailsFieldMaskOpeningHours                 = PlaceDetailsFieldMask("opening_hours")
+	PlaceDetailsFieldMaskCurrentOpeningHours          = PlaceDetailsFieldMask("current_opening_hours")
+	PlaceDetailsFieldMaskSecondaryOpeningHours        = PlaceDetailsFieldMask("secondary_opening_hours")
 	PlaceDetailsFieldMaskPermanentlyClosed            = PlaceDetailsFieldMask("permanently_closed")
 	PlaceDetailsFieldMaskPhotos                       = PlaceDetailsFieldMask("photos")
 	PlaceDetailsFieldMaskPlaceID                      = PlaceDetailsFieldMask("place_id")
 	PlaceDetailsFieldMaskPriceLevel                   = PlaceDetailsFieldMask("price_level")
 	PlaceDetailsFieldMaskRatings                      = PlaceDetailsFieldMask("rating")
 	PlaceDetailsFieldMaskUserRatingsTotal             = PlaceDetailsFieldMask("user_ratings_total")
+	PlaceDetailsFieldMaskReservable                   = PlaceDetailsFieldMask("reservable")
 	PlaceDetailsFieldMaskReviews                      = PlaceDetailsFieldMask("reviews")
+	PlaceDetailsFieldMaskServesBeer                   = PlaceDetailsFieldMask("serves_beer")
+	PlaceDetailsFieldMaskServesBreakfast              = PlaceDetailsFieldMask("serves_breakfast")
+	PlaceDetailsFieldMaskServesBrunch                 = PlaceDetailsFieldMask("serves_brunch")
+	PlaceDetailsFieldMaskServesDinner                 = PlaceDetailsFieldMask("serves_dinner")
+	PlaceDetailsFieldMaskServesLunch                  = PlaceDetailsFieldMask("serves_lunch")
+	PlaceDetailsFieldMaskServesVegetarianFood         = PlaceDetailsFieldMask("serves_vegetarian_food")
+	PlaceDetailsFieldMaskServesWine                   = PlaceDetailsFieldMask("serves_wine")
+	PlaceDetailsFieldMaskTakeout                      = PlaceDetailsFieldMask("takeout")
 	PlaceDetailsFieldMaskTypes                        = PlaceDetailsFieldMask("types")
 	PlaceDetailsFieldMaskURL                          = PlaceDetailsFieldMask("url")
 	PlaceDetailsFieldMaskUTCOffset                    = PlaceDetailsFieldMask("utc_offset")
 	PlaceDetailsFieldMaskVicinity                     = PlaceDetailsFieldMask("vicinity")
 	PlaceDetailsFieldMaskWebsite                      = PlaceDetailsFieldMask("website")
+	PlaceDetailsFieldMaskWheelchairAccessibleEntrance = PlaceDetailsFieldMask("wheelchair_accessible_entrance")
 )
 
 // ParsePlaceDetailsFieldMask will parse a string representation of
@@ -552,6 +597,14 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskADRAddress, nil
 	case "business_status":
 		return PlaceDetailsFieldMaskBusinessStatus, nil
+	case "curbside_pickup":
+		return PlaceDetailsFieldMaskCurbsidePickup, nil
+	case "delivery":
+		return PlaceDetailsFieldMaskDelivery, nil
+	case "dine_in":
+		return PlaceDetailsFieldMaskDineIn, nil
+	case "editorial_summary":
+		return PlaceDetailsFieldMaskEditorialSummary, nil
 	case "formatted_address":
 		return PlaceDetailsFieldMaskFormattedAddress, nil
 	case "formatted_phone_number":
@@ -588,6 +641,10 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskName, nil
 	case "opening_hours":
 		return PlaceDetailsFieldMaskOpeningHours, nil
+	case "current_opening_hours":
+		return PlaceDetailsFieldMaskCurrentOpeningHours, nil
+	case "secondary_opening_hours":
+		return PlaceDetailsFieldMaskSecondaryOpeningHours, nil
 	case "permanently_closed":
 		return PlaceDetailsFieldMaskPermanentlyClosed, nil
 	case "photos":
@@ -600,8 +657,26 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskRatings, nil
 	case "user_ratings_total":
 		return PlaceDetailsFieldMaskUserRatingsTotal, nil
+	case "reservable":
+		return PlaceDetailsFieldMaskReservable, nil
 	case "reviews":
 		return PlaceDetailsFieldMaskReviews, nil
+	case "serves_beer":
+		return PlaceDetailsFieldMaskServesBeer, nil
+	case "serves_breakfast":
+		return PlaceDetailsFieldMaskServesBreakfast, nil
+	case "serves_brunch":
+		return PlaceDetailsFieldMaskServesBrunch, nil
+	case "serves_dinner":
+		return PlaceDetailsFieldMaskServesDinner, nil
+	case "serves_lunch":
+		return PlaceDetailsFieldMaskServesLunch, nil
+	case "serves_vegetarian_food":
+		return PlaceDetailsFieldMaskServesVegetarianFood, nil
+	case "serves_wine":
+		return PlaceDetailsFieldMaskServesWine, nil
+	case "takeout":
+		return PlaceDetailsFieldMaskTakeout, nil
 	case "types":
 		return PlaceDetailsFieldMaskTypes, nil
 	case "url":
@@ -612,6 +687,8 @@ func ParsePlaceDetailsFieldMask(placeDetailsFieldMask string) (PlaceDetailsField
 		return PlaceDetailsFieldMaskVicinity, nil
 	case "website":
 		return PlaceDetailsFieldMaskWebsite, nil
+	case "wheelchair_accessible_entrance":
+		return PlaceDetailsFieldMaskWheelchairAccessibleEntrance, nil
 	default:
 		return PlaceDetailsFieldMask(""), fmt.Errorf("Unknown PlaceDetailsFieldMask \"%v\"", placeDetailsFieldMask)
 	}
@@ -666,6 +743,8 @@ const (
 // PlaceSearchFieldMask.
 func ParsePlaceSearchFieldMask(placeSearchFieldMask string) (PlaceSearchFieldMask, error) {
 	switch strings.ToLower(placeSearchFieldMask) {
+	case "business_status":
+		return PlaceSearchFieldMaskBusinessStatus, nil
 	case "formatted_address":
 		return PlaceSearchFieldMaskFormattedAddress, nil
 	case "geometry":

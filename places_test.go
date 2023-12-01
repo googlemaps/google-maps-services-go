@@ -651,59 +651,145 @@ func TestPlaceAutocompleteWithStructuredFormatting(t *testing.T) {
 func TestPlaceDetails(t *testing.T) {
 	response := `
 {
-   "html_attributions" : [],
-   "result" : {
-      "address_components" : [],
-      "formatted_address" : "3, Overseas Passenger Terminal, George St & Argyle Street, The Rocks NSW 2000, Australia",
-      "formatted_phone_number" : "(02) 9251 5600",
-      "geometry" : {
-         "location" : {
-            "lat" : -33.858018,
-            "lng" : 151.210091
-         }
-      },
-      "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/restaurant-71.png",
-      "international_phone_number" : "+61 2 9251 5600",
-      "name" : "Quay",
-      "opening_hours" : {
-         "open_now" : true,
-         "periods" : [
-            {
-               "close" : {
-                  "day" : 1,
-                  "time" : "1700"
-               },
-               "open" : {
-                  "day" : 1,
-                  "time" : "1330"
-               }
+    "html_attributions": [],
+    "result": {
+        "business_status": "OPERATIONAL",
+        "dine_in": true,
+        "formatted_address": "Upper Level Overseas Passenger Terminal, The Rocks NSW 2000, Australia",
+        "geometry": {
+            "location": {
+                "lat": -33.85756870000001,
+                "lng": 151.2100844
+            },
+            "viewport": {
+                "northeast": {
+                    "lat": -33.8561714197085,
+                    "lng": 151.2113682802915
+                },
+                "southwest": {
+                    "lat": -33.85886938029149,
+                    "lng": 151.2086703197085
+                }
             }
-         ],
-         "weekday_text" : [
-            "Monday: 1:30 – 5:00 pm"
-         ]
-      },
-      "photos" : [
-         {
-            "height" : 612,
-            "html_attributions" : [
-               "\u003ca href=\"https://maps.google.com/maps/contrib/107255044321733286691\"\u003eFrom a Google User\u003c/a\u003e"
+        },
+        "name": "Quay Restaurant",
+        "opening_hours": {
+            "open_now": false,
+            "periods": [
+                {
+                    "close": {
+                        "day": 0,
+                        "time": "2045"
+                    },
+                    "open": {
+                        "day": 0,
+                        "time": "1200"
+                    }
+                },
+                {
+                    "close": {
+                        "day": 4,
+                        "time": "2045"
+                    },
+                    "open": {
+                        "day": 4,
+                        "time": "1800"
+                    }
+                },
+                {
+                    "close": {
+                        "day": 5,
+                        "time": "2045"
+                    },
+                    "open": {
+                        "day": 5,
+                        "time": "1800"
+                    }
+                },
+                {
+                    "close": {
+                        "day": 6,
+                        "time": "2045"
+                    },
+                    "open": {
+                        "day": 6,
+                        "time": "1200"
+                    }
+                }
             ],
-            "photo_reference" : "CmRdAAAAm1qTaarpM_sUatFI7JxjwxVTgKCGSjz62q_vHpNMoZDP3PpBHGW-rAHQEEprl_c1MyvXFhvZb2mXj8yhKvnEMsSveb-cMuDaDgS7LS8sPPrMrt5s_Mx0G0ereom3j6KxEhAkaQH1_nWxpl4W2mFZ1CKoGhQV_Jx9MIn0skBS3tRAuIFzgHARww",
+            "weekday_text": [
+                "Monday: Closed",
+                "Tuesday: Closed",
+                "Wednesday: Closed",
+                "Thursday: 6:00 – 8:45 PM",
+                "Friday: 6:00 – 8:45 PM",
+                "Saturday: 12:00 – 8:45 PM",
+                "Sunday: 12:00 – 8:45 PM"
+            ]
+        },
+		"secondary_opening_hours": [
+            {
+                "open_now": true,
+                "periods": [
+                    {
+                        "close": {
+                            "day": 0,
+                            "time": "2045"
+                        },
+                        "open": {
+                            "day": 0,
+                            "time": "1200"
+                        }
+                    },
+                    {
+                        "close": {
+                            "day": 4,
+                            "time": "2045"
+                        },
+                        "open": {
+                            "day": 4,
+                            "time": "1800"
+                        }
+                    },
+                    {
+                        "close": {
+                            "day": 5,
+                            "time": "2045"
+                        },
+                        "open": {
+                            "day": 5,
+                            "time": "1800"
+                        }
+                    },
+                    {
+                        "close": {
+                            "day": 6,
+                            "time": "2045"
+                        },
+                        "open": {
+                            "day": 6,
+                            "time": "1200"
+                        }
+                    }
+                ],
+                "type": "KITCHEN",
+                "weekday_text": [
+                    "Monday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Tuesday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Wednesday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Thursday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Friday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Saturday: 11:30 AM – 2:00 PM, 5:00 – 10:00 PM",
+                    "Sunday: 11:30 AM – 2:00 PM, 5:00 – 9:00 PM"
+                ]
+            }
+	    ],
+      "photo_reference" : "CmRdAAAAm1qTaarpM_sUatFI7JxjwxVTgKCGSjz62q_vHpNMoZDP3PpBHGW-rAHQEEprl_c1MyvXFhvZb2mXj8yhKvnEMsSveb-cMuDaDgS7LS8sPPrMrt5s_Mx0G0ereom3j6KxEhAkaQH1_nWxpl4W2mFZ1CKoGhQV_Jx9MIn0skBS3tRAuIFzgHARww",
             "width" : 816
          }
       ],
-      "place_id" : "ChIJ02qnq0KuEmsRHUJF4zo1x4I",
+      "place_id": "ChIJ4cQcDV2uEmsRMxTEHBIe9ZQ",
       "price_level" : 4,
-      "rating" : 4.1,
-      "reviews" : [
-         {
-            "aspects" : [
-               {
-                  "rating" : 1,
-                  "type" : "overall"
-               }
-			],
 			"profile_photo_url": "https://lh3.googleusercontent.com/-EXtIWgDBHgs/AAAAAAAAAAI/AAAAAAAAAAA/AIcfdXCXHH76RsCp2i2B0qjO1WngDfIrQQ/s120-p-rw-no-mo/photo.jpg",
             "author_name" : "Rachel Lewis",
             "author_url" : "https://plus.google.com/114299517944848975298",
@@ -714,22 +800,35 @@ func TestPlaceDetails(t *testing.T) {
             "time" : 1441848853
          }
       ],
+      "rating" : 4.1,
+      "reviews" : [
+         {
+            "aspects" : [
+               {
+                  "rating" : 1,
+                  "type" : "overall"
+               }
+			],
+      "serves_dinner": true,
       "types" : [ "restaurant", "food", "point_of_interest", "establishment" ],
       "url" : "https://plus.google.com/105746337161979416551/about?hl=en-US",
       "user_ratings_total" : 275,
       "utc_offset" : 660,
       "vicinity" : "3 Overseas Passenger Terminal, George Street, The Rocks",
-      "website" : "http://www.quay.com.au/"
-   },
-   "status" : "OK"
+      "website" : "http://www.quay.com.au/",
+      "wheelchair_accessible_entrance": true,
+    },
+    "status": "OK"
 }
 `
 	server := mockServer(200, response)
 	defer server.Close()
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
-	placeID := "ChIJ02qnq0KuEmsRHUJF4zo1x4I"
+	placeID := "ChIJ4cQcDV2uEmsRMxTEHBIe9ZQ"
+	fields := []PlaceDetailsFieldMask{PlaceDetailsFieldMaskBusinessStatus, PlaceDetailsFieldMaskDineIn, PlaceDetailsFieldMaskFormattedAddress, PlaceDetailsFieldMaskGeometry, PlaceDetailsFieldMaskName, PlaceDetailsFieldMaskCurrentOpeningHours, PlaceDetailsFieldMaskSecondaryOpeningHours, PlaceDetailsFieldMaskPlaceID, PlaceDetailsFieldMaskServesDinner, PlaceDetailsFieldMaskUTCOffset, PlaceDetailsFieldMaskWheelchairAccessibleEntrance}
 	r := &PlaceDetailsRequest{
 		PlaceID: placeID,
+		Fields:  fields,
 	}
 
 	resp, err := c.PlaceDetails(context.Background(), r)
@@ -739,48 +838,42 @@ func TestPlaceDetails(t *testing.T) {
 		return
 	}
 
-	formattedAddress := "3, Overseas Passenger Terminal, George St & Argyle Street, The Rocks NSW 2000, Australia"
+	businessStatus := "OPERATIONAL"
+	if businessStatus != resp.BusinessStatus {
+		t.Errorf("expected %+v, was %+v", businessStatus, resp.BusinessStatus)
+	}
+
+	if !*&resp.DineIn {
+		t.Errorf("Expected DineIn to be true")
+	}
+
+	formattedAddress := "Upper Level Overseas Passenger Terminal, The Rocks NSW 2000, Australia"
 	if formattedAddress != resp.FormattedAddress {
 		t.Errorf("expected %+v, was %+v", formattedAddress, resp.FormattedAddress)
 	}
 
-	formattedPhoneNumber := "(02) 9251 5600"
-	if formattedPhoneNumber != resp.FormattedPhoneNumber {
-		t.Errorf("expected %+v, was %+v", formattedPhoneNumber, resp.FormattedPhoneNumber)
-	}
-
-	icon := "https://maps.gstatic.com/mapfiles/place_api/icons/restaurant-71.png"
-	if icon != resp.Icon {
-		t.Errorf("expected %+v, was %+v", icon, resp.Icon)
-	}
-
-	internationalPhoneNumber := "+61 2 9251 5600"
-	if internationalPhoneNumber != resp.InternationalPhoneNumber {
-		t.Errorf("expected %+v, was %+v", internationalPhoneNumber, resp.InternationalPhoneNumber)
-	}
-
-	name := "Quay"
+	name := "Quay Restaurant"
 	if name != resp.Name {
 		t.Errorf("expected %+v, was %+v", name, resp.Name)
 	}
 
-	if !*resp.OpeningHours.OpenNow {
-		t.Errorf("Expected OpenNow to be true")
-	}
-
-	if *resp.UTCOffset != 660 {
-		t.Errorf("Expected UTCOffset to be 660")
-	}
-
-	if resp.OpeningHours.Periods[0].Open.Day != time.Monday || resp.OpeningHours.Periods[0].Close.Day != time.Monday {
+	if resp.OpeningHours.Periods[0].Open.Day != time.Sunday || resp.OpeningHours.Periods[0].Close.Day != time.Sunday {
 		t.Errorf("OpeningHours.Periods[0].Open.Day or Close.Day incorrect")
 	}
 
-	if resp.OpeningHours.Periods[0].Open.Time != "1330" || resp.OpeningHours.Periods[0].Close.Time != "1700" {
+	if resp.OpeningHours.Periods[0].Open.Time != "1200" || resp.OpeningHours.Periods[0].Close.Time != "2045" {
 		t.Errorf("OpeningHours.Periods[0].Open.Time or Close.Time incorrect")
 	}
 
-	weekdayText := "Monday: 1:30 – 5:00 pm"
+	if resp.SecondaryOpeningHours[0].Periods[0].Open.Day != time.Sunday || resp.OpeningHours.Periods[0].Close.Day != time.Sunday {
+		t.Errorf("SecondaryOpeningHours[0].Periods[0].Open.Day or Close.Day incorrect")
+	}
+
+	if resp.SecondaryOpeningHours[0].Periods[0].Open.Time != "1200" || resp.OpeningHours.Periods[0].Close.Time != "2045" {
+		t.Errorf("SecondaryOpeningHours[0].Periods[0].Open.Time or Close.Time incorrect")
+	}
+
+	weekdayText := "Monday: Closed"
 	if weekdayText != resp.OpeningHours.WeekdayText[0] {
 		t.Errorf("expected %+v, was %+v", weekdayText, resp.OpeningHours.WeekdayText[0])
 	}
@@ -788,95 +881,19 @@ func TestPlaceDetails(t *testing.T) {
 	if placeID != resp.PlaceID {
 		t.Errorf("expected %+v, was %+v", placeID, resp.PlaceID)
 	}
-
-	authorName := "Rachel Lewis"
-	if authorName != resp.Reviews[0].AuthorName {
-		t.Errorf("expected %+v, was %+v", authorName, resp.Reviews[0].AuthorName)
+  
+	if !*&resp.ServesDinner {
+		t.Errorf("Expected ServesDinner to be true")
 	}
 
-	authorProfilePhoto := "https://lh3.googleusercontent.com/-EXtIWgDBHgs/AAAAAAAAAAI/AAAAAAAAAAA/AIcfdXCXHH76RsCp2i2B0qjO1WngDfIrQQ/s120-p-rw-no-mo/photo.jpg"
-	if authorProfilePhoto != resp.Reviews[0].AuthorProfilePhoto {
-		t.Errorf("expected %+v, was %+v", authorProfilePhoto, resp.Reviews[0].AuthorProfilePhoto)
+	if *resp.UTCOffset != 660 {
+		t.Errorf("Expected UTCOffset to be 660")
 	}
 
-	authorURL := "https://plus.google.com/114299517944848975298"
-	if authorURL != resp.Reviews[0].AuthorURL {
-		t.Errorf("expected %+v, was %+v", authorURL, resp.Reviews[0].AuthorURL)
+	if !*&resp.WheelchairAccessibleEntrance {
+		t.Errorf("Expected WheelchairAccessibleEntrance to be true")
 	}
 
-	language := "en"
-	if language != resp.Reviews[0].Language {
-		t.Errorf("expected %+v, was %+v", language, resp.Reviews[0].Language)
-	}
-
-	rating := 3
-	if rating != resp.Reviews[0].Rating {
-		t.Errorf("expected %+v, was %+v", rating, resp.Reviews[0].Rating)
-	}
-
-	relativeTimeDescription := "10 months ago"
-	if relativeTimeDescription != resp.Reviews[0].RelativeTimeDescription {
-		t.Errorf("expected %+v, was %+v", relativeTimeDescription, resp.Reviews[0].RelativeTimeDescription)
-	}
-
-	text := "Overall disappointing. This is the second time i've been there and my experience was... Nothing to nibble on for 45 mins and then the bread came. My first entree was the marron which I thought was tasteless - perhaps others would say delicate? but there you go. The XO sea was fantastic. I chose the  vegetarian main dish which was all about the texture which was great but nothing at all outstanding about the dish. My husband and daughter chose the duck for their main course it was the smallest main course i've ever seen - their faces were priceless when it arrived!. Snow egg was beautiful but the granita on the bottom had some solid chunks of hard ice. The service was quite good..."
-	if text != resp.Reviews[0].Text {
-		t.Errorf("expected %+v, was %+v", text, resp.Reviews[0].Text)
-	}
-
-	time := 1441848853
-	if time != resp.Reviews[0].Time {
-		t.Errorf("expected %+v, was %+v", time, resp.Reviews[0].Time)
-	}
-}
-
-func TestPlaceDetailsUTCOffsetAbsent(t *testing.T) {
-	response := `
-{
-   "html_attributions" : [],
-   "result" : {
-      "address_components" : [],
-      "formatted_address" : "3, Overseas Passenger Terminal, George St & Argyle Street, The Rocks NSW 2000, Australia",
-      "formatted_phone_number" : "(02) 9251 5600",
-      "geometry" : {
-         "location" : {
-            "lat" : -33.858018,
-            "lng" : 151.210091
-         }
-      },
-      "icon" : "https://maps.gstatic.com/mapfiles/place_api/icons/restaurant-71.png",
-      "international_phone_number" : "+61 2 9251 5600",
-      "name" : "Quay",
-      "place_id" : "ChIJ02qnq0KuEmsRHUJF4zo1x4I",
-      "price_level" : 4,
-      "rating" : 4.1,
-      "types" : [ "restaurant", "food", "point_of_interest", "establishment" ],
-      "url" : "https://plus.google.com/105746337161979416551/about?hl=en-US",
-      "user_ratings_total" : 275,
-      "vicinity" : "3 Overseas Passenger Terminal, George Street, The Rocks",
-      "website" : "http://www.quay.com.au/"
-   },
-   "status" : "OK"
-}
-`
-	server := mockServer(200, response)
-	defer server.Close()
-	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
-	placeID := "ChIJ02qnq0KuEmsRHUJF4zo1x4I"
-	r := &PlaceDetailsRequest{
-		PlaceID: placeID,
-	}
-
-	resp, err := c.PlaceDetails(context.Background(), r)
-
-	if err != nil {
-		t.Errorf("r.Get returned non nil error: %v", err)
-		return
-	}
-
-	if resp.UTCOffset != nil {
-		t.Errorf("Expected UTCOffset to be nil")
-	}
 }
 
 func TestPlaceDetailsMissingPlaceID(t *testing.T) {
@@ -892,33 +909,6 @@ func TestPlaceDetailsMissingPlaceID(t *testing.T) {
 	if "maps: PlaceID missing" != err.Error() {
 		t.Errorf("Wrong error returned \"%v\"", err)
 	}
-}
-
-func TestPlacePhoto(t *testing.T) {
-	photoReference := "ThisIsNotAPhotoReference"
-	expectedQuery := "key=AIzaNotReallyAnAPIKey&maxheight=400&maxwidth=400&photoreference=ThisIsNotAPhotoReference"
-
-	server := mockServerForQuery(expectedQuery, 200, "An Image?")
-	defer server.s.Close()
-
-	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
-
-	r := &PlacePhotoRequest{
-		PhotoReference: photoReference,
-		MaxHeight:      400,
-		MaxWidth:       400,
-	}
-
-	_, err := c.PlacePhoto(context.Background(), r)
-
-	if err != nil {
-		t.Errorf("Unexpected error in constructing request URL: %+v", err)
-	}
-
-	if server.successful != 1 {
-		t.Errorf("Got URL(s) %v, want %s", server.failed, expectedQuery)
-	}
-
 }
 
 func TestPlacePhotoMissingPhotoReference(t *testing.T) {
@@ -1114,7 +1104,7 @@ func TestPlaceAutocompleteJsonMarshalLowerCase(t *testing.T) {
 
 func TestFindPlaceFromText(t *testing.T) {
 	expectedQuery := "fields=photos%2Cformatted_address%2Cname%2Copening_hours%2Crating&input=mongolian+grill&inputtype=textquery&key=AIzaNotReallyAnAPIKey&locationbias=circle%3A2000%4047.6918452%2C-122.2226413"
-	response := `	
+	response := `
 {
 	"candidates" : [
 	   {

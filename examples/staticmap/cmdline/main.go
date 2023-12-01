@@ -37,6 +37,7 @@ var (
 	scale     = flag.Int("scale", -1, "Scale affects the number of pixels that are returned.")
 	format    = flag.String("format", "", "Format defines the format of the resulting image.")
 	maptype   = flag.String("maptype", "", "Maptype defines the type of map to construct.")
+	mapid     = flag.String("mapid", "", "MapId defines the mapid to use.")
 	language  = flag.String("language", "", "Language defines the language to use for display of labels on map tiles.")
 	region    = flag.String("region", "", "Region the appropriate borders to display, based on geo-political sensitivities.")
 )
@@ -81,6 +82,7 @@ func main() {
 		Language: *language,
 		Region:   *region,
 		MapType:  maps.MapType(*maptype),
+		MapId:    *mapid,
 	}
 
 	resp, err := client.StaticMap(context.Background(), r)
