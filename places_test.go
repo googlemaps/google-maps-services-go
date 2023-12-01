@@ -727,7 +727,7 @@ func TestPlaceDetails(t *testing.T) {
                 "Sunday: 12:00 – 8:45 PM"
             ]
         },
-		"secondary_opening_hours": [
+	"secondary_opening_hours": [
             {
                 "open_now": true,
                 "periods": [
@@ -784,39 +784,10 @@ func TestPlaceDetails(t *testing.T) {
                 ]
             }
 	    ],
-      "photo_reference" : "CmRdAAAAm1qTaarpM_sUatFI7JxjwxVTgKCGSjz62q_vHpNMoZDP3PpBHGW-rAHQEEprl_c1MyvXFhvZb2mXj8yhKvnEMsSveb-cMuDaDgS7LS8sPPrMrt5s_Mx0G0ereom3j6KxEhAkaQH1_nWxpl4W2mFZ1CKoGhQV_Jx9MIn0skBS3tRAuIFzgHARww",
-            "width" : 816
-         }
-      ],
-      "place_id": "ChIJ4cQcDV2uEmsRMxTEHBIe9ZQ",
-      "price_level" : 4,
-			"profile_photo_url": "https://lh3.googleusercontent.com/-EXtIWgDBHgs/AAAAAAAAAAI/AAAAAAAAAAA/AIcfdXCXHH76RsCp2i2B0qjO1WngDfIrQQ/s120-p-rw-no-mo/photo.jpg",
-            "author_name" : "Rachel Lewis",
-            "author_url" : "https://plus.google.com/114299517944848975298",
-            "language" : "en",
-            "rating" : 3,
-						"relative_time_description" : "10 months ago",
-            "text" : "Overall disappointing. This is the second time i've been there and my experience was... Nothing to nibble on for 45 mins and then the bread came. My first entree was the marron which I thought was tasteless - perhaps others would say delicate? but there you go. The XO sea was fantastic. I chose the  vegetarian main dish which was all about the texture which was great but nothing at all outstanding about the dish. My husband and daughter chose the duck for their main course it was the smallest main course i've ever seen - their faces were priceless when it arrived!. Snow egg was beautiful but the granita on the bottom had some solid chunks of hard ice. The service was quite good...",
-            "time" : 1441848853
-         }
-      ],
-      "rating" : 4.1,
-      "reviews" : [
-         {
-            "aspects" : [
-               {
-                  "rating" : 1,
-                  "type" : "overall"
-               }
-			],
-      "serves_dinner": true,
-      "types" : [ "restaurant", "food", "point_of_interest", "establishment" ],
-      "url" : "https://plus.google.com/105746337161979416551/about?hl=en-US",
-      "user_ratings_total" : 275,
-      "utc_offset" : 660,
-      "vicinity" : "3 Overseas Passenger Terminal, George Street, The Rocks",
-      "website" : "http://www.quay.com.au/",
-      "wheelchair_accessible_entrance": true,
+        "place_id": "ChIJ4cQcDV2uEmsRMxTEHBIe9ZQ",
+        "serves_dinner": true,
+        "utc_offset": 660,
+        "wheelchair_accessible_entrance": true
     },
     "status": "OK"
 }
