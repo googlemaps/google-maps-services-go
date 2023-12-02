@@ -127,7 +127,7 @@ If you find a bug, or have a feature request, please [file an issue][issues] on 
 
 You can also discuss this library on our [Discord server](https://discord.gg/hYsWbmk).
 
-[API key]: [https://developers.google.com/maps/faq#keysystem](https://developers.google.com/maps/documentation/places/web-service/get-api-key)
+[API key]: https://developers.google.com/maps/documentation/places/web-service/get-api-key
 
 [Google Maps Platform Web Services APIs]: https://developers.google.com/maps/apis-by-platform#web_service_apis
 [Directions API]: https://developers.google.com/maps/documentation/directions/
