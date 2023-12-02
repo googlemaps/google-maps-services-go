@@ -599,6 +599,9 @@ type PlaceReview struct {
 	// Rating the user's overall rating for this place. This is a whole number, ranging
 	// from 1 to 5.
 	Rating int `json:"rating,omitempty"`
+	// RelativeTimeDescription the time that the review was submitted in text, relative
+	// to the current time.
+	RelativeTimeDescription string `json:"relative_time_description,omitempty"`
 	// Text is the user's review. When reviewing a location with Google Places, text
 	// reviews are considered optional. Therefore, this field may by empty. Note that
 	// this field may include simple HTML markup.

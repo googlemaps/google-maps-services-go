@@ -727,7 +727,7 @@ func TestPlaceDetails(t *testing.T) {
                 "Sunday: 12:00 – 8:45 PM"
             ]
         },
-		"secondary_opening_hours": [
+	"secondary_opening_hours": [
             {
                 "open_now": true,
                 "periods": [
@@ -852,7 +852,7 @@ func TestPlaceDetails(t *testing.T) {
 	if placeID != resp.PlaceID {
 		t.Errorf("expected %+v, was %+v", placeID, resp.PlaceID)
 	}
-
+  
 	if !*&resp.ServesDinner {
 		t.Errorf("Expected ServesDinner to be true")
 	}
