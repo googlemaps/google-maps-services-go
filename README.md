@@ -90,6 +90,37 @@ func main() {
 }
 ```
 
+Sample usage of the Geocoding API with an API key to get an [Address Descriptor](https://mapsplatform.google.com/demos/address-descriptors/):
+
+```go
+package main
+
+import (
+	"context"
+	"log"
+
+	"github.com/kr/pretty"
+	"googlemaps.github.io/maps"
+)
+
+func main() {
+	c, err := maps.NewClient(maps.WithAPIKey("Insert-API-Key-Here"))
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+	r := &maps.GeocodingRequest{
+		LatLng: &LatLng{Lat: 40.714224, Lng: -73.961452},
+		EnableAddressDescriptor: True
+	}
+	reverseGeocodingResponse, _, err := c.ReverseGeocode(context.Background(), r)
+	if err != nil {
+		log.Fatalf("fatal error: %s", err)
+	}
+
+	pretty.Println(reverseGeocodingResponse)
+}
+```
+
 ## Features
 
 ### Rate limiting
