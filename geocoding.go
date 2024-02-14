@@ -34,7 +34,7 @@ var geocodingAPI = &apiConfig{
 // Geocode makes a Geocoding API request
 func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) (GeocodingResponse, error) {
 	if r.Address == "" && len(r.Components) == 0 && r.LatLng == nil {
-		return nil, errors.New("maps: address, components and LatLng are all missing")
+		return GeocodingResponse{}, errors.New("maps: address, components and LatLng are all missing")
 	}
 
 	var response struct {
@@ -50,14 +50,14 @@ func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) (GeocodingRes
 		return GeocodingResponse{}, err
 	}
 
-	return GeocodingResponse{response.Results},, nil
+	return GeocodingResponse{response.Results, AddressDescriptor{}}, nil
 }
 
 // ReverseGeocode makes a Reverse Geocoding API request
 func (c *Client) ReverseGeocode(ctx context.Context, r *GeocodingRequest) (GeocodingResponse, error) {
 	// Since Geocode() does not allow a nil LatLng, whereas it is allowed here
 	if r.LatLng == nil && r.PlaceID == "" {
-		return nil, errors.New("maps: LatLng and PlaceID are both missing")
+		return GeocodingResponse{}, errors.New("maps: LatLng and PlaceID are both missing")
 	}
 
 	var response struct {

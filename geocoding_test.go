@@ -127,69 +127,71 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 
 	resp, err := c.Geocode(context.Background(), r)
 
-	if len(resp) != 1 {
-		t.Errorf("Expected length of response is 1, was %+v", len(resp))
+	if len(resp.Results) != 1 {
+		t.Errorf("Expected length of response is 1, was %+v", len(resp.Results))
 	}
 	if err != nil {
 		t.Errorf("r.Get returned non nil error: %v", err)
 	}
 
 	correctResponse := GeocodingResponse{
-		Results: GeocodingResult{
-			AddressComponents: []AddressComponent{
-				{
-					LongName:  "1600",
-					ShortName: "1600",
-					Types:     []string{"street_number"},
+		Results: []GeocodingResult{
+			{
+				AddressComponents: []AddressComponent{
+					{
+						LongName:  "1600",
+						ShortName: "1600",
+						Types:     []string{"street_number"},
+					},
+					{
+						LongName:  "Amphitheatre Pkwy",
+						ShortName: "Amphitheatre Pkwy",
+						Types:     []string{"route"},
+					},
+					{
+						LongName:  "Mountain View",
+						ShortName: "Mountain View",
+						Types:     []string{"locality", "political"},
+					},
+					{
+						LongName:  "Santa Clara County",
+						ShortName: "Santa Clara County",
+						Types:     []string{"administrative_area_level_2", "political"},
+					},
+					{
+						LongName:  "California",
+						ShortName: "CA",
+						Types:     []string{"administrative_area_level_1", "political"},
+					},
+					{
+						LongName:  "United States",
+						ShortName: "US",
+						Types:     []string{"country", "political"},
+					},
+					{
+						LongName:  "94043",
+						ShortName: "94043",
+						Types:     []string{"postal_code"},
+					},
 				},
-				{
-					LongName:  "Amphitheatre Pkwy",
-					ShortName: "Amphitheatre Pkwy",
-					Types:     []string{"route"},
+				FormattedAddress: "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+				Geometry: AddressGeometry{
+					Location: LatLng{Lat: 37.4224764, Lng: -122.0842499},
+					Bounds: LatLngBounds{
+						NorthEast: LatLng{Lat: 37.4238253802915, Lng: -122.0829009197085},
+						SouthWest: LatLng{Lat: 37.4211274197085, Lng: -122.0855988802915},
+					},
+					LocationType: "ROOFTOP",
+					Viewport: LatLngBounds{
+						NorthEast: LatLng{Lat: 37.4238253802915, Lng: -122.0829009197085},
+						SouthWest: LatLng{Lat: 37.4211274197085, Lng: -122.0855988802915},
+					},
+					Types: nil,
 				},
-				{
-					LongName:  "Mountain View",
-					ShortName: "Mountain View",
-					Types:     []string{"locality", "political"},
-				},
-				{
-					LongName:  "Santa Clara County",
-					ShortName: "Santa Clara County",
-					Types:     []string{"administrative_area_level_2", "political"},
-				},
-				{
-					LongName:  "California",
-					ShortName: "CA",
-					Types:     []string{"administrative_area_level_1", "political"},
-				},
-				{
-					LongName:  "United States",
-					ShortName: "US",
-					Types:     []string{"country", "political"},
-				},
-				{
-					LongName:  "94043",
-					ShortName: "94043",
-					Types:     []string{"postal_code"},
-				},
+				PartialMatch: false,
+				PlaceID:      "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
+				Types:        []string{"street_address"},
 			},
-			FormattedAddress: "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
-			Geometry: AddressGeometry{
-				Location: LatLng{Lat: 37.4224764, Lng: -122.0842499},
-				Bounds: LatLngBounds{
-					NorthEast: LatLng{Lat: 37.4238253802915, Lng: -122.0829009197085},
-					SouthWest: LatLng{Lat: 37.4211274197085, Lng: -122.0855988802915},
-				},
-				LocationType: "ROOFTOP",
-				Viewport: LatLngBounds{
-					NorthEast: LatLng{Lat: 37.4238253802915, Lng: -122.0829009197085},
-					SouthWest: LatLng{Lat: 37.4211274197085, Lng: -122.0855988802915},
-				},
-				Types: nil,
-			},
-			PartialMatch: false,
-			PlaceID:      "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
-			Types:        []string{"street_address"},
 		},
 	}
 
@@ -312,73 +314,75 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 
 	resp, err := c.ReverseGeocode(context.Background(), r)
 
-	if len(resp) != 1 {
-		t.Errorf("expected %+v, was %+v", 1, len(resp))
+	if len(resp.Results) != 1 {
+		t.Errorf("expected %+v, was %+v", 1, len(resp.Results))
 	}
 	if err != nil {
 		t.Errorf("r.Get returned non nil error: %v", err)
 	}
 
 	correctResponse := GeocodingResponse{
-		Results: GeocodingResult{
-			AddressComponents: []AddressComponent{
-				{
-					LongName:  "277",
-					ShortName: "277",
-					Types:     []string{"street_number"},
+		Results: []GeocodingResult{
+			{
+				AddressComponents: []AddressComponent{
+					{
+						LongName:  "277",
+						ShortName: "277",
+						Types:     []string{"street_number"},
+					},
+					{
+						LongName:  "Bedford Avenue",
+						ShortName: "Bedford Ave",
+						Types:     []string{"route"},
+					},
+					{
+						LongName:  "Williamsburg",
+						ShortName: "Williamsburg",
+						Types:     []string{"neighborhood", "political"},
+					},
+					{
+						LongName:  "Brooklyn",
+						ShortName: "Brooklyn",
+						Types:     []string{"sublocality", "political"},
+					},
+					{
+						LongName:  "Kings",
+						ShortName: "Kings",
+						Types:     []string{"administrative_area_level_2", "political"},
+					},
+					{
+						LongName:  "New York",
+						ShortName: "NY",
+						Types:     []string{"administrative_area_level_1", "political"},
+					},
+					{
+						LongName:  "United States",
+						ShortName: "US",
+						Types:     []string{"country", "political"},
+					},
+					{
+						LongName:  "11211",
+						ShortName: "11211",
+						Types:     []string{"postal_code"},
+					},
 				},
-				{
-					LongName:  "Bedford Avenue",
-					ShortName: "Bedford Ave",
-					Types:     []string{"route"},
+				FormattedAddress: "277 Bedford Avenue, Brooklyn, NY 11211, USA",
+				Geometry: AddressGeometry{
+					Location: LatLng{Lat: 40.714232, Lng: -73.9612889},
+					Bounds: LatLngBounds{
+						NorthEast: LatLng{Lat: 40.7155809802915, Lng: -73.9599399197085},
+						SouthWest: LatLng{Lat: 40.7128830197085, Lng: -73.96263788029151},
+					},
+					LocationType: "ROOFTOP",
+					Viewport: LatLngBounds{
+						NorthEast: LatLng{Lat: 40.7155809802915, Lng: -73.9599399197085},
+						SouthWest: LatLng{Lat: 40.7128830197085, Lng: -73.96263788029151},
+					},
+					Types: nil,
 				},
-				{
-					LongName:  "Williamsburg",
-					ShortName: "Williamsburg",
-					Types:     []string{"neighborhood", "political"},
-				},
-				{
-					LongName:  "Brooklyn",
-					ShortName: "Brooklyn",
-					Types:     []string{"sublocality", "political"},
-				},
-				{
-					LongName:  "Kings",
-					ShortName: "Kings",
-					Types:     []string{"administrative_area_level_2", "political"},
-				},
-				{
-					LongName:  "New York",
-					ShortName: "NY",
-					Types:     []string{"administrative_area_level_1", "political"},
-				},
-				{
-					LongName:  "United States",
-					ShortName: "US",
-					Types:     []string{"country", "political"},
-				},
-				{
-					LongName:  "11211",
-					ShortName: "11211",
-					Types:     []string{"postal_code"},
-				},
+				PlaceID: "ChIJd8BlQ2BZwokRAFUEcm_qrcA",
+				Types:   []string{"street_address"},
 			},
-			FormattedAddress: "277 Bedford Avenue, Brooklyn, NY 11211, USA",
-			Geometry: AddressGeometry{
-				Location: LatLng{Lat: 40.714232, Lng: -73.9612889},
-				Bounds: LatLngBounds{
-					NorthEast: LatLng{Lat: 40.7155809802915, Lng: -73.9599399197085},
-					SouthWest: LatLng{Lat: 40.7128830197085, Lng: -73.96263788029151},
-				},
-				LocationType: "ROOFTOP",
-				Viewport: LatLngBounds{
-					NorthEast: LatLng{Lat: 40.7155809802915, Lng: -73.9599399197085},
-					SouthWest: LatLng{Lat: 40.7128830197085, Lng: -73.96263788029151},
-				},
-				Types: nil,
-			},
-			PlaceID: "ChIJd8BlQ2BZwokRAFUEcm_qrcA",
-			Types:   []string{"street_address"},
 		},
 	}
 
@@ -636,64 +640,66 @@ func TestReverseGeocodingPlaceID(t *testing.T) {
 	}
 
 	resp, err := c.ReverseGeocode(context.Background(), r)
-	if len(resp) != 1 {
-		t.Errorf("Expected length of response is 1, was %+v", len(resp))
+	if len(resp.Results) != 1 {
+		t.Errorf("Expected length of response is 1, was %+v", len(resp.Results))
 	}
 	if err != nil {
 		t.Errorf("r.Get returned non nil error: %v", err)
 	}
 
 	correctResponse := GeocodingResponse{
-		Results: GeocodingResult{
-			AddressComponents: []AddressComponent{
-				{
-					LongName:  "1600",
-					ShortName: "1600",
-					Types:     []string{"street_number"},
+		Results: []GeocodingResult{
+			{
+				AddressComponents: []AddressComponent{
+					{
+						LongName:  "1600",
+						ShortName: "1600",
+						Types:     []string{"street_number"},
+					},
+					{
+						LongName:  "Amphitheatre Pkwy",
+						ShortName: "Amphitheatre Pkwy",
+						Types:     []string{"route"},
+					},
+					{
+						LongName:  "Mountain View",
+						ShortName: "Mountain View",
+						Types:     []string{"locality", "political"},
+					},
+					{
+						LongName:  "Santa Clara County",
+						ShortName: "Santa Clara County",
+						Types:     []string{"administrative_area_level_2", "political"},
+					},
+					{
+						LongName:  "California",
+						ShortName: "CA",
+						Types:     []string{"administrative_area_level_1", "political"},
+					},
+					{
+						LongName:  "United States",
+						ShortName: "US",
+						Types:     []string{"country", "political"},
+					},
+					{
+						LongName:  "94043",
+						ShortName: "94043",
+						Types:     []string{"postal_code"},
+					},
 				},
-				{
-					LongName:  "Amphitheatre Pkwy",
-					ShortName: "Amphitheatre Pkwy",
-					Types:     []string{"route"},
+				FormattedAddress: "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+				Geometry: AddressGeometry{
+					Location:     LatLng{Lat: 37.4224764, Lng: -122.0842499},
+					LocationType: "ROOFTOP",
+					Viewport: LatLngBounds{
+						NorthEast: LatLng{Lat: 37.4238253802915, Lng: -122.0829009197085},
+						SouthWest: LatLng{Lat: 37.4211274197085, Lng: -122.0855988802915},
+					},
+					Types: nil,
 				},
-				{
-					LongName:  "Mountain View",
-					ShortName: "Mountain View",
-					Types:     []string{"locality", "political"},
-				},
-				{
-					LongName:  "Santa Clara County",
-					ShortName: "Santa Clara County",
-					Types:     []string{"administrative_area_level_2", "political"},
-				},
-				{
-					LongName:  "California",
-					ShortName: "CA",
-					Types:     []string{"administrative_area_level_1", "political"},
-				},
-				{
-					LongName:  "United States",
-					ShortName: "US",
-					Types:     []string{"country", "political"},
-				},
-				{
-					LongName:  "94043",
-					ShortName: "94043",
-					Types:     []string{"postal_code"},
-				},
+				PlaceID: "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
+				Types:   []string{"street_address"},
 			},
-			FormattedAddress: "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
-			Geometry: AddressGeometry{
-				Location:     LatLng{Lat: 37.4224764, Lng: -122.0842499},
-				LocationType: "ROOFTOP",
-				Viewport: LatLngBounds{
-					NorthEast: LatLng{Lat: 37.4238253802915, Lng: -122.0829009197085},
-					SouthWest: LatLng{Lat: 37.4211274197085, Lng: -122.0855988802915},
-				},
-				Types: nil,
-			},
-			PlaceID: "ChIJ2eUgeAK6j4ARbn5u_wAGqWA",
-			Types:   []string{"street_address"},
 		},
 		AddressDescriptor: AddressDescriptor{
 			Landmarks: []Landmark{
@@ -701,35 +707,35 @@ func TestReverseGeocodingPlaceID(t *testing.T) {
 					PlaceID:                     "ChIJvUbrwCCoAWARX2QiHCsn5A4",
 					DisplayName:                 LocalizedText{Text: "Kinkaku-ji", LanguageCode: "en"},
 					Types:                       []string{"establishment", "place_of_worship", "point_of_interest", "tourist_attraction"},
-					SpatialRelationship:         NEAR,
+					SpatialRelationship:         SPATIAL_RELATIONSHIP_NEAR,
 					StraightLineDistanceMeters:  0.009104185,
 				},
 				{
 					PlaceID:                     "ChIJf2s61SCoAWARVtK8cnSu6zw",
 					DisplayName:                 LocalizedText{Text: "Shariden Kinkaku", LanguageCode: "en"},
 					Types:                       []string{"establishment", "place_of_worship", "point_of_interest", "tourist_attraction"},
-					SpatialRelationship:         WITHIN,
+					SpatialRelationship:         SPATIAL_RELATIONSHIP_WITHIN,
 					StraightLineDistanceMeters:  73.58092,
 				},
 				{
 					PlaceID:                     "ChIJXZeF2jipAWARNbF8pJDRjFc",
 					DisplayName:                 LocalizedText{Text: "Kyōko-chi Pond", LanguageCode: "en"},
 					Types:                       []string{"establishment", "park", "point_of_interest"},
-					SpatialRelationship:         BEHIND,
+					SpatialRelationship:         SPATIAL_RELATIONSHIP_BEHIND,
 					StraightLineDistanceMeters:  57.99922,
 				},
 				{
 					PlaceID:                     "ChIJj69vLCapAWAR0FBBPEfPeAQ",
 					DisplayName:                 LocalizedText{Text: "鹿苑寺（金閣寺）", LanguageCode: "ja"},
 					Types:                       []string{"establishment", "place_of_worship", "point_of_interest"},
-					SpatialRelationship:         WITHIN,
+					SpatialRelationship:         SPATIAL_RELATIONSHIP_WITHIN,
 					StraightLineDistanceMeters:  32.30453,
 				},
 				{
 					PlaceID:                     "ChIJ482HblCpAWARoLBXDZpv7aI",
 					DisplayName:                 LocalizedText{Text: "Kinkaku-ji Fence", LanguageCode: "en"},
 					Types:                       []string{"establishment", "point_of_interest"},
-					SpatialRelationship:         WITHIN,
+					SpatialRelationship:         SPATIAL_RELATIONSHIP_WITHIN,
 					StraightLineDistanceMeters:  99.38629,
 				},
 			},
@@ -737,12 +743,12 @@ func TestReverseGeocodingPlaceID(t *testing.T) {
 				{
 					PlaceID:                     "ChIJe9XMwiCoAWARVrQpOsYqdBE",
 					DisplayName:                 LocalizedText{Text: "Kinkakujicho", LanguageCode: "en"},
-					Containment:                 WITHIN,
+					Containment:                 CONTAINMENT_WITHIN,
 				},
 				{
 					PlaceID:                     "ChIJk-6T5COoAWARa-KMWGWzrwQ",
 					DisplayName:                 LocalizedText{Text: "Kinkaku-ji", LanguageCode: "en"},
-					Containment:                 OUTSKIRTS,
+					Containment:                 CONTAINMENT_OUTSKIRTS,
 				},
 			},
 		},
@@ -791,11 +797,11 @@ func TestGeocodingZeroResults(t *testing.T) {
 		t.Errorf("Unexpected error for ZERO_RESULTS status")
 	}
 
-	if response == nil {
+	if response.Results == nil {
 		t.Errorf("Unexpected nil response for ZERO_RESULTS status")
 	}
 
-	if len(response) != 0 {
+	if len(response.Results) != 0 {
 		t.Errorf("Unexpected response for ZERO_RESULTS status")
 	}
 }
@@ -814,11 +820,11 @@ func TestReverseGeocodingZeroResults(t *testing.T) {
 		t.Errorf("Unexpected error for ZERO_RESULTS status")
 	}
 
-	if response == nil {
+	if response.Results == nil {
 		t.Errorf("Unexpected nil response for ZERO_RESULTS status")
 	}
 
-	if len(response) != 0 {
+	if len(response.Results) != 0 {
 		t.Errorf("Unexpected response for ZERO_RESULTS status")
 	}
 }

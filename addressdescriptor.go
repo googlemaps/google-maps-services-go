@@ -14,6 +14,10 @@
 
 package maps
 
+import (
+	"fmt"
+)
+
 /**
 * An enum representing the relationship in space between the landmark and the target.
 */
@@ -22,23 +26,23 @@ type SpatialRelationship string
 const (
 	 // This is the default relationship when nothing more specific below
     // applies.
-    NEAR                   SpatialRelationship = "NEAR"
+    SPATIAL_RELATIONSHIP_NEAR                   SpatialRelationship = "NEAR"
 	// The landmark has a spatial geometry and the target is within its
 	// bounds.
-    WITHIN                 SpatialRelationship = "WITHIN"
+    SPATIAL_RELATIONSHIP_WITHIN                 SpatialRelationship = "WITHIN"
 	// The target is directly adjacent to the landmark or landmark's access
 	// point.
-    BESIDE                 SpatialRelationship = "BESIDE"
+    SPATIAL_RELATIONSHIP_BESIDE                 SpatialRelationship = "BESIDE"
 	// The target is directly opposite the landmark on the other side of the
 	// road.
-    ACROSS_THE_ROAD        SpatialRelationship = "ACROSS_THE_ROAD"
+    SPATIAL_RELATIONSHIP_ACROSS_THE_ROAD        SpatialRelationship = "ACROSS_THE_ROAD"
 	// On the same route as the landmark but not besides or across.
-    DOWN_THE_ROAD          SpatialRelationship = "DOWN_THE_ROAD"
+    SPATIAL_RELATIONSHIP_DOWN_THE_ROAD          SpatialRelationship = "DOWN_THE_ROAD"
 	// Not on the same route as the landmark but a single 'turn' away.
-    AROUND_THE_CORNER      SpatialRelationship = "AROUND_THE_CORNER"
+    SPATIAL_RELATIONSHIP_AROUND_THE_CORNER      SpatialRelationship = "AROUND_THE_CORNER"
 	// Close to the landmark's structure but further away from its access
 	// point.
-    BEHIND                 SpatialRelationship = "BEHIND"
+    SPATIAL_RELATIONSHIP_BEHIND                 SpatialRelationship = "BEHIND"
 )
 
 // String method for formatted output
@@ -57,11 +61,11 @@ const (
 	*/
     CONTAINMENT_UNSPECIFIED Containment = "CONTAINMENT_UNSPECIFIED"
 	/** The target location is within the area region, close to the center. */
-    WITHIN                  Containment = "WITHIN"
+    CONTAINMENT_WITHIN                  Containment = "WITHIN"
 	/** The target location is within the area region, close to the edge. */
-    OUTSKIRTS               Containment = "OUTSKIRTS"
+    CONTAINMENT_OUTSKIRTS               Containment = "OUTSKIRTS"
 	/** The target location is outside the area region, but close by. */
-    NEAR                    Containment = "NEAR"
+    CONTAINMENT_NEAR                    Containment = "NEAR"
 )
 
 // String method for formatted output
@@ -137,7 +141,7 @@ type Area struct {
 type AddressDescriptor struct {
 	// A ranked list of nearby landmarks. The most useful (recognizable and
   	// nearby) landmarks are ranked first.
-	Landmarks    []Landmark   `json:"landmarks"
+	Landmarks    []Landmark   `json:"landmarks"`
 	// A ranked list of containing or adjacent areas. The most useful
   // (recognizable and precise) areas are ranked first.
 	Areas        []Area       `json:"areas"`
