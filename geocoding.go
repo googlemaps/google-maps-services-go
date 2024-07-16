@@ -32,9 +32,9 @@ var geocodingAPI = &apiConfig{
 }
 
 // Geocode makes a Geocoding API request
-func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
+func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) (GeocodingResponse, error) {
 	if r.Address == "" && len(r.Components) == 0 && r.LatLng == nil {
-		return nil, errors.New("maps: address, components and LatLng are all missing")
+		return GeocodingResponse{}, errors.New("maps: address, components and LatLng are all missing")
 	}
 
 	var response struct {
@@ -43,38 +43,38 @@ func (c *Client) Geocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingR
 	}
 
 	if err := c.getJSON(ctx, geocodingAPI, r, &response); err != nil {
-		return nil, err
+		return GeocodingResponse{}, err
 	}
 
 	if err := response.StatusError(); err != nil {
-		return nil, err
+		return GeocodingResponse{}, err
 	}
 
-	return response.Results, nil
+	return GeocodingResponse{response.Results, AddressDescriptor{}}, nil
 }
 
 // ReverseGeocode makes a Reverse Geocoding API request
-func (c *Client) ReverseGeocode(ctx context.Context, r *GeocodingRequest) ([]GeocodingResult, error) {
+func (c *Client) ReverseGeocode(ctx context.Context, r *GeocodingRequest) (GeocodingResponse, error) {
 	// Since Geocode() does not allow a nil LatLng, whereas it is allowed here
 	if r.LatLng == nil && r.PlaceID == "" {
-		return nil, errors.New("maps: LatLng and PlaceID are both missing")
+		return GeocodingResponse{}, errors.New("maps: LatLng and PlaceID are both missing")
 	}
 
 	var response struct {
 		Results []GeocodingResult `json:"results"`
+		AddressDescriptor AddressDescriptor `json:"address_descriptor"`
 		commonResponse
 	}
 
 	if err := c.getJSON(ctx, geocodingAPI, r, &response); err != nil {
-		return nil, err
+		return GeocodingResponse{}, err
 	}
 
 	if err := response.StatusError(); err != nil {
-		return nil, err
+		return GeocodingResponse{}, err
 	}
 
-	return response.Results, nil
-
+	return GeocodingResponse{response.Results, response.AddressDescriptor}, nil
 }
 
 func (r *GeocodingRequest) params() url.Values {
@@ -118,6 +118,9 @@ func (r *GeocodingRequest) params() url.Values {
 	}
 	if r.Language != "" {
 		q.Set("language", r.Language)
+	}
+	if r.EnableAddressDescriptor == true {
+		q.Set("enable_address_descriptor", "true")
 	}
 
 	return q
@@ -176,10 +179,21 @@ type GeocodingRequest struct {
 	// Language is the language in which to return results. Optional.
 	Language string
 
+	// Language is the language in which to return results. Optional.
+	EnableAddressDescriptor bool
+
 	// Custom allows passing through custom parameters to the Geocoding back end.
 	// Use with caution. For more detail on why this is required, please see
 	// https://googlegeodevelopers.blogspot.com/2016/11/address-geocoding-in-google-maps-apis.html
 	Custom url.Values
+}
+
+// GeocodingResponse is the response to a Geocoding API request.
+type GeocodingResponse struct {
+	// Results is the Geocoding results
+	Results []GeocodingResult
+	// The Address Descriptor for the target in the reverse geocoding requeest
+	AddressDescriptor AddressDescriptor
 }
 
 // GeocodingResult is a single geocoded address

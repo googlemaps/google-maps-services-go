@@ -41,6 +41,7 @@ var (
 	latlng       = flag.String("latlng", "", "The textual latitude/longitude value for which you wish to obtain the closest, human-readable address.")
 	resultType   = flag.String("result_type", "", "One or more address types, separated by a pipe (|).")
 	locationType = flag.String("location_type", "", "One or more location types, separated by a pipe (|).")
+	enableAddressDescriptor = flag.String("enable_address_descriptor", "", "True or False.  Whether to return the Address Descriptors in the response.")
 )
 
 func usageAndExit(msg string) {
@@ -81,6 +82,7 @@ func main() {
 	parseLatLng(*latlng, r)
 	parseResultType(*resultType, r)
 	parseLocationType(*locationType, r)
+	parseEnableAddressDescriptor(*enableAddressDescriptor, r)
 
 	resp, err := client.Geocode(context.Background(), r)
 	check(err)
@@ -185,5 +187,13 @@ func parseLocationType(locationType string, r *maps.GeocodingRequest) {
 			}
 		}
 
+	}
+}
+
+func parseEnableAddressDescriptor(enableAddressDescriptor string, r *maps.GeocodingRequest) {
+	if enableAddressDescriptor == "True" {
+		r.EnableAddressDescriptor = true
+	} else {
+		r.EnableAddressDescriptor = false
 	}
 }
