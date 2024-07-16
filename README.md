@@ -90,7 +90,7 @@ func main() {
 }
 ```
 
-Sample usage of the Geocoding API with an API key to get an [Address Descriptor](https://mapsplatform.google.com/demos/address-descriptors/):
+Sample usage of the Geocoding API with an API key to get an [Address Descriptor](https://developers.google.com/maps/documentation/geocoding/address-descriptors/requests-address-descriptors):
 
 ```go
 package main
