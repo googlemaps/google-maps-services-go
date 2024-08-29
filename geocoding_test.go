@@ -80,6 +80,51 @@ func TestGeocodingGoogleHQ(t *testing.T) {
                     ]
                 }
             ],
+            "buildings": [
+                {
+                    "building_outlines": [
+                        {
+                            "display_polygon": {
+                                "coordinates": [
+                                    [
+                                        [
+                                            -73.9613792179329,
+                                            40.7142072515061
+                                        ],
+                                        [
+                                            -73.9612484582837,
+                                            40.7141533670676
+                                        ],
+                                        [
+                                            -73.9612131226706,
+                                            40.7142067241756
+                                        ],
+                                        [
+                                            -73.9613437029752,
+                                            40.7142628459036
+                                        ],
+                                        [
+                                            -73.9613792179329,
+                                            40.7142072515061
+                                        ]
+                                    ]
+                                ],
+                                "type": "Polygon"
+                            }
+                        }
+                    ],
+                    "place_id": "ChIJRYYERGBZwokRAM4n1GlcYX4"
+                }
+            ],
+            "entrances": [
+                {
+                    "building_place_id": "ChIJRYYERGBZwokRAM4n1GlcYX4",
+                    "location": {
+                        "lat": 40.7142502,
+                        "lng": -73.9613518
+                    }
+                }
+            ],
             "formatted_address": "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
             "geometry": {
                 "location": {
@@ -116,13 +161,17 @@ func TestGeocodingGoogleHQ(t *testing.T) {
         }
     ],
     "status": "OK"
-}`
+}
+`
 
 	server := mockServer(200, response)
 	defer server.Close()
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &GeocodingRequest{
 		Address: "1600 Amphitheatre Parkway, Mountain View, CA",
+		Custom: url.Values{
+			"extra_computations": []string{"BUILDING_AND_ENTRANCES"},
+		},
 	}
 
 	resp, err := c.Geocode(context.Background(), r)
@@ -174,6 +223,33 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 						Types:     []string{"postal_code"},
 					},
 				},
+				Buildings: []Building{
+					{
+						BuildingOutlines: []BuildingOutline{
+							{
+								DisplayPolygon: DisplayPolygon{
+									Coordinates: [][][]float64{
+										{
+											{-73.9613792179329, 40.7142072515061},
+											{-73.9612484582837, 40.7141533670676},
+											{-73.9612131226706, 40.7142067241756},
+											{-73.9613437029752, 40.7142628459036},
+											{-73.9613792179329, 40.7142072515061},
+										},
+									},
+									Type: "Polygon",
+								},
+							},
+						},
+						PlaceId: "ChIJRYYERGBZwokRAM4n1GlcYX4",
+					},
+				},
+				Entrances: []Entrance{
+					{
+						BuildingPlaceId: "ChIJRYYERGBZwokRAM4n1GlcYX4",
+						Location:        LatLng{Lat: 40.7142502, Lng: -73.9613518},
+					},
+				},
 				FormattedAddress: "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
 				Geometry: AddressGeometry{
 					Location: LatLng{Lat: 37.4224764, Lng: -122.0842499},
@@ -201,7 +277,6 @@ func TestGeocodingGoogleHQ(t *testing.T) {
 }
 
 func TestGeocodingReverseGeocoding(t *testing.T) {
-
 	response := `{
     "results": [
         {
@@ -268,6 +343,51 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
                     ]
                 }
             ],
+            "buildings": [
+                {
+                    "building_outlines": [
+                        {
+                            "display_polygon": {
+                                "coordinates": [
+                                    [
+                                        [
+                                            -73.9613792179329,
+                                            40.7142072515061
+                                        ],
+                                        [
+                                            -73.9612484582837,
+                                            40.7141533670676
+                                        ],
+                                        [
+                                            -73.9612131226706,
+                                            40.7142067241756
+                                        ],
+                                        [
+                                            -73.9613437029752,
+                                            40.7142628459036
+                                        ],
+                                        [
+                                            -73.9613792179329,
+                                            40.7142072515061
+                                        ]
+                                    ]
+                                ],
+                                "type": "Polygon"
+                            }
+                        }
+                    ],
+                    "place_id": "ChIJRYYERGBZwokRAM4n1GlcYX4"
+                }
+            ],
+            "entrances": [
+                {
+                    "building_place_id": "ChIJRYYERGBZwokRAM4n1GlcYX4",
+                    "location": {
+                        "lat": 40.7142502,
+                        "lng": -73.9613518
+                    }
+                }
+            ],
             "formatted_address": "277 Bedford Avenue, Brooklyn, NY 11211, USA",
             "geometry": {
                 "location": {
@@ -310,6 +430,9 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.URL))
 	r := &GeocodingRequest{
 		LatLng: &LatLng{Lat: 40.714224, Lng: -73.961452},
+		Custom: url.Values{
+			"extra_computations": []string{"BUILDING_AND_ENTRANCES"},
+		},
 	}
 
 	resp, err := c.ReverseGeocode(context.Background(), r)
@@ -364,6 +487,33 @@ func TestGeocodingReverseGeocoding(t *testing.T) {
 						LongName:  "11211",
 						ShortName: "11211",
 						Types:     []string{"postal_code"},
+					},
+				},
+				Buildings: []Building{
+					{
+						BuildingOutlines: []BuildingOutline{
+							{
+								DisplayPolygon: DisplayPolygon{
+									Coordinates: [][][]float64{
+										{
+											{-73.9613792179329, 40.7142072515061},
+											{-73.9612484582837, 40.7141533670676},
+											{-73.9612131226706, 40.7142067241756},
+											{-73.9613437029752, 40.7142628459036},
+											{-73.9613792179329, 40.7142072515061},
+										},
+									},
+									Type: "Polygon",
+								},
+							},
+						},
+						PlaceId: "ChIJRYYERGBZwokRAM4n1GlcYX4",
+					},
+				},
+				Entrances: []Entrance{
+					{
+						BuildingPlaceId: "ChIJRYYERGBZwokRAM4n1GlcYX4",
+						Location:        LatLng{Lat: 40.7142502, Lng: -73.9613518},
 					},
 				},
 				FormattedAddress: "277 Bedford Avenue, Brooklyn, NY 11211, USA",
@@ -704,51 +854,81 @@ func TestReverseGeocodingPlaceID(t *testing.T) {
 		AddressDescriptor: AddressDescriptor{
 			Landmarks: []Landmark{
 				{
-					PlaceID:                     "ChIJvUbrwCCoAWARX2QiHCsn5A4",
-					DisplayName:                 LocalizedText{Text: "Kinkaku-ji", LanguageCode: "en"},
-					Types:                       []string{"establishment", "place_of_worship", "point_of_interest", "tourist_attraction"},
-					SpatialRelationship:         SPATIAL_RELATIONSHIP_NEAR,
-					StraightLineDistanceMeters:  0.009104185,
+					PlaceID: "ChIJvUbrwCCoAWARX2QiHCsn5A4",
+					DisplayName: LocalizedText{
+						Text:         "Kinkaku-ji",
+						LanguageCode: "en",
+					},
+					Types: []string{
+						"establishment",
+						"place_of_worship",
+						"point_of_interest",
+						"tourist_attraction",
+					},
+					SpatialRelationship:        SPATIAL_RELATIONSHIP_NEAR,
+					StraightLineDistanceMeters: 0.009104185,
 				},
 				{
-					PlaceID:                     "ChIJf2s61SCoAWARVtK8cnSu6zw",
-					DisplayName:                 LocalizedText{Text: "Shariden Kinkaku", LanguageCode: "en"},
-					Types:                       []string{"establishment", "place_of_worship", "point_of_interest", "tourist_attraction"},
-					SpatialRelationship:         SPATIAL_RELATIONSHIP_WITHIN,
-					StraightLineDistanceMeters:  73.58092,
+					PlaceID: "ChIJf2s61SCoAWARVtK8cnSu6zw",
+					DisplayName: LocalizedText{
+						Text:         "Shariden Kinkaku",
+						LanguageCode: "en",
+					},
+					Types: []string{
+						"establishment",
+						"place_of_worship",
+						"point_of_interest",
+						"tourist_attraction",
+					},
+					SpatialRelationship:        SPATIAL_RELATIONSHIP_WITHIN,
+					StraightLineDistanceMeters: 73.58092,
 				},
 				{
-					PlaceID:                     "ChIJXZeF2jipAWARNbF8pJDRjFc",
-					DisplayName:                 LocalizedText{Text: "Kyōko-chi Pond", LanguageCode: "en"},
-					Types:                       []string{"establishment", "park", "point_of_interest"},
-					SpatialRelationship:         SPATIAL_RELATIONSHIP_BEHIND,
-					StraightLineDistanceMeters:  57.99922,
+					PlaceID: "ChIJXZeF2jipAWARNbF8pJDRjFc",
+					DisplayName: LocalizedText{
+						Text:         "Kyōko-chi Pond",
+						LanguageCode: "en",
+					},
+					Types: []string{
+						"establishment",
+						"park",
+						"point_of_interest",
+					},
+					SpatialRelationship:        SPATIAL_RELATIONSHIP_BEHIND,
+					StraightLineDistanceMeters: 57.99922,
 				},
 				{
-					PlaceID:                     "ChIJj69vLCapAWAR0FBBPEfPeAQ",
-					DisplayName:                 LocalizedText{Text: "鹿苑寺（金閣寺）", LanguageCode: "ja"},
-					Types:                       []string{"establishment", "place_of_worship", "point_of_interest"},
-					SpatialRelationship:         SPATIAL_RELATIONSHIP_WITHIN,
-					StraightLineDistanceMeters:  32.30453,
+					PlaceID:     "ChIJj69vLCapAWAR0FBBPEfPeAQ",
+					DisplayName: LocalizedText{Text: "鹿苑寺（金閣寺）", LanguageCode: "ja"},
+					Types: []string{
+						"establishment",
+						"place_of_worship",
+						"point_of_interest",
+					},
+					SpatialRelationship:        SPATIAL_RELATIONSHIP_WITHIN,
+					StraightLineDistanceMeters: 32.30453,
 				},
 				{
-					PlaceID:                     "ChIJ482HblCpAWARoLBXDZpv7aI",
-					DisplayName:                 LocalizedText{Text: "Kinkaku-ji Fence", LanguageCode: "en"},
-					Types:                       []string{"establishment", "point_of_interest"},
-					SpatialRelationship:         SPATIAL_RELATIONSHIP_WITHIN,
-					StraightLineDistanceMeters:  99.38629,
+					PlaceID: "ChIJ482HblCpAWARoLBXDZpv7aI",
+					DisplayName: LocalizedText{
+						Text:         "Kinkaku-ji Fence",
+						LanguageCode: "en",
+					},
+					Types:                      []string{"establishment", "point_of_interest"},
+					SpatialRelationship:        SPATIAL_RELATIONSHIP_WITHIN,
+					StraightLineDistanceMeters: 99.38629,
 				},
 			},
 			Areas: []Area{
 				{
-					PlaceID:                     "ChIJe9XMwiCoAWARVrQpOsYqdBE",
-					DisplayName:                 LocalizedText{Text: "Kinkakujicho", LanguageCode: "en"},
-					Containment:                 CONTAINMENT_WITHIN,
+					PlaceID:     "ChIJe9XMwiCoAWARVrQpOsYqdBE",
+					DisplayName: LocalizedText{Text: "Kinkakujicho", LanguageCode: "en"},
+					Containment: CONTAINMENT_WITHIN,
 				},
 				{
-					PlaceID:                     "ChIJk-6T5COoAWARa-KMWGWzrwQ",
-					DisplayName:                 LocalizedText{Text: "Kinkaku-ji", LanguageCode: "en"},
-					Containment:                 CONTAINMENT_OUTSKIRTS,
+					PlaceID:     "ChIJk-6T5COoAWARa-KMWGWzrwQ",
+					DisplayName: LocalizedText{Text: "Kinkaku-ji", LanguageCode: "en"},
+					Containment: CONTAINMENT_OUTSKIRTS,
 				},
 			},
 		},
@@ -792,7 +972,6 @@ func TestGeocodingZeroResults(t *testing.T) {
 	}
 
 	response, err := c.Geocode(context.Background(), r)
-
 	if err != nil {
 		t.Errorf("Unexpected error for ZERO_RESULTS status")
 	}
@@ -815,7 +994,6 @@ func TestReverseGeocodingZeroResults(t *testing.T) {
 	}
 
 	response, err := c.ReverseGeocode(context.Background(), r)
-
 	if err != nil {
 		t.Errorf("Unexpected error for ZERO_RESULTS status")
 	}
