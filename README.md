@@ -1,18 +1,23 @@
-Go Client for Google Maps Services
-==================================
-
-[![GoDoc](https://godoc.org/googlemaps.github.io/maps?status.svg)](https://godoc.org/googlemaps.github.io/maps)
+[![GoDoc](https://godoc.org/googlemaps.github.io/maps?status.svg)][documentation]
 [![Go Report Card](https://goreportcard.com/badge/github.com/googlemaps/google-maps-services-go)](https://goreportcard.com/report/github.com/googlemaps/google-maps-services-go)
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/googlemaps/google-maps-services-go)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![GitHub Go version](https://img.shields.io/github/go-mod/go-version/googlemaps/google-maps-services-go)
+
+![Release](https://github.com/googlemaps/google-maps-services-go/workflows/Release/badge.svg)
+![Stable](https://img.shields.io/badge/stability-stable-green)
+[![Tests/Build](https://github.com/googlemaps/google-maps-services-go/actions/workflows/test.yml/badge.svg)](https://github.com/googlemaps/google-maps-services-go/actions/workflows/test.yml)
+
+![Contributors](https://img.shields.io/github/contributors/googlemaps/google-maps-services-go?color=green)
+[![License](https://img.shields.io/github/license/googlemaps/google-maps-services-go?color=blue)][license]
+[![StackOverflow](https://img.shields.io/stackexchange/stackoverflow/t/google-maps?color=orange&label=google-maps&logo=stackoverflow)](https://stackoverflow.com/questions/tagged/google-maps)
+[![Discord](https://img.shields.io/discord/676948200904589322?color=6A7EC2&logo=discord&logoColor=ffffff)][Discord server]
+
+# Go Client for Google Maps Services
 
 ## Description
 
-Use Go? This library brings many [Google Maps Platform Web Services APIs] to your Go application.
+Use Go? Want to [geocode][Geocoding API] something? Looking for [directions][Directions API]? This client library brings the following [Google Maps Platform Web Services APIs] to your server-side Go applications:
 
-The Go Client for Google Maps Services is a Go Client library for the following Google Maps Platform
-APIs:
-
+- [Maps Static API]
 - [Directions API]
 - [Distance Matrix API]
 - [Elevation API]
@@ -20,7 +25,6 @@ APIs:
 - [Places API]
 - [Roads API]
 - [Time Zone API]
-- [Maps Static API]
 
 > [!TIP]
 > See the [Google Maps Platform Cloud Client Library for Go](https://github.com/googleapis/google-cloud-go/tree/main/maps) for our newer APIs
@@ -28,26 +32,29 @@ APIs:
 
 ## Requirements
 
-- Go 1.7 or later.
-- A Google Maps Platform [API key] from a project with the APIs below enabled.
+- [Sign up with Google Maps Platform]
+- A Google Maps Platform [project] with the desired API(s) from the above list enabled
+- An [API key] associated with the project above
+- Go 1.7+
 
-> [!IMPORTANT]  
-> This key should be kept secret on your server.
+## API Key Security
+
+This client library is designed for use in server-side applications.
+
+In either case, it is important to add [API key restrictions](https://developers.google.com/maps/api-security-best-practices#restricting-api-keys) to improve its security. Additional security measures, such as hiding your key
+from version control, should also be put in place to further improve the security of your API key.
+
+Check out the [API Security Best Practices](https://developers.google.com/maps/api-security-best-practices) guide to learn more.
 
 ## Installation
 
-To install the Go Client for Google Maps Services, please execute the following `go get` command.
+To install the client library, execute the following command:
 
-```bash
-go get googlemaps.github.io/maps
-```
+    go get googlemaps.github.io/maps
 
 ## Documentation
 
-View the [reference documentation](https://godoc.org/googlemaps.github.io/maps).
-
-Additional documentation about the APIs is available at:
-
+You can find the reference [documentation] at GoDoc, and each API also has its own set of documentation:
 - [Directions API]
 - [Distance Matrix API]
 - [Elevation API]
@@ -73,7 +80,7 @@ import (
 )
 
 func main() {
-	c, err := maps.NewClient(maps.WithAPIKey("Insert-API-Key-Here"))
+	c, err := maps.NewClient(maps.WithAPIKey("YOUR_API_KEY"))
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
@@ -104,7 +111,7 @@ import (
 )
 
 func main() {
-	c, err := maps.NewClient(maps.WithAPIKey("Insert-API-Key-Here"))
+	c, err := maps.NewClient(maps.WithAPIKey("YOUR_API_KEY"))
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
@@ -141,33 +148,51 @@ and `metrics.RegisterViews()` to make the metrics available to be exported.
 OpenCensus can export these metrics to a [variety of monitoring services](https://opencensus.io/exporters/).
 You can also implement your own metric reporter instead of using the provided one.
 
+## Contributing
+
+Contributions are welcome and encouraged! If you'd like to contribute, send us a [pull request] and refer to our [code of conduct] and [contributing guide].
+
 ## Terms of Service
 
-This library uses Google Maps Platform services, and any use of Google Maps Platform is subject to the [Terms of Service](https://cloud.google.com/maps-platform/terms).
+This library uses Google Maps Platform services. Use of Google Maps Platform services through this library is subject to the Google Maps Platform [Terms of Service].
 
-For clarity, this library, and each underlying component, is not a Google Maps Platform Core Service.
+This library is not a Google Maps Platform Core Service. Therefore, the Google Maps Platform Terms of Service, e.g., [Technical Support Services Guidelines], Service Level Agreement ["SLA"][SLA], and [Deprecation Policy], do not apply to the code in this library.
 
 ## Support
 
-This library is offered via an open source license. It is not governed by the Google Maps Platform Support [Technical Support Services Guidelines](https://cloud.google.com/maps-platform/terms/tssg), the [SLA](https://cloud.google.com/maps-platform/terms/sla), or the [Deprecation Policy](https://cloud.google.com/maps-platform/terms) (however, any Google Maps Platform services used by the library remain subject to the Google Maps Platform Terms of Service).
+This library is offered via an open source [license]. It is not governed by the Google Maps Platform Support Technical Support Services Guidelines, the SLA, or the Deprecation Policy. However, any Google Maps Platform services used by the library remain subject to the Google Maps Platform Terms of Service.
 
-This library adheres to [semantic versioning](https://semver.org/) to indicate when backwards-incompatible changes are introduced.
+This library adheres to [semantic versioning] to indicate when backwards-incompatible changes are introduced. Accordingly, while the library is in version 0.x, backwards-incompatible changes may be introduced at any time.
 
-If you find a bug, or have a feature request, please [file an issue][issues] on GitHub. If you would like to get answers to technical questions from other Google Maps Platform developers, ask through one of our [developer community channels](https://developers.google.com/maps/developer-community). If you'd like to contribute, please check the [Contributing guide][contrib].
+If you find a bug, or have a feature request, please [file an issue] on GitHub. If you would like to get answers to technical questions from other Google Maps Platform developers, ask through one of our [developer community channels]. If you'd like to contribute, please check the [contributing guide].
 
-You can also discuss this library on our [Discord server](https://discord.gg/hYsWbmk).
-
-[API key]: https://developers.google.com/maps/documentation/places/web-service/get-api-key
+You can also discuss this library on our [Discord server].
 
 [Google Maps Platform Web Services APIs]: https://developers.google.com/maps/apis-by-platform#web_service_apis
-[Directions API]: https://developers.google.com/maps/documentation/directions/
-[Distance Matrix API]: https://developers.google.com/maps/documentation/distancematrix/
-[Elevation API]: https://developers.google.com/maps/documentation/elevation/
-[Geocoding API]: https://developers.google.com/maps/documentation/geocoding/
-[Places API]: https://developers.google.com/places/web-service/
-[Roads API]: https://developers.google.com/maps/documentation/roads/
-[Time Zone API]: https://developers.google.com/maps/documentation/timezone/
-[Maps Static API]: https://developers.google.com/maps/documentation/maps-static/
+[Maps Static API]: https://developers.google.com/maps/documentation/maps-static
+[Directions API]: https://developers.google.com/maps/documentation/directions
+[Distance Matrix API]: https://developers.google.com/maps/documentation/distancematrix
+[Elevation API]: https://developers.google.com/maps/documentation/elevation
+[Geocoding API]: https://developers.google.com/maps/documentation/geocoding
+[Places API]: https://developers.google.com/places/web-service
+[Roads API]: https://developers.google.com/maps/documentation/roads
+[Time Zone API]: https://developers.google.com/maps/documentation/timezone
 
-[issues]: https://github.com/googlemaps/google-maps-services-go/issues
-[contrib]: https://github.com/googlemaps/google-maps-services-go/blob/master/CONTRIB.md
+[API key]: https://developers.google.com/maps/documentation/javascript/get-api-key
+[documentation]: https://godoc.org/googlemaps.github.io/maps
+
+[code of conduct]: ?tab=coc-ov-file#readme
+[contributing guide]: CONTRIB.md
+[Deprecation Policy]: https://cloud.google.com/maps-platform/terms
+[developer community channels]: https://developers.google.com/maps/developer-community
+[Discord server]: https://discord.gg/hYsWbmk
+[file an issue]: https://github.com/googlemaps/google-maps-services-go/issues/new/choose
+[license]: LICENSE
+[project]: https://developers.google.com/maps/documentation/javascript/cloud-setup#enabling-apis
+[pull request]: https://github.com/googlemaps/google-maps-services-go/compare
+[semantic versioning]: https://semver.org
+[Sign up with Google Maps Platform]: https://console.cloud.google.com/google/maps-apis/start
+[similar inquiry]: https://github.com/googlemaps/google-maps-services-go/issues
+[SLA]: https://cloud.google.com/maps-platform/terms/sla
+[Technical Support Services Guidelines]: https://cloud.google.com/maps-platform/terms/tssg
+[Terms of Service]: https://cloud.google.com/maps-platform/terms
