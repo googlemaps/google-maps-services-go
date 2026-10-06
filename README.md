@@ -6,6 +6,22 @@ Go Client for Google Maps Services
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/googlemaps/google-maps-services-go)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+> [!IMPORTANT]
+> **Legacy APIs End of Sale & Newer Client Libraries**
+>
+> Several APIs supported by this library are in [Legacy status](https://developers.google.com/maps/legacy):
+> - **Places API (Legacy):** This product is in [Legacy status](https://developers.google.com/maps/legacy). As of October 2026, Places API (Legacy) can no longer be enabled for new Google Cloud projects. Existing projects remain fully supported. For new features and improved performance, [migrate to Places API (New)](https://developers.google.com/maps/documentation/places/web-service/legacy/migrate-overview).
+> - **Directions API (Legacy):** This product is in [Legacy status](https://developers.google.com/maps/legacy). As of October 2026, Directions API (Legacy) can no longer be enabled for new Google Cloud projects. Existing projects remain fully supported. For new features and improved performance, [migrate to the Routes API](https://developers.google.com/maps/documentation/routes/migrate-routes).
+> - **Distance Matrix API (Legacy):** This product is in [Legacy status](https://developers.google.com/maps/legacy). As of October 2026, Distance Matrix API (Legacy) can no longer be enabled for new Google Cloud projects. Existing projects remain fully supported. For new features and improved performance, [migrate to the Routes API](https://developers.google.com/maps/documentation/routes/migrate-routes).
+>
+> For our newer APIs, see the [Google Maps Platform Cloud Client Library for Go](https://github.com/googleapis/google-cloud-go/tree/main/maps) ([overview](https://docs.cloud.google.com/apis/docs/cloud-client-libraries)):
+> - [Places API (New)](https://github.com/googleapis/google-cloud-go/tree/main/maps/places)
+> - [Routes API](https://github.com/googleapis/google-cloud-go/tree/main/maps/routing)
+> - [Address Validation API](https://github.com/googleapis/google-cloud-go/tree/main/maps/addressvalidation)
+> - [Datasets API](https://github.com/googleapis/google-cloud-go/tree/main/maps/mapsplatformdatasets)
+>
+> The new APIs will not be added to this client library.
+
 ## Description
 
 Use Go? This library brings many [Google Maps Platform Web Services APIs] to your Go application.
@@ -13,18 +29,17 @@ Use Go? This library brings many [Google Maps Platform Web Services APIs] to you
 The Go Client for Google Maps Services is a Go Client library for the following Google Maps Platform
 APIs:
 
-- [Directions API]
-- [Distance Matrix API]
 - [Elevation API]
 - [Geocoding API]
-- [Places API]
 - [Roads API]
 - [Time Zone API]
 - [Maps Static API]
 
-> [!TIP]
-> See the [Google Maps Platform Cloud Client Library for Go](https://github.com/googleapis/google-cloud-go/tree/main/maps) for our newer APIs
-> including Address Validation API, Datasets API, Fleet Engine, new Places API, and Routes API.
+As well as the following legacy APIs:
+
+- [Directions API (Legacy)][Directions API]
+- [Distance Matrix API (Legacy)][Distance Matrix API]
+- [Places API (Legacy)][Places API]
 
 ## Requirements
 
