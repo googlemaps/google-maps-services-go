@@ -444,7 +444,7 @@ type PlaceDetailsRequest struct {
 	// ReviewsSort specifies the sorting method to use when returning reviews.
 	// Can be set to most_relevant (default) or newest.
 	//
-	//For most_relevant (default), reviews are sorted by relevance; the service
+	// For most_relevant (default), reviews are sorted by relevance; the service
 	// will bias the results to return reviews originally written in the
 	// preferred language.
 	// For newest, reviews are sorted in chronological order; the preferred
