@@ -51,6 +51,7 @@ type ClientOption func(*Client) error
 var defaultRequestsPerSecond = 50
 
 type contextKey string
+
 func (c contextKey) String() string {
 	return "maps " + string(c)
 }
@@ -223,7 +224,7 @@ func (c *Client) get(ctx context.Context, config *apiConfig, apiReq apiRequest) 
 	if c.baseURL != "" {
 		host = c.baseURL
 	}
-	req, err := http.NewRequest("GET", host+config.path, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", host+config.path, nil)
 	if err != nil {
 		return nil, err
 	}
