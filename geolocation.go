@@ -54,14 +54,19 @@ const (
 	RadioTypeGSM   RadioType = "gsm"
 	RadioTypeCDMA  RadioType = "cdma"
 	RadioTypeWCDMA RadioType = "wcdma"
+	RadioTypeNR    RadioType = "nr"
 )
 
 // CellTower is a cell tower object for localisation requests
 type CellTower struct {
 	// CellID Unique identifier of the cell
 	CellID int `json:"cellId,omitempty"`
-	// LocationAreaCode is the Location Area Code (LAC) for GSM and WCDMAnetworks. The
-	// Network ID (NID) for CDMA networks.
+	// NewRadioCellID is the 36-bit New Radio Cell Identity (NCI, valid range
+	// 0–68719476735) for 5G NR networks. Required when RadioType is "nr".
+	NewRadioCellID uint64 `json:"newRadioCellId,omitempty"`
+	// LocationAreaCode is the Location Area Code (LAC) for GSM and WCDMA networks,
+	// the Network ID (NID) for CDMA networks, or the Tracking Area Code (TAC,
+	// range 0–16777215 for NR) for LTE and 5G NR networks.
 	LocationAreaCode int `json:"locationAreaCode,omitempty"`
 	// MobileCountryCode is the cell tower's Mobile Country Code (MCC).
 	MobileCountryCode int `json:"mobileCountryCode,omitempty"`
