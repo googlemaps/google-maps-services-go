@@ -192,3 +192,82 @@ func TestCellTowerAndWiFiRequest(t *testing.T) {
 		t.Errorf("expected %+v, was %+v", correctResponse, resp)
 	}
 }
+
+func TestCellTower5GNewRadioRequest(t *testing.T) {
+	response := `{
+		"location" : {
+			"lat" : 31.69040000,
+			"lng" : -106.42450000
+		},
+		"accuracy" : 420.0
+	}`
+
+	server := &countingServer{}
+
+	failResponse := func(reason string, w http.ResponseWriter, r *http.Request) {
+		server.failed = append(server.failed, r.URL.RawQuery)
+		s := fmt.Sprintf(`{"status":"fail", "message": "%s"}`, reason)
+		http.Error(w, s, 999)
+	}
+
+	server.s = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			failResponse("failed to read body", w, r)
+			return
+		}
+		body := string(b)
+		expected := `{"homeMobileCountryCode":334,` +
+			`"homeMobileNetworkCode":20,` +
+			`"radioType":"nr",` +
+			`"considerIp":false,` +
+			`"cellTowers":[{"newRadioCellId":68719476735,` +
+			`"locationAreaCode":14010,` +
+			`"mobileCountryCode":334,` +
+			`"mobileNetworkCode":20,` +
+			`"signalStrength":-92}]}`
+		if body != expected {
+			failResponse("failed to parse body", w, r)
+			return
+		}
+
+		server.successful++
+
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		fmt.Fprintln(w, response)
+	}))
+
+	defer server.s.Close()
+	c, _ := NewClient(WithAPIKey(apiKey), WithBaseURL(server.s.URL))
+	r := &GeolocationRequest{
+		HomeMobileCountryCode: 334,
+		HomeMobileNetworkCode: 20,
+		RadioType:             RadioTypeNR,
+		ConsiderIP:            false,
+		CellTowers: []CellTower{{
+			NewRadioCellID:    68719476735,
+			LocationAreaCode:  14010,
+			MobileCountryCode: 334,
+			MobileNetworkCode: 20,
+			SignalStrength:    -92,
+		}},
+	}
+
+	resp, err := c.Geolocate(context.Background(), r)
+	if err != nil {
+		t.Errorf("r.Get returned non nil error, was %+v", err)
+	}
+
+	correctResponse := GeolocationResult{
+		Location: LatLng{
+			Lat: 31.69040000,
+			Lng: -106.42450000,
+		},
+		Accuracy: 420.0,
+	}
+
+	if !reflect.DeepEqual(*resp, correctResponse) {
+		t.Errorf("expected %+v, was %+v", correctResponse, resp)
+	}
+}
